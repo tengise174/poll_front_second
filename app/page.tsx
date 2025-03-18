@@ -1,3 +1,12 @@
+'use client'
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 export default function Home() {
-  return <div className="bg-red-400">rfgrege</div>;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/editor");
+  }, []);
+  return <div></div>;
 }

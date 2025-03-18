@@ -1,5 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
 
+
+export interface CustomHeaderProps {
+  
+}
+
 export interface FormItemProps {
   itemType?: string;
   span?: number;
