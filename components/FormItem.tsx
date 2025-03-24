@@ -10,6 +10,7 @@ const FormItem = ({
   required,
   rules,
   hidePasswordSuggest,
+  value,
   ...props
 }: FormItemProps) => {
   return (
@@ -30,6 +31,7 @@ const FormItem = ({
                   allowClear
                   required={required}
                   hidePasswordSuggest={hidePasswordSuggest}
+                  value={value}
                   {...props}
                 />
               );

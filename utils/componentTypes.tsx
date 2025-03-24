@@ -1,9 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-
-export interface CustomHeaderProps {
-  
-}
+export interface CustomHeaderProps {}
 
 export interface FormItemProps {
   itemType?: string;
@@ -16,6 +13,7 @@ export interface FormItemProps {
   hidePasswordSuggest?: boolean;
   onChange?: any;
   className?: string;
+  value?: string;
 }
 
 export interface CustomInputType {
@@ -91,6 +89,26 @@ export interface QuestionTypeProps {
     | null;
 }
 
+interface SettingsPageProps {
+  isTemplate: boolean;
+  isAccessLevel: boolean;
+  isTimeSelected: boolean;
+  isDuration: boolean;
+  isPollsterNumber: boolean;
+  selectedSettingItem: "TEMPLATE" | "ACCESS_LEVEL" | "POLLSTER_NUMBER" | "EMPLOYEE_MANAGE" | "";
+}
+
+interface StartPageProps {
+  title: string;
+  greetingMessage: string;
+  btnLabel: string;
+}
+
+export interface SettingsEditorProps {
+  settingsPage: SettingsPageProps;
+  setSettingsPage: Dispatch<SetStateAction<SettingsPageProps>>;
+}
+
 export interface StartShapeEditorProps {
   id: string;
   activeColor: number;
@@ -104,16 +122,10 @@ export interface StartShapeEditorProps {
         themeId: number;
       }
     | undefined;
-  hideMark: boolean;
-  setHideMark: Dispatch<SetStateAction<boolean>>;
   logoPosition: string;
   setLogoPosition: Dispatch<SetStateAction<string>>;
-}
-
-interface StartPageProps {
-  title: string;
-  greetingMessage: string;
-  btnLabel: string;
+  startPage: StartPageProps;
+  setStartPage: Dispatch<SetStateAction<StartPageProps>>;
 }
 
 export interface StartTextEditorProps {
@@ -135,6 +147,7 @@ interface QuestionProps {
     | null;
   minAnswerCount?: number;
   order: number;
+  rateNumber?: number;
   id?: number;
 }
 
@@ -161,11 +174,23 @@ export interface QuestionSquareEditorProps {
 }
 
 export interface QuestionTextEditorProps {
+  id: string;
+  setChosenType: Dispatch<SetStateAction<ChosenTypeProps>>;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  templateQuestions: {
+    id: string;
+    options: Array<any>;
+    content: string;
+  }[];
   newQuestions: QuestionProps[];
   setNewQuestions: Dispatch<SetStateAction<Array<QuestionProps>>>;
   currentPage: number;
   currentQuestion: QuestionProps | undefined;
   setCurrentQuestion: Dispatch<SetStateAction<QuestionProps | undefined>>;
+}
+
+export interface SettingsDisplayProps {
+  settingsPage: SettingsPageProps;
 }
 
 export interface StartDisplayProps {
@@ -174,7 +199,6 @@ export interface StartDisplayProps {
   activeColor: number;
   logoPosition: string;
   uploadedImage: string | null;
-  hideMark: boolean;
 }
 
 export interface QuestionDisplayProps {
@@ -182,14 +206,12 @@ export interface QuestionDisplayProps {
   setChosenType: Dispatch<SetStateAction<ChosenTypeProps>>;
   dualColors: string[][];
   activeColor: number;
-  setActiveLayout: Dispatch<SetStateAction<"shape" | "text" | "square">>;
   currentPage: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
   currentQuestion: QuestionProps | undefined;
   setCurrentQuestion: Dispatch<SetStateAction<QuestionProps | undefined>>;
   newQuestions: QuestionProps[];
   setNewQuestions: Dispatch<SetStateAction<Array<QuestionProps>>>;
-  customQuestionLimit: number | undefined;
 }
 
 interface endPageProps {
@@ -203,7 +225,6 @@ export interface EndDisplayProps {
   activeColor: number;
   logoPosition: string;
   uploadedImage: string | null;
-  hideMark: boolean;
 }
 
 export interface StartEditorProps {

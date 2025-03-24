@@ -1,3 +1,4 @@
+import '@ant-design/v5-patch-for-react-19';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -32,6 +33,20 @@ export default function RootLayout({
             activeBorderColor: '#492DC2',
             hoverBorderColor: '#492DC2',
             colorPrimaryHover: '#492DC2',
+          },
+          Switch: {
+            colorPrimary: '#492DC2',
+            colorPrimaryHover: '#492DC2',
+          },
+          DatePicker: {
+            activeBorderColor: '#492DC2',
+            hoverBorderColor: '#492DC2',
+          },
+          InputNumber: {
+            activeBorderColor: '#492DC2',
+            hoverBorderColor: '#492DC2',
+            colorText: '#492DC2',
+            handleHoverColor: '#492DC2',
           }
         },
       }}

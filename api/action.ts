@@ -59,3 +59,12 @@ export const getProfile = async() => {
     throw error;
   } 
 } 
+
+export const updateProfile = async(data: any) => {
+  try {
+    const response = await instance.post("/auth/update-profile")
+    return response.data;
+  } catch(error: any) {
+    throw error;
+  } 
+} 
