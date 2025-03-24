@@ -11,6 +11,7 @@ const FormItem = ({
   rules,
   hidePasswordSuggest,
   value,
+  placeholder,
   ...props
 }: FormItemProps) => {
   return (
@@ -32,6 +33,7 @@ const FormItem = ({
                   required={required}
                   hidePasswordSuggest={hidePasswordSuggest}
                   value={value}
+                  placeholder={placeholder}
                   {...props}
                 />
               );

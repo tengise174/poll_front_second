@@ -18,6 +18,7 @@ const CustomInput = ({
   hidePasswordSuggest,
   onChange,
   showPasswordProgress,
+  placeholder,
   ...props
 }: CustomInputType & {
   tooltipBgColor?: string;
@@ -85,6 +86,7 @@ const CustomInput = ({
         value={value}
         allowClear={false}
         onChange={onChange}
+        placeholder={placeholder}
         {...props}
       />
     );
@@ -110,6 +112,7 @@ const CustomInput = ({
             {isPasswordVisible ? <Eye /> : <EyeInvisible />}
           </div>
         }
+        placeholder={placeholder}
         {...props}
       />
       {showPasswordProgress && value && value?.length > 0 && (
@@ -141,6 +144,7 @@ const CustomInput = ({
         value={value}
         allowClear={false}
         onChange={onChange}
+        placeholder={placeholder}
         {...props}
       />
     </div>

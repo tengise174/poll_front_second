@@ -85,7 +85,10 @@ const SettingsEditor = ({
               ? () => {
                   setSettingsPage((prev) => ({
                     ...prev,
-                    selectedSettingItem: prev.selectedSettingItem === "ACCESS_LEVEL" ? "" : "ACCESS_LEVEL",
+                    selectedSettingItem:
+                      prev.selectedSettingItem === "ACCESS_LEVEL"
+                        ? ""
+                        : "ACCESS_LEVEL",
                   }));
                 }
               : undefined
@@ -252,7 +255,10 @@ const SettingsEditor = ({
           onClick={() => {
             setSettingsPage((prev) => ({
               ...prev,
-              selectedSettingItem: prev.selectedSettingItem === "EMPLOYEE_MANAGE" ? "" : "EMPLOYEE_MANAGE",
+              selectedSettingItem:
+                prev.selectedSettingItem === "EMPLOYEE_MANAGE"
+                  ? ""
+                  : "EMPLOYEE_MANAGE",
             }));
           }}
           className="cursor-pointer flex items-center"

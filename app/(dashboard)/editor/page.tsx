@@ -61,6 +61,15 @@ export default function SurveyDetailPage() {
       | "POLLSTER_NUMBER"
       | "EMPLOYEE_MANAGE"
       | "";
+    templateProps: {
+      tempTitle: string;
+      extraDesc: string;
+      useFields: {
+        EDUCATION: number;
+        HUMAN_RESOURCES: number;
+        OTHER: number;
+      };
+    };
   }>({
     isTemplate: false,
     isAccessLevel: false,
@@ -68,6 +77,15 @@ export default function SurveyDetailPage() {
     isDuration: false,
     isPollsterNumber: false,
     selectedSettingItem: "",
+    templateProps: {
+      tempTitle: "",
+      extraDesc: "",
+      useFields: {
+        EDUCATION: 1,
+        HUMAN_RESOURCES: 0,
+        OTHER: 1,
+      },
+    },
   });
 
   const [startPage, setStartPage] = useState<{
@@ -143,6 +161,8 @@ export default function SurveyDetailPage() {
       setLogoPosition(themePage.logoPosition);
     }
   }, [themePage]);
+
+  // console.log(settingsPage);
 
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">
@@ -229,6 +249,7 @@ export default function SurveyDetailPage() {
           {activeSection === 0 && (
             <SettingsDisplay
               settingsPage={settingsPage}
+              setSettingsPage={setSettingsPage}
             />
           )}
           {activeSection === 1 && (

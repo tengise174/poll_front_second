@@ -14,6 +14,7 @@ export interface FormItemProps {
   onChange?: any;
   className?: string;
   value?: string;
+  placeholder?: string;
 }
 
 export interface CustomInputType {
@@ -88,14 +89,27 @@ export interface QuestionTypeProps {
     | "TEXT"
     | null;
 }
-
 interface SettingsPageProps {
   isTemplate: boolean;
   isAccessLevel: boolean;
   isTimeSelected: boolean;
   isDuration: boolean;
   isPollsterNumber: boolean;
-  selectedSettingItem: "TEMPLATE" | "ACCESS_LEVEL" | "POLLSTER_NUMBER" | "EMPLOYEE_MANAGE" | "";
+  selectedSettingItem:
+    | "TEMPLATE"
+    | "ACCESS_LEVEL"
+    | "POLLSTER_NUMBER"
+    | "EMPLOYEE_MANAGE"
+    | "";
+  templateProps: {
+    tempTitle: string;
+    extraDesc: string;
+    useFields: {
+      EDUCATION: number;
+      HUMAN_RESOURCES: number;
+      OTHER: number;
+    };
+  };
 }
 
 interface StartPageProps {
@@ -105,6 +119,16 @@ interface StartPageProps {
 }
 
 export interface SettingsEditorProps {
+  settingsPage: SettingsPageProps;
+  setSettingsPage: Dispatch<SetStateAction<SettingsPageProps>>;
+}
+
+export interface SettingsDisplayProps {
+  settingsPage: SettingsPageProps;
+  setSettingsPage: Dispatch<SetStateAction<SettingsPageProps>>;
+}
+
+export interface MakeTempCardProps {
   settingsPage: SettingsPageProps;
   setSettingsPage: Dispatch<SetStateAction<SettingsPageProps>>;
 }
@@ -187,10 +211,6 @@ export interface QuestionTextEditorProps {
   currentPage: number;
   currentQuestion: QuestionProps | undefined;
   setCurrentQuestion: Dispatch<SetStateAction<QuestionProps | undefined>>;
-}
-
-export interface SettingsDisplayProps {
-  settingsPage: SettingsPageProps;
 }
 
 export interface StartDisplayProps {
