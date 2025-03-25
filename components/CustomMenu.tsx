@@ -2,7 +2,7 @@
 
 import { Button, ConfigProvider, Menu, MenuProps } from "antd";
 import Sider from "antd/es/layout/Sider";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 
@@ -29,6 +29,7 @@ const baseItems: MenuItem[] = [
 
 const CustomMenu = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [hydration, setHydration] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [items, setItems] = useState<MenuItem[]>(baseItems);

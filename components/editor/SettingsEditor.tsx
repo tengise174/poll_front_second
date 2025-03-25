@@ -3,7 +3,7 @@
 import { DatePicker, InputNumber, Switch } from "antd";
 import CustomInput from "../CustomInput";
 import { useState } from "react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { SettingsEditorProps } from "@/utils/componentTypes";
 
 const startPageInputClass =
@@ -163,6 +163,12 @@ const SettingsEditor = ({
                 format="YYYY-MM-DD HH:mm:ss"
                 placeholder="Эхлэх хугацаа сонгоно уу"
                 className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple"
+                onChange={(date: Dayjs | null) => {
+                  setSettingsPage((prev) => ({
+                    ...prev,
+                    startTime: date?.format("YYYY-MM-DD HH:mm:ss"),
+                  }));
+                }}
               />
             </div>
             <div className="flex flex-row justify-between items-center">
@@ -172,6 +178,13 @@ const SettingsEditor = ({
                 format="YYYY-MM-DD HH:mm:ss"
                 placeholder="Дуусах хугацаа сонгоно уу"
                 className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple"
+                onChange={(date: Dayjs | null) => {
+                  setSettingsPage((prev) => ({
+                    ...prev,
+                    endDate:
+                      date?.format("YYYY-MM-DD HH:mm:ss")?.toString() ?? "",
+                  }));
+                }}
               />
             </div>
           </div>
@@ -204,7 +217,15 @@ const SettingsEditor = ({
         {settingsPage.isDuration && (
           <div className="w-full flex flex-row justify-between items-center">
             <p className="text-xs">/МИН/</p>
-            <InputNumber className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple" />
+            <InputNumber
+              onChange={(value) =>
+                setSettingsPage((prev) => ({
+                  ...prev,
+                  duration: Number(value),
+                }))
+              }
+              className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple"
+            />
           </div>
         )}
       </div>
@@ -238,7 +259,15 @@ const SettingsEditor = ({
         {settingsPage.isPollsterNumber && (
           <div className="w-full flex flex-row justify-between items-center">
             <p className="text-xs">Тоо</p>
-            <InputNumber className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple" />
+            <InputNumber
+              onChange={(value) =>
+                setSettingsPage((prev) => ({
+                  ...prev,
+                  pollsterNumber: Number(value),
+                }))
+              }
+              className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple"
+            />
           </div>
         )}
       </div>

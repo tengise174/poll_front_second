@@ -95,6 +95,10 @@ interface SettingsPageProps {
   isTimeSelected: boolean;
   isDuration: boolean;
   isPollsterNumber: boolean;
+  startDate: string;
+  endDate: string;
+  duration: number;
+  pollsterNumber: number| null;
   selectedSettingItem:
     | "TEMPLATE"
     | "ACCESS_LEVEL"

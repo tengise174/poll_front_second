@@ -4,22 +4,28 @@ import CustomButton from "@/components/CustomButton";
 import ArrowRightIcon from "@/public/icons/arrow_right";
 import SeedIcon from "@/public/icons/seed";
 import RateStarIcon from "@/public/icons/rate_star";
-import { Checkbox, ConfigProvider, Input, Radio, Rate } from "antd";
+import { Checkbox, ConfigProvider, Input, Radio, Rate, theme } from "antd";
 import React, { useEffect, useState } from "react";
+import BoxIcon from "@/public/icons/box_icon";
+import { dualColors } from "@/utils/utils";
+import TextArea from "antd/es/input/TextArea";
 
 const data = {
   id: "62c4712a-4cd0-4b61-8041-0ed2569aa32a",
-  name: "Ажлын байрны стресс",
   startPage: {
-    title:
-      " Ажил үүргийн ачаалал, хугацааны шахалт, болон ажлын орчинтой холбоотойгоор үүсдэг сэтгэл зүйн дарамт бөгөөд ажилтны эрүүл мэнд, бүтээмжид сөргөөр нөлөөлдөг.",
-    greetingMessage:
-      "Mind Metrix-ийн бүтээгдэхүүний судалгаа хийх зорилгоор үүсгэсэн survey",
+    title: "Асулгын гарчиг байрлана",
+    greetingMessage: "Асуулгын тайлбар байрлана",
     btnLabel: "Эхлэх",
-    imagePosition: "TOP_CENTER",
-    showAppLogo: true,
-    surveyLogoUrl: "1",
-    tip: "Зөв, буруу хариулт байхгүй тул удаан бодолгүй хариулаарай.",
+  },
+  themePage: {
+    logoPosition: "TOP_CENTER",
+    showWaterMark: true,
+    themeId: 0,
+  },
+  settingsPage: {
+    startDate: "2023-06-01",
+    endDate: "2023-06-30",
+    duration: 30,
   },
   questions: [
     {
@@ -28,8 +34,8 @@ const data = {
       custom: false,
       content:
         "Ихэнх үед ажил дээрээ байхад би амьдралаа хянаж, зохицуулж чадахгүй байгаа мэт санагддаг",
-      type: "multi",
-      reqNumber: 3,
+      type: "MULTI_CHOICE",
+      minAnswerCount: 3,
       maxrixRows: null,
       options: [
         {
@@ -205,8 +211,8 @@ const data = {
       custom: false,
       content:
         "Хэрэв надад илүү их хугацаа байсан бол би ажлаа илүү сайн хийх байсан",
-      type: "single",
-      reqNumber: 2,
+      type: "SINGLE_CHOICE",
+      minAnswerCount: 2,
       maxrixRows: null,
       options: [
         {
@@ -242,8 +248,8 @@ const data = {
       custom: false,
       content:
         "Ихэнх үед ажил дээрээ байхад би амьдралаа хянаж, зохицуулж чадахгүй байгаа мэт санагддаг",
-      type: "multi",
-      reqNumber: 2,
+      type: "MULTI_CHOICE",
+      minAnswerCount: 2,
       maxrixRows: null,
       options: [
         {
@@ -279,10 +285,10 @@ const data = {
       custom: false,
       content:
         "Ихэнх үед ажил дээрээ байхад би амьдралаа хянаж, зохицуулж чадахгүй байгаа мэт санагддаг",
-      type: "rate",
-      reqNumber: 0,
+      type: "RATE",
+      minAnswerCount: 0,
       rateNumber: 6,
-      rateType: "number" /** 'number' || 'icon' */,
+      rateType: "NUMBER" /** 'number' || 'icon' */,
       maxrixRows: null,
       options: [
         {
@@ -298,8 +304,8 @@ const data = {
       custom: false,
       content:
         "Ихэнх үед ажил дээрээ байхад би амьдралаа хянаж, зохицуулж чадахгүй байгаа мэт санагддаг",
-      type: "radio",
-      reqNumber: 0,
+      type: "YES_NO",
+      minAnswerCount: 0,
       maxrixRows: null,
       options: [
         {
@@ -320,8 +326,8 @@ const data = {
       custom: false,
       content:
         "Ихэнх үед ажил дээрээ байхад би амьдралаа хянаж, зохицуулж чадахгүй байгаа мэт санагддаг",
-      type: "input",
-      reqNumber: 0,
+      type: "TEXT",
+      minAnswerCount: 0,
       maxrixRows: null,
       options: [],
     },
@@ -332,16 +338,24 @@ const data = {
   },
 };
 
-const custStyle = {
-  backgroundColor: "#101820",
-  primaryColor: "#FEE715",
-};
-
 export default function TestPage() {
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: number]: any }>({});
   const [rateValue, setRateValue] = useState<number>(0);
+  const [custStyle, setCustStyle] = useState<{
+    backgroundColor: string;
+    primaryColor: string;
+  }>({ backgroundColor: "#FDFDFD", primaryColor: "#2C2C2C" });
+
+  useEffect(() => {
+    if (data && data.themePage.themeId) {
+      setCustStyle({
+        backgroundColor: dualColors[data.themePage.themeId][0],
+        primaryColor: dualColors[data.themePage.themeId][1],
+      });
+    }
+  }, [data]);
 
   const handleChange = (questionId: number, value?: any) => {
     setAnswers((prevAnswers) => ({
@@ -354,18 +368,18 @@ export default function TestPage() {
     if (answers) console.log(answers);
   }, [answers]);
 
-  const hasAnswered = (id: number, reqNumber: number, type: string) => {
-    if (type === "multi") {
+  const hasAnswered = (id: number, minAnswerCount: number, type: string) => {
+    if (type === "MULTI_CHOICE") {
       if (answers[id] === undefined) return false;
       else {
-        return answers[id] ? answers[id].length >= reqNumber : false;
+        return answers[id] ? answers[id].length >= minAnswerCount : false;
       }
     }
 
-    if (type === "single" || type === "rate" || type === "radio")
+    if (type === "SINGLE_CHOICE" || type === "RATE" || type === "YES_NO")
       return answers[id] !== undefined;
 
-    if (type === "input")
+    if (type === "TEXT")
       return answers[id] !== undefined && answers[id].trim().length > 0;
 
     return true;
@@ -391,16 +405,16 @@ export default function TestPage() {
     >
       <div
         className={`h-[49px] flex flex-row items-center ${
-          data.startPage.imagePosition === "TOP_LEFT"
+          data.themePage.logoPosition === "TOP_LEFT"
             ? "justify-start"
-            : data.startPage.imagePosition === "TOP_CENTER"
+            : data.themePage.logoPosition === "TOP_CENTER"
             ? "justify-center"
-            : data.startPage.imagePosition === "TOP_RIGHT"
+            : data.themePage.logoPosition === "TOP_RIGHT"
             ? "justify-end"
             : ""
         } `}
       >
-        <SeedIcon className={`h-full w-auto`} />
+        <BoxIcon className={`h-full w-auto`} />
       </div>
       <div
         className={`flex flex-1 flex-col items-center py-[72px] overflow-hidden`}
@@ -412,13 +426,13 @@ export default function TestPage() {
                 style={{ color: custStyle.primaryColor }}
                 className={`text-center text-5xl font-semibold`}
               >
-                {data.name}
+                {data.startPage.title}
               </h1>
               <p
                 style={{ color: custStyle.primaryColor }}
                 className={`text-center text-base font-medium`}
               >
-                {data.startPage.title}
+                {data.startPage.greetingMessage}
               </p>
               <div className={`flex flex-col items-center gap-[10px]`}>
                 <p
@@ -430,7 +444,7 @@ export default function TestPage() {
                 <div
                   className={`rounded-[99px] px-5 py-[5px] bg-[#434343] text-white text-sm font-medium`}
                 >
-                  24 мин
+                  {data.settingsPage.duration} мин
                 </div>
               </div>
             </div>
@@ -472,7 +486,7 @@ export default function TestPage() {
               }}
             >
               <div className="w-full h-[90%]">
-                {orderedQuestions[questionNo].type === "multi" && (
+                {orderedQuestions[questionNo].type === "MULTI_CHOICE" && (
                   <Checkbox.Group
                     value={answers[orderedQuestions[questionNo].id] || []}
                     onChange={(checkedValues) =>
@@ -495,7 +509,7 @@ export default function TestPage() {
                     ))}
                   </Checkbox.Group>
                 )}
-                {orderedQuestions[questionNo].type === "single" && (
+                {orderedQuestions[questionNo].type === "SINGLE_CHOICE" && (
                   <Radio.Group
                     onChange={(e) =>
                       handleChange(
@@ -504,12 +518,12 @@ export default function TestPage() {
                       )
                     }
                     value={answers[orderedQuestions[questionNo].id]}
-                    className="flex flex-col gap-3 w-full max-h-full overflow-y-auto"
+                    className="flex flex-col w-full max-h-full overflow-y-auto"
                   >
                     {orderedQuestions[questionNo].options.map((item, index) => (
                       <Radio
                         style={{ color: custStyle.primaryColor }}
-                        className={`custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3 bg-transparent`}
+                        className={`custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent`}
                         key={index}
                         value={item}
                       >
@@ -518,7 +532,7 @@ export default function TestPage() {
                     ))}
                   </Radio.Group>
                 )}
-                {orderedQuestions[questionNo].type === "rate" && (
+                {orderedQuestions[questionNo].type === "RATE" && (
                   <div className="w-full flex items-center justify-center">
                     <Rate
                       count={orderedQuestions[questionNo].rateNumber}
@@ -528,7 +542,7 @@ export default function TestPage() {
                         setRateValue(value);
                       }}
                       character={({ index = 0 }) =>
-                        orderedQuestions[questionNo].rateType === "number" ? (
+                        orderedQuestions[questionNo].rateType === "NUMBER" ? (
                           <span
                             className={`text-base font-semibold font-open`}
                             style={{
@@ -553,7 +567,7 @@ export default function TestPage() {
                     />
                   </div>
                 )}
-                {orderedQuestions[questionNo].type === "radio" && (
+                {orderedQuestions[questionNo].type === "YES_NO" && (
                   <Radio.Group
                     optionType="button"
                     buttonStyle="solid"
@@ -564,7 +578,7 @@ export default function TestPage() {
                       )
                     }
                     value={answers[orderedQuestions[questionNo].id]}
-                    className="flex flex-col gap-3 w-full"
+                    className="flex flex-col w-full"
                   >
                     {orderedQuestions[questionNo].options.map(
                       (option, index) => (
@@ -572,6 +586,7 @@ export default function TestPage() {
                           style={{ color: custStyle.primaryColor }}
                           key={index}
                           value={option}
+                          className="!w-full !mt-3"
                         >
                           {option.content}
                         </Radio>
@@ -579,8 +594,8 @@ export default function TestPage() {
                     )}
                   </Radio.Group>
                 )}
-                {orderedQuestions[questionNo].type === "input" && (
-                  <Input
+                {orderedQuestions[questionNo].type === "TEXT" && (
+                  <TextArea
                     onChange={(e) =>
                       handleChange(
                         orderedQuestions[questionNo].id,
@@ -617,12 +632,12 @@ export default function TestPage() {
                     ? "Дуусгах"
                     : "Цааш"
                 }
-                className="h-9 w-[220px] rounded-[99px] text-[13px] font-semibold"
+                className="h-9 w-[220px] rounded-[99px] text-[13px] font-semibold cursor-pointer"
                 style={{
                   color: custStyle.backgroundColor,
                   backgroundColor: hasAnswered(
                     orderedQuestions[questionNo].id,
-                    orderedQuestions[questionNo].reqNumber,
+                    orderedQuestions[questionNo].minAnswerCount,
                     orderedQuestions[questionNo].type
                   )
                     ? custStyle.primaryColor
@@ -631,7 +646,7 @@ export default function TestPage() {
                 disabled={
                   !hasAnswered(
                     orderedQuestions[questionNo].id,
-                    orderedQuestions[questionNo].reqNumber,
+                    orderedQuestions[questionNo].minAnswerCount,
                     orderedQuestions[questionNo].type
                   )
                 }
@@ -655,7 +670,7 @@ export default function TestPage() {
               >
                 Таны судалгаа амжилттай илгээгдлээ
               </p>
-              <SeedIcon />
+              <BoxIcon />
             </div>
             <CustomButton
               style={{
@@ -693,13 +708,13 @@ export default function TestPage() {
               className={`text-[8px] font-normal`}
               style={{ color: custStyle.primaryColor }}
             >
-              Судалгааг үүсгэгч
+              Асуулга үүсгэгч
             </p>
             <p
               className={`text-sm font-medium`}
               style={{ color: custStyle.primaryColor }}
             >
-              OptimalNMAX LLC
+              MPoll
             </p>
           </div>
         )}

@@ -41,3 +41,50 @@ body {
 .custom-divider-1 {
   border-top: 1px solid #d9d9d9 !important;
 }
+
+
+
+.shadow-custom-200 {
+  box-shadow: var(--sds-size-depth-0) var(--sds-size-depth-025)
+    var(--sds-size-depth-100) var(--sds-size-depth-0) var(--sds-color-black-200);
+}
+
+.custom-radio .ant-radio-checked .ant-radio-inner {
+  @apply border-[#D9D9D9] bg-inherit;
+}
+
+.custom-radio .ant-radio-inner::after {
+  background-color: var(--primary-color, black);
+}
+
+.circle-checkbox .ant-checkbox-inner {
+  background-color: inherit;
+  position: relative;
+  border-radius: 50%;
+  border: 1px solid #d9d9d9;
+  width: 22px;
+  height: 22px;
+}
+
+.circle-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: transparent;
+  border-color: #d9d9d9;
+}
+
+.circle-checkbox .ant-checkbox-inner::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 0px;
+  background-color: var(--primary-color, black);
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.circle-checkbox .ant-checkbox-checked .ant-checkbox-inner::after {
+  display: block;
+}

@@ -55,6 +55,10 @@ export default function SurveyDetailPage() {
     isTimeSelected: boolean;
     isDuration: boolean;
     isPollsterNumber: boolean;
+    startDate: string;
+    endDate: string;
+    duration: number;
+    pollsterNumber: number | null;
     selectedSettingItem:
       | "TEMPLATE"
       | "ACCESS_LEVEL"
@@ -76,6 +80,10 @@ export default function SurveyDetailPage() {
     isTimeSelected: false,
     isDuration: false,
     isPollsterNumber: false,
+    startDate: "",
+    endDate: "",
+    duration: 0,
+    pollsterNumber: null,
     selectedSettingItem: "",
     templateProps: {
       tempTitle: "",
@@ -162,7 +170,7 @@ export default function SurveyDetailPage() {
     }
   }, [themePage]);
 
-  // console.log(settingsPage);
+  console.log(settingsPage);
 
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">
