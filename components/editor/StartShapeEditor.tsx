@@ -1,16 +1,14 @@
 "use client";
-import ColorFilterIcon from "@/public/icons/color_filter";
-import ScreenMirrorIcon from "@/public/icons/screen_mirror";
+import React, { useRef, useState } from "react";
+import { message, Modal } from "antd";
+import CustomButton from "../CustomButton";
+import CustomInput from "../CustomInput";
+import LogoAlignSection from "../LogoAlignSection";
 import { StartShapeEditorProps } from "@/utils/componentTypes";
 import { dualColors } from "@/utils/utils";
-import { message, Modal, Switch } from "antd";
-import React, { useEffect, useRef, useState } from "react";
-import CustomButton from "../CustomButton";
-import LogoAlignSection from "../LogoAlignSection";
 import GalleryEditIcon from "@/public/icons/gallery_edit";
 import GalleryIcon from "@/public/icons/gallery";
 import SendSquareIcon from "@/public/icons/send_quare";
-import CustomInput from "../CustomInput";
 
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -79,7 +77,7 @@ const StartShapeEditor = ({
                 title: e.target.value,
               }))
             }
-            defaultValue={startPage?.title}
+            value={startPage?.title}
             className={startPageInputClass}
             placeholder="Судалгааны нэр"
           />
@@ -91,13 +89,13 @@ const StartShapeEditor = ({
             </p>
           </div>
           <CustomInput
+            value={startPage?.greetingMessage}
             onChange={(e: any) =>
               setStartPage((prev) => ({
                 ...prev,
                 greetingMessage: e.target.value,
               }))
             }
-            defaultValue={startPage?.greetingMessage}
             className="w-full bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal"
             placeholder="Судалгааны тайлбар"
             itemType="textarea"
@@ -110,7 +108,7 @@ const StartShapeEditor = ({
             </p>
           </div>
           <CustomInput
-            defaultValue={startPage?.btnLabel}
+            value={startPage?.btnLabel}
             onChange={(e: any) =>
               setStartPage((prev) => ({
                 ...prev,

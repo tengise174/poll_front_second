@@ -1,14 +1,14 @@
 "use client";
 
-import CustomButton from "@/components/CustomButton";
-import ArrowRightIcon from "@/public/icons/arrow_right";
-import SeedIcon from "@/public/icons/seed";
-import RateStarIcon from "@/public/icons/rate_star";
-import { Checkbox, ConfigProvider, Input, Radio, Rate, theme } from "antd";
 import React, { useEffect, useState } from "react";
-import BoxIcon from "@/public/icons/box_icon";
-import { dualColors } from "@/utils/utils";
+import { Checkbox, ConfigProvider, Radio, Rate } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import CustomButton from "@/components/CustomButton";
+import { dualColors } from "@/utils/utils";
+import RateStarIcon from "@/public/icons/rate_star";
+import BoxIcon from "@/public/icons/box_icon";
+import ArrowRightIcon from "@/public/icons/arrow_right";
+
 
 const data = {
   id: "62c4712a-4cd0-4b61-8041-0ed2569aa32a",
@@ -288,7 +288,7 @@ const data = {
       type: "RATE",
       minAnswerCount: 0,
       rateNumber: 6,
-      rateType: "NUMBER" /** 'number' || 'icon' */,
+      rateType: "NUMBER",
       maxrixRows: null,
       options: [
         {

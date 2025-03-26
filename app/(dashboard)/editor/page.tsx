@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { message, Skeleton } from "antd";
-import AddIcon from "@/public/icons/add";
-import { dualColors } from "@/utils/utils";
+import { useParams } from "next/navigation";
 import StartShapeEditor from "@/components/editor/StartShapeEditor";
 import QuestionTextEditor from "@/components/editor/QuestionTextEditor";
 import StartDisplay from "@/components/editor/StartDisplay";
@@ -13,41 +10,19 @@ import EndEditor from "@/components/editor/EndEditor";
 import EndDisplay from "@/components/editor/EndDisplay";
 import SettingsEditor from "@/components/editor/SettingsEditor";
 import SettingsDisplay from "@/components/editor/SettingsDisplay";
+import { dualColors } from "@/utils/utils";
+import AddIcon from "@/public/icons/add";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
-  const router = useRouter();
   const [activeSection, setActiveSection] = useState(0);
   const [logoPosition, setLogoPosition] = useState<string>("TOP_MIDDLE");
   const [activeColor, setActiveColor] = useState<number>(0);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [chosenType, setChosenType] = useState<
-    | "MULTI_CHOICE"
-    | "SINGLE_CHOICE"
-    | "STAR_RATING"
-    | "NUMBER_RATING"
-    | "YES_NO"
-    | "TEXT"
-    | null
+    "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | null
   >(null);
   const [currentPage, setCurrentPage] = useState(0);
-
-  const [currentQuestion, setCurrentQuestion] = useState<{
-    content: string;
-    options?: Array<{ content: string }>;
-    questionType:
-      | "MULTI_CHOICE"
-      | "SINGLE_CHOICE"
-      | "STAR_RATING"
-      | "NUMBER_RATING"
-      | "YES_NO"
-      | "TEXT"
-      | null;
-    minAnswerCount?: number;
-    rateNumber?: number;
-    order: number;
-    id?: number;
-  }>();
 
   const [settingsPage, setSettingsPage] = useState<{
     isTemplate: boolean;
@@ -57,7 +32,7 @@ export default function SurveyDetailPage() {
     isPollsterNumber: boolean;
     startDate: string;
     endDate: string;
-    duration: number;
+    duration: number | null;
     pollsterNumber: number | null;
     selectedSettingItem:
       | "TEMPLATE"
@@ -69,9 +44,9 @@ export default function SurveyDetailPage() {
       tempTitle: string;
       extraDesc: string;
       useFields: {
-        EDUCATION: number;
-        HUMAN_RESOURCES: number;
-        OTHER: number;
+        EDUCATION: boolean;
+        HUMAN_RESOURCES: boolean;
+        OTHER: boolean;
       };
     };
   }>({
@@ -82,16 +57,16 @@ export default function SurveyDetailPage() {
     isPollsterNumber: false,
     startDate: "",
     endDate: "",
-    duration: 0,
+    duration: null,
     pollsterNumber: null,
     selectedSettingItem: "",
     templateProps: {
       tempTitle: "",
       extraDesc: "",
       useFields: {
-        EDUCATION: 1,
-        HUMAN_RESOURCES: 0,
-        OTHER: 1,
+        EDUCATION: true,
+        HUMAN_RESOURCES: false,
+        OTHER: false,
       },
     },
   });
@@ -124,6 +99,23 @@ export default function SurveyDetailPage() {
     Array<{ id: string; options: Array<any>; content: string }>
   >([]);
 
+  const [currentQuestion, setCurrentQuestion] = useState<{
+    content: string;
+    options?: Array<{ content: string }>;
+    questionType:
+      | "MULTI_CHOICE"
+      | "SINGLE_CHOICE"
+      | "RATING"
+      | "YES_NO"
+      | "TEXT"
+      | null;
+    minAnswerCount?: number;
+    rateNumber?: number;
+    rateType?: "STAR" | "NUMBER";
+    order: number;
+    id?: number;
+  }>();
+
   const [newQuestions, setNewQuestions] = useState<
     Array<{
       content: string;
@@ -131,14 +123,14 @@ export default function SurveyDetailPage() {
       questionType:
         | "MULTI_CHOICE"
         | "SINGLE_CHOICE"
-        | "STAR_RATING"
-        | "NUMBER_RATING"
+        | "RATING"
         | "YES_NO"
         | "TEXT"
         | null;
       minAnswerCount?: number;
       order: number;
       rateNumber?: number;
+      rateType?: "STAR" | "NUMBER";
       id?: number;
     }>
   >([
@@ -148,6 +140,7 @@ export default function SurveyDetailPage() {
       order: 0,
       minAnswerCount: 1,
       rateNumber: 4,
+      rateType: "STAR",
       options: [],
     },
   ]);

@@ -1,7 +1,6 @@
-import BoxIcon from "@/public/icons/box_icon";
-import SeedIcon from "@/public/icons/seed";
-import { StartDisplayProps } from "@/utils/componentTypes";
 import React from "react";
+import { StartDisplayProps } from "@/utils/componentTypes";
+import BoxIcon from "@/public/icons/box_icon";
 
 const StartDisplay = ({
   startPage,

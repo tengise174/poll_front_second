@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import zxcvbn from "zxcvbn";
 import { Input, Progress } from "antd";
-import { CustomInputType } from "../utils/componentTypes";
+import zxcvbn from "zxcvbn";
 import Eye from "../public/icons/eye";
 import EyeInvisible from "../public/icons/eye_invisible";
+import { CustomInputType } from "../utils/componentTypes";
 
 const CustomInput = ({
   itemType,

@@ -2,16 +2,15 @@ import {
   employeeData,
   pollsterData,
 } from "@/app/(dashboard)/editor/utils/content";
-import { SettingsDisplayProps } from "@/utils/componentTypes";
 import ManageEmpTable from "./ManageEmpTable";
 import AddPollsterTable from "./AddPollsterTable";
 import MakeTempCard from "./MakeTempCard";
+import { SettingsDisplayProps } from "@/utils/componentTypes";
 
 const SettingsDisplay = ({
   settingsPage,
   setSettingsPage,
 }: SettingsDisplayProps) => {
-  console.log(settingsPage);
 
   return (
     <div className="w-full flex justify-center h-full items-center">

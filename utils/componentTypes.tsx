@@ -83,8 +83,7 @@ export interface QuestionTypeProps {
   questionType:
     | "MULTI_CHOICE"
     | "SINGLE_CHOICE"
-    | "STAR_RATING"
-    | "NUMBER_RATING"
+    | "RATING"
     | "YES_NO"
     | "TEXT"
     | null;
@@ -97,7 +96,7 @@ interface SettingsPageProps {
   isPollsterNumber: boolean;
   startDate: string;
   endDate: string;
-  duration: number;
+  duration: number | null;
   pollsterNumber: number| null;
   selectedSettingItem:
     | "TEMPLATE"
@@ -109,9 +108,9 @@ interface SettingsPageProps {
     tempTitle: string;
     extraDesc: string;
     useFields: {
-      EDUCATION: number;
-      HUMAN_RESOURCES: number;
-      OTHER: number;
+      EDUCATION: boolean;
+      HUMAN_RESOURCES: boolean;
+      OTHER: boolean;
     };
   };
 }
@@ -168,22 +167,21 @@ interface QuestionProps {
   questionType:
     | "MULTI_CHOICE"
     | "SINGLE_CHOICE"
-    | "STAR_RATING"
-    | "NUMBER_RATING"
+    | "RATING"
     | "YES_NO"
     | "TEXT"
     | null;
   minAnswerCount?: number;
   order: number;
   rateNumber?: number;
+  rateType?: "STAR" | "NUMBER";
   id?: number;
 }
 
 type ChosenTypeProps =
   | "MULTI_CHOICE"
   | "SINGLE_CHOICE"
-  | "STAR_RATING"
-  | "NUMBER_RATING"
+  | "RATING"
   | "YES_NO"
   | "TEXT"
   | null;

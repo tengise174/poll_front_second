@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { InputNumber, Radio } from "antd";
 import CustomInput from "../CustomInput";
-import { QuestionTextEditorProps } from "@/utils/componentTypes";
-import { InputNumber } from "antd";
-import AddIcon from "@/public/icons/add";
 import CustomButton from "../CustomButton";
+import { QuestionTextEditorProps } from "@/utils/componentTypes";
+import AddIcon from "@/public/icons/add";
+import RateStarIcon from "@/public/icons/rate_star";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -99,6 +100,85 @@ const QuestionTextEditor = ({
             placeholder="Асуултаа энд бичнэ үү?"
           />
         </div>
+
+        {/* New Rate Number Input for STAR_RATING and NUMBER_RATING */}
+        {["RATING"].includes(currentQuestion?.questionType ?? "") && (
+          <div>
+            <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
+              <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
+                Үнэлгээний хамгийн их утга
+              </p>
+              <InputNumber
+                onChange={(value: number | null) => {
+                  const newValue = value || 5; // Default to 5 if null
+                  setNewQuestions((prev) =>
+                    prev.map((item, index) =>
+                      index === currentPage
+                        ? { ...item, rateNumber: newValue }
+                        : item
+                    )
+                  );
+                  if (currentQuestion) {
+                    setCurrentQuestion({
+                      ...currentQuestion,
+                      rateNumber: newValue,
+                    });
+                  }
+                }}
+                value={currentQuestion?.rateNumber || 5}
+                className={`${questionInputClass} flex items-center`}
+                min={1}
+                max={10} // You can adjust the max value as needed
+              />
+            </div>
+            <div className="my-4">
+              <Radio.Group
+                className="w-full"
+                optionType="button"
+                buttonStyle="solid"
+                value={currentQuestion?.rateType || "STAR"}
+                onChange={(e) => {
+                  const updatedQuestions = newQuestions.map((item, index) =>
+                    index === currentPage
+                      ? { ...item, rateType: e.target.value }
+                      : item
+                  );
+                  setNewQuestions(updatedQuestions);
+                  if (currentQuestion) {
+                    setCurrentQuestion({
+                      ...currentQuestion,
+                      rateType: e.target.value,
+                    });
+                  }
+                }}
+              >
+                <div className="flex flex-col gap-2 w-full">
+                  <Radio value={"STAR"}>
+                    <div className="flex flex-row items-center justify-between">
+                      <p>Одтой үнэлгээ</p>
+                      <div className="flex flex-row gap-2">
+                        <RateStarIcon className=" text-yellow-400" />
+                        <RateStarIcon className=" text-yellow-400" />
+                        <RateStarIcon className=" text-yellow-400" />
+                      </div>
+                    </div>
+                  </Radio>
+                  <Radio value={"NUMBER"}>
+                    <div className="flex flex-row items-center justify-between">
+                      <p>Тоон үнэлгээ</p>
+                      <div className="flex flex-row gap-2">
+                        <p className="font-bold text-[17px]">1</p>
+                        <p className="font-bold text-[17px]">2</p>
+                        <p className="font-bold text-[17px]">3</p>
+                      </div>
+                    </div>
+                  </Radio>
+                </div>
+              </Radio.Group>
+            </div>
+          </div>
+        )}
+
         {currentQuestion?.options && currentQuestion?.options.length > 0 && (
           <div>
             {currentQuestion?.questionType === "MULTI_CHOICE" && (
@@ -107,15 +187,20 @@ const QuestionTextEditor = ({
                   Доод сонгох хариултын тоо
                 </p>
                 <InputNumber
-                  onChange={(e: any) =>
+                  onChange={(value: any) => {
+                    setCurrentQuestion((prev) => ({
+                      ...prev!,
+                      minAnswerCount: value || 1,
+                    }));
+
                     setNewQuestions((prev) =>
                       prev.map((item, index) =>
                         index === currentPage
-                          ? { ...item, minAnswerCount: e }
+                          ? { ...item, minAnswerCount: value }
                           : item
                       )
-                    )
-                  }
+                    );
+                  }}
                   defaultValue={1}
                   value={currentQuestion?.minAnswerCount || 1}
                   className={`${questionInputClass} flex items-center`}

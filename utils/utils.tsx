@@ -79,32 +79,27 @@ export const manualStatusTag = ({ status }: { status: string }) => {
 export const questionTypes: QuestionTypeProps[] = [
   {
     icon: <MultipleChoiceIcon />,
-    title: "Multi-choice",
+    title: "Олон сонголт",
     questionType: "MULTI_CHOICE",
   },
   {
     icon: <SingleChoiceIcon />,
-    title: "Single-choice",
+    title: "Нэг сонголт",
     questionType: "SINGLE_CHOICE",
   },
   {
     icon: <RatingChoiceIcon />,
-    title: "Star-rating",
-    questionType: "STAR_RATING",
-  },
-  {
-    icon: <RatingChoiceIcon />,
-    title: "Number-rating",
-    questionType: "NUMBER_RATING",
+    title: "Үнэлгээ",
+    questionType: "RATING",
   },
   {
     icon: <YesNoChoiceIcon />,
-    title: "Yes/No",
+    title: "Тийм/Үгүй",
     questionType: "YES_NO",
   },
   {
     icon: <TextChoiceIcon />,
-    title: "Comment Box",
+    title: "Сэтгэгдэл",
     questionType: "TEXT",
   },
 ];

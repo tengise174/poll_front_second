@@ -1,9 +1,8 @@
 "use client";
 
 import { DatePicker, InputNumber, Switch } from "antd";
-import CustomInput from "../CustomInput";
-import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
+import CustomInput from "../CustomInput";
 import { SettingsEditorProps } from "@/utils/componentTypes";
 
 const startPageInputClass =
@@ -162,11 +161,14 @@ const SettingsEditor = ({
                 showTime
                 format="YYYY-MM-DD HH:mm:ss"
                 placeholder="Эхлэх хугацаа сонгоно уу"
+                value={
+                  settingsPage.startDate ? dayjs(settingsPage.startDate) : null
+                }
                 className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple"
                 onChange={(date: Dayjs | null) => {
                   setSettingsPage((prev) => ({
                     ...prev,
-                    startTime: date?.format("YYYY-MM-DD HH:mm:ss"),
+                    startDate: date ? date.format("YYYY-MM-DD HH:mm:ss") : "",
                   }));
                 }}
               />
@@ -177,12 +179,14 @@ const SettingsEditor = ({
                 showTime
                 format="YYYY-MM-DD HH:mm:ss"
                 placeholder="Дуусах хугацаа сонгоно уу"
+                value={
+                  settingsPage.endDate ? dayjs(settingsPage.endDate) : null
+                }
                 className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple"
                 onChange={(date: Dayjs | null) => {
                   setSettingsPage((prev) => ({
                     ...prev,
-                    endDate:
-                      date?.format("YYYY-MM-DD HH:mm:ss")?.toString() ?? "",
+                    endDate: date ? date.format("YYYY-MM-DD HH:mm:ss") : "",
                   }));
                 }}
               />
@@ -218,6 +222,7 @@ const SettingsEditor = ({
           <div className="w-full flex flex-row justify-between items-center">
             <p className="text-xs">/МИН/</p>
             <InputNumber
+              value={settingsPage.duration}
               onChange={(value) =>
                 setSettingsPage((prev) => ({
                   ...prev,
@@ -260,6 +265,7 @@ const SettingsEditor = ({
           <div className="w-full flex flex-row justify-between items-center">
             <p className="text-xs">Тоо</p>
             <InputNumber
+              value={settingsPage.pollsterNumber}
               onChange={(value) =>
                 setSettingsPage((prev) => ({
                   ...prev,

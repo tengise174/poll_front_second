@@ -1,6 +1,6 @@
-import { FormItemProps } from "../utils/componentTypes";
 import { Col, Form } from "antd";
 import CustomInput from "./CustomInput";
+import { FormItemProps } from "../utils/componentTypes";
 
 const FormItem = ({
   itemType,

@@ -1,6 +1,6 @@
+import React from "react";
 import BoxIcon from "@/public/icons/box_icon";
 import { EndDisplayProps } from "@/utils/componentTypes";
-import React from "react";
 
 const EndDisplay = ({
   endPage,

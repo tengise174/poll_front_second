@@ -1,15 +1,14 @@
-import { Button, Input, Space, Table } from "antd";
 import { useRef, useState } from "react";
-import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Input, Space, Table } from "antd";
+import { EditOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import FormItem from "../FormItem";
 import CustomButton from "../CustomButton";
 
 const ManageEmpTable = ({ dataSource }: any) => {
+  const searchInput = useRef(null);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
-  const searchInput = useRef(null);
 
   const getColumnSearchProps = (dataIndex: any) => ({
     filterDropdown: ({

@@ -1,6 +1,6 @@
+import { Dispatch, SetStateAction } from "react";
 import AlignRightIcon from "@/public/icons/align_right";
 import AlignVertical from "@/public/icons/align_vertical";
-import { Dispatch, SetStateAction } from "react";
 
 const LogoAlignSection = ({
   activeIcon,

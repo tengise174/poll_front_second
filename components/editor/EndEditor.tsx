@@ -1,8 +1,6 @@
-import ColorFilterIcon from "@/public/icons/color_filter";
 import React, { useState } from "react";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
-import { message } from "antd";
 import { StartEditorProps } from "@/utils/componentTypes";
 
 const startPageInputClass =
@@ -28,7 +26,7 @@ const EndEditor = ({ id, endPage, setEndPage }: StartEditorProps) => {
               endTitle: e.target.value,
             }))
           }
-          defaultValue={endPage?.endTitle}
+          value={endPage?.endTitle}
           placeholder="Талархлын үг"
           className={startPageInputClass}
         />
@@ -46,7 +44,7 @@ const EndEditor = ({ id, endPage, setEndPage }: StartEditorProps) => {
               thankYouMessage: e.target.value,
             }))
           }
-          defaultValue={endPage?.thankYouMessage}
+          value={endPage?.thankYouMessage}
           className="w-full bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal"
           itemType="textarea"
           placeholder="Асуулгын тухай тайлбар"
@@ -57,7 +55,7 @@ const EndEditor = ({ id, endPage, setEndPage }: StartEditorProps) => {
         loading={loading}
         disabled={loading}
         titleClassname="text-[#FDFDFD] text-[14px] font-semibold "
-        className="h-[42px] w-full bg-main-purple cursor-pointer rounded-lg flex items-center justify-center mt-[10px] !text-sm"
+        className="!h-[38px] w-full bg-main-purple cursor-pointer rounded-lg flex items-center justify-center mt-[10px] !text-sm"
         title="Дуусгах"
       />
     </div>

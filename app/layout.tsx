@@ -55,6 +55,12 @@ export default function RootLayout({
             activeBorderColor: "#492DC2",
             optionSelectedBg: "#DDCEFB",
           },
+          Radio: {
+            buttonSolidCheckedBg:  "#000000",
+            buttonSolidCheckedHoverBg:  "#000000",
+            colorPrimary:  "#000000",
+            borderRadius: 0,
+          }
         },
       }}
     >

@@ -1,11 +1,9 @@
-import CloseCircleIcon from "@/public/icons/close_circle";
 import React from "react";
-import StarRatingSection from "../StartRatingSection";
-import NumberRatingSection from "../NumberRatingSection";
+import RateSection from "../RatingSection";
 import { questionTypes } from "@/utils/utils";
-import { message } from "antd";
-import AddIcon from "@/public/icons/add";
 import { QuestionDisplayProps } from "@/utils/componentTypes";
+import CloseCircleIcon from "@/public/icons/close_circle";
+import AddIcon from "@/public/icons/add";
 
 const QuestionDisplay = ({
   chosenType,
@@ -100,11 +98,11 @@ const QuestionDisplay = ({
                   Хариултаа бичнэ үү
                 </div>
               )}
-              {currentQuestion?.questionType === "STAR_RATING" && (
-                <StarRatingSection />
-              )}
-              {currentQuestion?.questionType === "NUMBER_RATING" && (
-                <NumberRatingSection />
+              {currentQuestion?.questionType === "RATING" && (
+                <RateSection
+                  rateType={currentQuestion.rateType ?? "NUMBER"}
+                  rateNumber={currentQuestion.rateNumber ?? 5}
+                />
               )}
             </div>
           </div>
