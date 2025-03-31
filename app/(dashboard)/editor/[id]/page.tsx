@@ -67,7 +67,8 @@ export default function SurveyDetailPage() {
           options:
             question.options?.map((option: any) => ({
               content: option.content,
-            })) || [],
+              order: option.order,
+            })).sort((a: any, b: any) => a.order - b.order) || [],
         }))
         .sort((a: any, b: any) => a.order - b.order);
       setChosenType(transformedQuestions[0].questionType);
@@ -128,7 +129,7 @@ export default function SurveyDetailPage() {
 
   const [currentQuestion, setCurrentQuestion] = useState<{
     content: string;
-    options?: Array<{ content: string; }>;
+    options?: Array<{ content: string; order: number }>;
     questionType:
       | "MULTI_CHOICE"
       | "SINGLE_CHOICE"
@@ -146,7 +147,7 @@ export default function SurveyDetailPage() {
   const [newQuestions, setNewQuestions] = useState<
     Array<{
       content: string;
-      options?: Array<{ content: string; }>;
+      options?: Array<{ content: string; order: number }>;
       questionType:
         | "MULTI_CHOICE"
         | "SINGLE_CHOICE"

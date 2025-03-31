@@ -8,19 +8,23 @@ import { dualColors } from "@/utils/utils";
 import RateStarIcon from "@/public/icons/rate_star";
 import BoxIcon from "@/public/icons/box_icon";
 import ArrowRightIcon from "@/public/icons/arrow_right";
-import { useParams } from "next/navigation";
+
 
 const data = {
   id: "62c4712a-4cd0-4b61-8041-0ed2569aa32a",
-  title: "Асулгын гарчиг байрлана",
-  greetingMessage: "Асуулгын тайлбар байрлана",
-  btnLabel: "Эхлэх",
-  endTitle: "Thank you for your time!",
-  thankYouMessage: "Баярлалаа",
-  themeId: 2,
-  startDate: "2023-06-01",
-  endDate: "2023-06-30",
-  duration: 30,
+  startPage: {
+    title: "Асулгын гарчиг байрлана",
+    greetingMessage: "Асуулгын тайлбар байрлана",
+    btnLabel: "Эхлэх",
+  },
+  themePage: {
+    themeId: 0,
+  },
+  settingsPage: {
+    startDate: "2023-06-01",
+    endDate: "2023-06-30",
+    duration: 30,
+  },
   questions: [
     {
       id: 1,
@@ -326,11 +330,13 @@ const data = {
       options: [],
     },
   ],
+  endPage: {
+    endTitle: "Thank you for your time!",
+    thankYouMessage: "Баярлалаа",
+  },
 };
 
 export default function TestPage() {
-  const { id } = useParams();
-
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: number]: any }>({});
@@ -341,10 +347,10 @@ export default function TestPage() {
   }>({ backgroundColor: "#FDFDFD", primaryColor: "#2C2C2C" });
 
   useEffect(() => {
-    if (data && data.themeId) {
+    if (data && data.themePage.themeId) {
       setCustStyle({
-        backgroundColor: dualColors[data.themeId][0],
-        primaryColor: dualColors[data.themeId][1],
+        backgroundColor: dualColors[data.themePage.themeId][0],
+        primaryColor: dualColors[data.themePage.themeId][1],
       });
     }
   }, [data]);
@@ -395,7 +401,9 @@ export default function TestPage() {
       }
       className={`p-[30px] flex flex-col font-open h-screen`}
     >
-      <div className={`h-[49px] flex flex-row items-center justify-center`}>
+      <div
+        className={`h-[49px] flex flex-row items-center justify-center`}
+      >
         <BoxIcon className={`h-full w-auto`} />
       </div>
       <div
@@ -408,13 +416,13 @@ export default function TestPage() {
                 style={{ color: custStyle.primaryColor }}
                 className={`text-center text-5xl font-semibold`}
               >
-                {data.title}
+                {data.startPage.title}
               </h1>
               <p
                 style={{ color: custStyle.primaryColor }}
                 className={`text-center text-base font-medium`}
               >
-                {data.greetingMessage}
+                {data.startPage.greetingMessage}
               </p>
               <div className={`flex flex-col items-center gap-[10px]`}>
                 <p
@@ -426,7 +434,7 @@ export default function TestPage() {
                 <div
                   className={`rounded-[99px] px-5 py-[5px] bg-[#434343] text-white text-sm font-medium`}
                 >
-                  {data.duration} мин
+                  {data.settingsPage.duration} мин
                 </div>
               </div>
             </div>
@@ -437,7 +445,7 @@ export default function TestPage() {
                 backgroundColor: custStyle.primaryColor,
                 color: custStyle.backgroundColor,
               }}
-              title={data.btnLabel}
+              title={data.startPage.btnLabel}
               onClick={() => {
                 setStep("questions");
               }}

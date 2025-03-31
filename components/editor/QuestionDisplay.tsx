@@ -167,7 +167,7 @@ const QuestionDisplay = ({
                                 questionType: item.questionType,
 
                                 ...(shouldAddAnswers && {
-                                  options: ["", ""],
+                                  options: [{ content: "", order: 1 }, { content: "", order: 2 }],
                                 }),
                                 order: lastIndex + 1,
                               }
@@ -182,7 +182,7 @@ const QuestionDisplay = ({
                           questionType: item.questionType,
                           ...(shouldAddAnswers
                             ? {
-                                options: ["", ""],
+                              options: [{ content: "", order: 1 }, { content: "", order: 2 }],
                               }
                             : { options: [] }),
                           order: lastIndex + 2,

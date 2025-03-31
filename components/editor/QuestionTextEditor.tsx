@@ -127,7 +127,7 @@ const QuestionTextEditor = ({
                 value={currentQuestion?.rateNumber || 5}
                 className={`${questionInputClass} flex items-center`}
                 min={1}
-                max={10} 
+                max={10}
               />
             </div>
             <div className="my-4">
@@ -229,16 +229,11 @@ const QuestionTextEditor = ({
                                 ...currentQuestion,
                                 options: prev?.options.map(
                                   (
-                                    option: {
-                                      content: string;
-                                    },
+                                    option: { content: string; order: number },
                                     i: number
                                   ) =>
                                     i === answerIndex
-                                      ? {
-                                          ...option,
-                                          content: e.target.value,
-                                        }
+                                      ? { ...option, content: e.target.value }
                                       : option
                                 ),
                               }));
@@ -286,16 +281,24 @@ const QuestionTextEditor = ({
               ) && (
                 <div
                   onClick={() => {
+                    const newOrder =
+                      (currentQuestion?.options?.length || 0) + 1;
                     setCurrentQuestion((prev: any) => ({
                       ...currentQuestion,
-                      options: [...prev.options, { content: "" }],
+                      options: [
+                        ...(prev.options || []),
+                        { content: "", order: newOrder },
+                      ],
                     }));
                     setNewQuestions((prev) =>
                       prev.map((item, index) =>
                         index === currentPage && item.options
                           ? {
                               ...item,
-                              options: [...item.options, { content: "" }],
+                              options: [
+                                ...item.options,
+                                { content: "", order: newOrder },
+                              ],
                             }
                           : item
                       )

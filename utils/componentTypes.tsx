@@ -145,7 +145,7 @@ export interface StartTextEditorProps {
 
 interface QuestionProps {
   content: string;
-  options?: Array<{ content: string; }>;
+  options?: Array<{ content: string; order: number }>;
   questionType:
     | "MULTI_CHOICE"
     | "SINGLE_CHOICE"
