@@ -145,7 +145,6 @@ export interface StartShapeEditorProps {
   themePage:
     | {
         logoPosition: string;
-        showWaterMark: boolean;
         themeId: number;
       }
     | undefined;

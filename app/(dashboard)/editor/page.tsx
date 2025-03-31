@@ -91,7 +91,6 @@ export default function SurveyDetailPage() {
 
   const [themePage, setThemePage] = useState<{
     logoPosition: string;
-    showWaterMark: boolean;
     themeId: number;
   }>();
 
@@ -163,7 +162,6 @@ export default function SurveyDetailPage() {
     }
   }, [themePage]);
 
-  console.log(settingsPage);
 
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">
