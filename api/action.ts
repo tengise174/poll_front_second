@@ -27,16 +27,15 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
 // Sign-up request
 export const signup = async (body: any) => {
   try {
     const response = await instance.post("/auth/signup", body);
     const { accessToken } = response.data;
     localStorage.setItem("token", accessToken);
-    return response.data; 
+    return response.data;
   } catch (error: any) {
-    throw error; 
+    throw error;
   }
 };
 
@@ -44,45 +43,65 @@ export const signin = async (body: any) => {
   try {
     const response = await instance.post("/auth/signin", body);
     const { accessToken } = response.data;
-    localStorage.setItem("token", accessToken); 
-    return response.data; 
+    localStorage.setItem("token", accessToken);
+    return response.data;
   } catch (error: any) {
-    throw error; 
+    throw error;
   }
 };
 
-export const getProfile = async() => {
+export const getProfile = async () => {
   try {
-    const response = await instance.get("/auth/profile")
+    const response = await instance.get("/auth/profile");
     return response.data;
-  } catch(error: any) {
+  } catch (error: any) {
     throw error;
-  } 
-} 
+  }
+};
 
-export const updateProfile = async(data: any) => {
+export const updateProfile = async (data: any) => {
   try {
-    const response = await instance.post("/auth/update-profile")
+    const response = await instance.post("/auth/update-profile");
     return response.data;
-  } catch(error: any) {
+  } catch (error: any) {
     throw error;
-  } 
-} 
+  }
+};
 
-export const createPoll = async(data: any) => {
+export const checkUserExists = async (username: string) => {
   try {
-    const response = await instance.post("/polls", data)
+    const response = await instance.get(
+      `/auth/check-user?username=${username}`
+    );
     return response.data;
-  } catch(error: any) {
+  } catch (error: any) {
     throw error;
-  } 
-} 
+  }
+};
 
-export const getPollById = async(id: string) => {
+export const createPoll = async (data: any) => {
   try {
-    const response = await instance.get(`/polls/${id}`)
+    const response = await instance.post("/polls", data);
     return response.data;
-  } catch(error: any) {
+  } catch (error: any) {
     throw error;
-  } 
-} 
+  }
+};
+
+export const updatePoll = async (id: string, data: any) => {
+  try {
+    const response = await instance.put(`/polls/${id}`, data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getPollById = async (id: string) => {
+  try {
+    const response = await instance.get(`/polls/${id}`);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};

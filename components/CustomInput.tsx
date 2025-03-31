@@ -19,6 +19,7 @@ const CustomInput = ({
   onChange,
   showPasswordProgress,
   placeholder,
+  onPressEnter,
   ...props
 }: CustomInputType & {
   tooltipBgColor?: string;
@@ -87,6 +88,7 @@ const CustomInput = ({
         allowClear={false}
         onChange={onChange}
         placeholder={placeholder}
+        onPressEnter={onPressEnter}
         {...props}
       />
     );
@@ -113,6 +115,7 @@ const CustomInput = ({
           </div>
         }
         placeholder={placeholder}
+        onPressEnter={onPressEnter}
         {...props}
       />
       {showPasswordProgress && value && value?.length > 0 && (

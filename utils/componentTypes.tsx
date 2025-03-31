@@ -15,6 +15,7 @@ export interface FormItemProps {
   className?: string;
   value?: string;
   placeholder?: string;
+  onPressEnter?: any;
 }
 
 export interface CustomInputType {
@@ -36,6 +37,7 @@ export interface CustomInputType {
   onBlur?: any;
   status?: "" | "warning" | "error" | undefined;
   suffix?: any;
+  onPressEnter?: any;
 }
 
 export interface CustomButtonType {
@@ -97,6 +99,7 @@ interface SettingsPageProps {
   endDate: string;
   duration: number | null;
   pollsterNumber: number| null;
+  pollsters: Array<{ username: string }>;
   selectedSettingItem:
     | "ACCESS_LEVEL"
     | "POLLSTER_NUMBER"
@@ -126,15 +129,10 @@ export interface MakeTempCardProps {
 
 export interface StartShapeEditorProps {
   id: string;
-  activeColor: number;
-  setActiveColor: Dispatch<SetStateAction<number>>;
+  themeId: number;
+  setThemeId: Function;
   uploadedImage: string | null;
   setUploadedImage: Dispatch<SetStateAction<string | null>>;
-  themePage:
-    | {
-        themeId: number;
-      }
-    | undefined;
   startPage: StartPageProps;
   setStartPage: Dispatch<SetStateAction<StartPageProps>>;
 }
@@ -147,7 +145,7 @@ export interface StartTextEditorProps {
 
 interface QuestionProps {
   content: string;
-  options?: Array<any>;
+  options?: Array<{ content: string; }>;
   questionType:
     | "MULTI_CHOICE"
     | "SINGLE_CHOICE"
@@ -197,7 +195,7 @@ export interface QuestionTextEditorProps {
 export interface StartDisplayProps {
   startPage: StartPageProps;
   dualColors: string[][];
-  activeColor: number;
+  themeId: number;
   uploadedImage: string | null;
 }
 
@@ -205,7 +203,7 @@ export interface QuestionDisplayProps {
   chosenType: ChosenTypeProps;
   setChosenType: Dispatch<SetStateAction<ChosenTypeProps>>;
   dualColors: string[][];
-  activeColor: number;
+  themeId: number;
   currentPage: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
   currentQuestion: QuestionProps | undefined;
@@ -222,7 +220,7 @@ interface endPageProps {
 export interface EndDisplayProps {
   endPage: endPageProps;
   dualColors: string[][];
-  activeColor: number;
+  themeId: number;
   uploadedImage: string | null;
 }
 

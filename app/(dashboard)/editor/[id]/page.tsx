@@ -12,7 +12,7 @@ import SettingsEditor from "@/components/editor/SettingsEditor";
 import SettingsDisplay from "@/components/editor/SettingsDisplay";
 import { dualColors } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
-import { createPoll, getPollById } from "@/api/action";
+import { createPoll, getPollById, updatePoll } from "@/api/action";
 import { useQuery } from "@tanstack/react-query";
 
 export default function SurveyDetailPage() {
@@ -28,6 +28,8 @@ export default function SurveyDetailPage() {
 
   useEffect(() => {
     if (data) {
+      setThemeId(data.themeId);
+
       setSettingsPage((prev) => ({
         ...prev,
         startDate: data.startDate,
@@ -38,6 +40,7 @@ export default function SurveyDetailPage() {
         isTimeSelected: data.isTimeSelected,
         isDuration: data.isDuration,
         isPollsterNumber: data.isPollsterNumber,
+        pollsters: data.pollsters,
       }));
 
       setStartPage((prev) => ({
@@ -53,8 +56,8 @@ export default function SurveyDetailPage() {
         thankYouMessage: data.thankYouMessage,
       }));
 
-      const transformedQuestions = data.questions.map(
-        (question: any, index: any) => ({
+      const transformedQuestions = data.questions
+        .map((question: any, index: any) => ({
           content: question.content,
           questionType: question.questionType,
           minAnswerCount: question.minAnswerCount || 1,
@@ -65,8 +68,8 @@ export default function SurveyDetailPage() {
             question.options?.map((option: any) => ({
               content: option.content,
             })) || [],
-        })
-      ).sort((a: any, b: any) => a.order - b.order);
+        }))
+        .sort((a: any, b: any) => a.order - b.order);
       setChosenType(transformedQuestions[0].questionType);
       setCurrentQuestion(transformedQuestions[0]);
       setNewQuestions(transformedQuestions);
@@ -74,7 +77,7 @@ export default function SurveyDetailPage() {
   }, [id, data]);
 
   const [activeSection, setActiveSection] = useState(0);
-  const [activeColor, setActiveColor] = useState<number>(0);
+  const [themeId, setThemeId] = useState<number>(0);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [chosenType, setChosenType] = useState<
     "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | null
@@ -90,10 +93,8 @@ export default function SurveyDetailPage() {
     endDate: string;
     duration: number | null;
     pollsterNumber: number | null;
-    selectedSettingItem:
-      | "ACCESS_LEVEL"
-      | "POLLSTER_NUMBER"
-      | "";
+    pollsters: Array<{ username: string }>;
+    selectedSettingItem: "ACCESS_LEVEL" | "POLLSTER_NUMBER" | "";
   }>({
     isAccessLevel: false,
     isTimeSelected: false,
@@ -103,6 +104,7 @@ export default function SurveyDetailPage() {
     endDate: "",
     duration: null,
     pollsterNumber: null,
+    pollsters: [],
     selectedSettingItem: "",
   });
 
@@ -124,13 +126,9 @@ export default function SurveyDetailPage() {
     thankYouMessage: "",
   });
 
-  const [themePage, setThemePage] = useState<{
-    themeId: number;
-  }>();
-
   const [currentQuestion, setCurrentQuestion] = useState<{
     content: string;
-    options?: Array<{ content: string }>;
+    options?: Array<{ content: string; }>;
     questionType:
       | "MULTI_CHOICE"
       | "SINGLE_CHOICE"
@@ -148,7 +146,7 @@ export default function SurveyDetailPage() {
   const [newQuestions, setNewQuestions] = useState<
     Array<{
       content: string;
-      options?: Array<any>;
+      options?: Array<{ content: string; }>;
       questionType:
         | "MULTI_CHOICE"
         | "SINGLE_CHOICE"
@@ -180,7 +178,7 @@ export default function SurveyDetailPage() {
     btnLabel: startPage.btnLabel,
     endTitle: endPage.endTitle,
     thankYouMessage: endPage.thankYouMessage,
-    themeId: themePage?.themeId,
+    themeId: themeId,
     startDate: settingsPage.startDate,
     endDate: settingsPage.endDate,
     duration: settingsPage.duration,
@@ -190,16 +188,22 @@ export default function SurveyDetailPage() {
     isTimeSelected: settingsPage.isTimeSelected,
     isDuration: settingsPage.isDuration,
     isPollsterNumber: settingsPage.isPollsterNumber,
+    pollsters: settingsPage.pollsters,
   };
 
-  console.log(newQuestions);
-
   const handleCreatePoll = async () => {
-    try {
-      const result = await createPoll(questionData);
-      console.log(result);
-    } catch (e) {
-      console.log(e);
+    if (id === "new") {
+      try {
+        const result = await createPoll(questionData);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      try {
+        const result = await updatePoll(id as string, questionData);
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
@@ -249,11 +253,10 @@ export default function SurveyDetailPage() {
           {activeSection === 1 && (
             <StartShapeEditor
               id={String(id)}
-              activeColor={activeColor}
-              setActiveColor={setActiveColor}
+              themeId={themeId}
+              setThemeId={setThemeId}
               uploadedImage={uploadedImage}
               setUploadedImage={setUploadedImage}
-              themePage={themePage}
               startPage={startPage}
               setStartPage={setStartPage}
             />
@@ -305,7 +308,7 @@ export default function SurveyDetailPage() {
             <StartDisplay
               startPage={startPage}
               dualColors={dualColors}
-              activeColor={activeColor}
+              themeId={themeId}
               uploadedImage={uploadedImage}
             />
           )}
@@ -314,7 +317,7 @@ export default function SurveyDetailPage() {
               chosenType={chosenType}
               setChosenType={setChosenType}
               dualColors={dualColors}
-              activeColor={activeColor}
+              themeId={themeId}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               currentQuestion={currentQuestion}
@@ -327,7 +330,7 @@ export default function SurveyDetailPage() {
             <EndDisplay
               endPage={endPage}
               dualColors={dualColors}
-              activeColor={activeColor}
+              themeId={themeId}
               uploadedImage={uploadedImage}
             />
           )}

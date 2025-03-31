@@ -5,14 +5,14 @@ import { EndDisplayProps } from "@/utils/componentTypes";
 const EndDisplay = ({
   endPage,
   dualColors,
-  activeColor,
+  themeId,
   uploadedImage,
 }: EndDisplayProps) => {
   return (
     <div
       style={{
-        color: dualColors[activeColor][1],
-        backgroundColor: dualColors[activeColor][0],
+        color: dualColors[themeId][1],
+        backgroundColor: dualColors[themeId][0],
       }}
       className={`border border-[#303030] rounded-[10px] w-full h-full flex flex-col justify-between pt-10 px-5 pb-5`}
     >
@@ -32,13 +32,13 @@ const EndDisplay = ({
           )}
         </div>
         <p
-          style={{ color: dualColors[activeColor][1] }}
+          style={{ color: dualColors[themeId][1] }}
           className="text-[14px] leading-[17px] font-semibold mt-[100px]"
         >
           {endPage?.endTitle}
         </p>
         <p
-          style={{ color: dualColors[activeColor][1] }}
+          style={{ color: dualColors[themeId][1] }}
           className="text-[14px] leading-[17px] font-semibold mt-5 text-center"
         >
           {endPage?.thankYouMessage}

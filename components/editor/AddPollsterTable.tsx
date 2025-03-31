@@ -1,14 +1,27 @@
 import { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import { Button, Input, Space, Table } from "antd";
-import { EditOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Space, Table } from "antd";
+import {
+  EditOutlined,
+  SearchOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import FormItem from "../FormItem";
 import CustomButton from "../CustomButton";
+import { checkUserExists } from "@/api/action";
+import { useAlert } from "@/context/AlertProvider";
 
-const ManageEmpTable = ({ dataSource }: any) => {
+const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
   const searchInput = useRef(null);
+  const { showAlert } = useAlert();
+  const [value, setValue] = useState<string>("");
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+
+  const pollsterTableData = settingsPage.pollsters.map((pollster: any) => ({
+    key: pollster.username,
+    name: pollster.username,
+  }));
 
   const getColumnSearchProps = (dataIndex: any) => ({
     filterDropdown: ({
@@ -93,7 +106,7 @@ const ManageEmpTable = ({ dataSource }: any) => {
     setSearchText("");
   };
 
-  const employeeTableColumns = [
+  const pollsterTableColumns = [
     {
       title: "Нэр",
       dataIndex: "name",
@@ -107,31 +120,95 @@ const ManageEmpTable = ({ dataSource }: any) => {
       key: "action",
       render: (_: any, record: any) => (
         <Space size={"middle"}>
-          <EditOutlined className="!text-green-800" />
-          <DeleteOutlined className="!text-red-500" />
+          <DeleteOutlined
+            className="!text-red-500"
+            onClick={() => handleDelete(record.name)}
+          />
         </Space>
       ),
       width: 120,
     },
   ];
 
+  const handleDelete = (username: string) => {
+    setSettingsPage((prev: any) => ({
+      ...prev,
+      pollsters: prev.pollsters.filter(
+        (pollster: any) => pollster.username !== username
+      ),
+    }));
+    showAlert(`"${username}" амжилттай устгагдлаа`, "success", "", true);
+  };
+
+  const searchUsername = async (username: string) => {
+    if (!username.trim()) {
+      showAlert("Please enter a username", "warning", "", true);
+      return;
+    }
+
+    try {
+      const isAlreadyAdded = settingsPage.pollsters.some(
+        (pollster: any) => pollster.username === username
+      );
+      if (isAlreadyAdded) {
+        showAlert(
+          `"${username}" нь аль хэдийн нэмэгдсэн байна`,
+          "warning",
+          "",
+          true
+        );
+        return;
+      }
+
+      const result = await checkUserExists(username);
+      if (!result.exists) {
+        showAlert(
+          `"${username}" бүртгэгдсэн байхгүй байна`,
+          "warning",
+          "",
+          true
+        );
+      } else {
+        setSettingsPage((prev: any) => ({
+          ...prev,
+          pollsters: [...prev.pollsters, { username }],
+        }));
+        setValue("");
+        showAlert(`"${username}" амжилттай нэмэгдлээ`, "success", "", true);
+      }
+    } catch (error: any) {
+      console.error("Error checking username:", error);
+      showAlert(
+        "An error occurred while checking the username",
+        "error",
+        "",
+        true
+      );
+    }
+  };
+
   return (
     <div className="w-full h-full">
-      <div className="w-full flex flex-row justify-start items-center mb-4 gap-3">
-        <FormItem
-          itemType="name"
+      <div className="flex flex-row items-center gap-5 !h-9 mb-5">
+        <Input
           placeholder="Оролцогчийн нэр оруул"
-          className="!h-10 mb-1"
+          value={value}
+          className=""
+          onChange={(e: any) => setValue(e.target.value)}
+          onPressEnter={() => searchUsername(value)}
         />
         <CustomButton
           title={"Нэмэх"}
-          className="bg-main-purple px-3 rounded-2xl !h-9 text-white cursor-pointer"
+          className="bg-main-purple px-3 rounded-2xl text-white cursor-pointer h-full"
+          onClick={() => {
+            searchUsername(value);
+          }}
         />
       </div>
       <Table
         className="w-full h-full"
-        dataSource={dataSource}
-        columns={employeeTableColumns}
+        dataSource={pollsterTableData}
+        columns={pollsterTableColumns}
         pagination={{
           position: ["bottomCenter"],
           pageSize: 10,
@@ -141,4 +218,4 @@ const ManageEmpTable = ({ dataSource }: any) => {
   );
 };
 
-export default ManageEmpTable;
+export default AddPollsterTable;

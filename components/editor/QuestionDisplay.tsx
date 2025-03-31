@@ -9,7 +9,7 @@ const QuestionDisplay = ({
   chosenType,
   setChosenType,
   dualColors,
-  activeColor,
+  themeId,
   currentPage,
   setCurrentPage,
   currentQuestion,
@@ -24,14 +24,14 @@ const QuestionDisplay = ({
           <div
             id="question_prev"
             style={{
-              color: dualColors[activeColor][1],
-              backgroundColor: dualColors[activeColor][0],
+              color: dualColors[themeId][1],
+              backgroundColor: dualColors[themeId][0],
             }}
             className={` rounded-[10px] w-full flex flex-col items-center p-5`}
           >
             <div className="flex flex-col max-w-[430px] w-full">
               <p
-                style={{ color: dualColors[activeColor][1] }}
+                style={{ color: dualColors[themeId][1] }}
                 className="text-[14px] leading-[17px] font-semibold cursor-pointer"
               >
                 {currentPage + 1}. {currentQuestion?.content}
@@ -74,7 +74,7 @@ const QuestionDisplay = ({
                                 );
                               }}
                               style={{
-                                color: dualColors[activeColor][1],
+                                color: dualColors[themeId][1],
                               }}
                               className="ml-[10px] cursor-pointer"
                             />

@@ -15,11 +15,10 @@ const startPageInputClass =
 
 const StartShapeEditor = ({
   id,
-  activeColor,
-  setActiveColor,
+  themeId,
+  setThemeId,
   uploadedImage,
   setUploadedImage,
-  themePage,
   startPage,
   setStartPage,
 }: StartShapeEditorProps) => {
@@ -56,7 +55,7 @@ const StartShapeEditor = ({
   };
 
   const handleClickColor = (index: number) => {
-    setActiveColor(index);
+    setThemeId(index);
   };
 
   return (
@@ -129,7 +128,7 @@ const StartShapeEditor = ({
                 onClick={() => handleClickColor(index)}
                 key={index}
                 className={`w-10 h-10 rounded-[10px] border cursor-pointer relative ${
-                  activeColor === index
+                  themeId === index
                     ? "border-[2px] border-[#303030]"
                     : "border-none"
                 }`}

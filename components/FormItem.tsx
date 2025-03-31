@@ -12,6 +12,7 @@ const FormItem = ({
   hidePasswordSuggest,
   value,
   placeholder,
+  onPressEnter,
   ...props
 }: FormItemProps) => {
   return (
@@ -34,6 +35,7 @@ const FormItem = ({
                   hidePasswordSuggest={hidePasswordSuggest}
                   value={value}
                   placeholder={placeholder}
+                  onPressEnter={onPressEnter}
                   {...props}
                 />
               );
