@@ -18,8 +18,6 @@ const data = {
     btnLabel: "Эхлэх",
   },
   themePage: {
-    logoPosition: "TOP_CENTER",
-    showWaterMark: true,
     themeId: 0,
   },
   settingsPage: {
@@ -404,15 +402,7 @@ export default function TestPage() {
       className={`p-[30px] flex flex-col font-open h-screen`}
     >
       <div
-        className={`h-[49px] flex flex-row items-center ${
-          data.themePage.logoPosition === "TOP_LEFT"
-            ? "justify-start"
-            : data.themePage.logoPosition === "TOP_CENTER"
-            ? "justify-center"
-            : data.themePage.logoPosition === "TOP_RIGHT"
-            ? "justify-end"
-            : ""
-        } `}
+        className={`h-[49px] flex flex-row items-center justify-center`}
       >
         <BoxIcon className={`h-full w-auto`} />
       </div>

@@ -6,7 +6,7 @@ import { StartEditorProps } from "@/utils/componentTypes";
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
 
-const EndEditor = ({ id, endPage, setEndPage }: StartEditorProps) => {
+const EndEditor = ({ id, endPage, setEndPage, handleCreatPoll }: StartEditorProps) => {
 
   const [loading, setLoading] = useState(false);
 
@@ -57,6 +57,7 @@ const EndEditor = ({ id, endPage, setEndPage }: StartEditorProps) => {
         titleClassname="text-[#FDFDFD] text-[14px] font-semibold "
         className="!h-[38px] w-full bg-main-purple cursor-pointer rounded-lg flex items-center justify-center mt-[10px] !text-sm"
         title="Дуусгах"
+        onClick={handleCreatPoll}
       />
     </div>
   );

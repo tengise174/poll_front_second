@@ -68,3 +68,21 @@ export const updateProfile = async(data: any) => {
     throw error;
   } 
 } 
+
+export const createPoll = async(data: any) => {
+  try {
+    const response = await instance.post("/polls", data)
+    return response.data;
+  } catch(error: any) {
+    throw error;
+  } 
+} 
+
+export const getPollById = async(id: string) => {
+  try {
+    const response = await instance.get(`/polls/${id}`)
+    return response.data;
+  } catch(error: any) {
+    throw error;
+  } 
+} 

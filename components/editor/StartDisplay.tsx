@@ -6,7 +6,6 @@ const StartDisplay = ({
   startPage,
   dualColors,
   activeColor,
-  logoPosition,
   uploadedImage,
 }: StartDisplayProps) => {
   return (
@@ -20,13 +19,8 @@ const StartDisplay = ({
     >
       <div className="w-full flex flex-col items-center">
         <div
-          className={`w-full flex flex-col  ${
-            logoPosition === "TOP_RIGHT"
-              ? "items-end"
-              : logoPosition === "TOP_LEFT"
-              ? "items-start"
-              : "items-center"
-          }`}
+          className={`w-full flex flex-col items-center
+          `}
         >
           {!uploadedImage ? (
             <BoxIcon className="w-11 h-11 rounded-md text-red-200" />

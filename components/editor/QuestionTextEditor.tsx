@@ -15,7 +15,6 @@ const QuestionTextEditor = ({
   id,
   setChosenType,
   setCurrentPage,
-  templateQuestions,
   newQuestions,
   setNewQuestions,
   currentPage,
@@ -128,7 +127,7 @@ const QuestionTextEditor = ({
                 value={currentQuestion?.rateNumber || 5}
                 className={`${questionInputClass} flex items-center`}
                 min={1}
-                max={10} // You can adjust the max value as needed
+                max={10} 
               />
             </div>
             <div className="my-4">

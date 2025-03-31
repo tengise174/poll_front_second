@@ -20,8 +20,6 @@ const StartShapeEditor = ({
   uploadedImage,
   setUploadedImage,
   themePage,
-  logoPosition,
-  setLogoPosition,
   startPage,
   setStartPage,
 }: StartShapeEditorProps) => {
@@ -171,8 +169,6 @@ const StartShapeEditor = ({
           )}
 
           <LogoAlignSection
-            activeIcon={logoPosition}
-            setActiveIcon={setLogoPosition}
           />
         </div>
       </div>

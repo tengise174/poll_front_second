@@ -89,7 +89,6 @@ export interface QuestionTypeProps {
     | null;
 }
 interface SettingsPageProps {
-  isTemplate: boolean;
   isAccessLevel: boolean;
   isTimeSelected: boolean;
   isDuration: boolean;
@@ -99,20 +98,9 @@ interface SettingsPageProps {
   duration: number | null;
   pollsterNumber: number| null;
   selectedSettingItem:
-    | "TEMPLATE"
     | "ACCESS_LEVEL"
     | "POLLSTER_NUMBER"
-    | "EMPLOYEE_MANAGE"
     | "";
-  templateProps: {
-    tempTitle: string;
-    extraDesc: string;
-    useFields: {
-      EDUCATION: boolean;
-      HUMAN_RESOURCES: boolean;
-      OTHER: boolean;
-    };
-  };
 }
 
 interface StartPageProps {
@@ -144,12 +132,9 @@ export interface StartShapeEditorProps {
   setUploadedImage: Dispatch<SetStateAction<string | null>>;
   themePage:
     | {
-        logoPosition: string;
         themeId: number;
       }
     | undefined;
-  logoPosition: string;
-  setLogoPosition: Dispatch<SetStateAction<string>>;
   startPage: StartPageProps;
   setStartPage: Dispatch<SetStateAction<StartPageProps>>;
 }
@@ -202,11 +187,6 @@ export interface QuestionTextEditorProps {
   id: string;
   setChosenType: Dispatch<SetStateAction<ChosenTypeProps>>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
-  templateQuestions: {
-    id: string;
-    options: Array<any>;
-    content: string;
-  }[];
   newQuestions: QuestionProps[];
   setNewQuestions: Dispatch<SetStateAction<Array<QuestionProps>>>;
   currentPage: number;
@@ -218,7 +198,6 @@ export interface StartDisplayProps {
   startPage: StartPageProps;
   dualColors: string[][];
   activeColor: number;
-  logoPosition: string;
   uploadedImage: string | null;
 }
 
@@ -244,7 +223,6 @@ export interface EndDisplayProps {
   endPage: endPageProps;
   dualColors: string[][];
   activeColor: number;
-  logoPosition: string;
   uploadedImage: string | null;
 }
 
@@ -252,6 +230,7 @@ export interface StartEditorProps {
   id: string;
   endPage: endPageProps;
   setEndPage: Dispatch<SetStateAction<endPageProps>>;
+  handleCreatPoll : Function;
 }
 
 export type CorporateType = {

@@ -15,61 +15,6 @@ const SettingsEditor = ({
   return (
     <div className="py-4 px-5">
       <div
-        className={`
-        ${
-          settingsPage.selectedSettingItem === "TEMPLATE"
-            ? "bg-first-gray"
-            : "bg-second-bg"
-        }
-        rounded-[10px] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between`}
-      >
-        <div
-          onClick={
-            settingsPage.isTemplate
-              ? () => {
-                  setSettingsPage((prev) => ({
-                    ...prev,
-                    selectedSettingItem:
-                      prev.selectedSettingItem === "TEMPLATE" ? "" : "TEMPLATE",
-                  }));
-                }
-              : undefined
-          }
-          className={`${
-            settingsPage.isTemplate ? "cursor-pointer" : ""
-          }  flex items-center`}
-        >
-          <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-            Нээлттэй болгох
-          </p>
-        </div>
-        <div className="flex flex-row items-center">
-          <CustomInput
-            value="Асуулгыг нээлттэй хуваалцах"
-            disabled={true}
-            className={`${startPageInputClass} ${
-              settingsPage.isTemplate
-                ? "!bg-not-clicked !border-main-purple !text-main-purple"
-                : ""
-            }`}
-            suffix={
-              <Switch
-                onChange={(checked) =>
-                  setSettingsPage((prev) => ({
-                    ...prev,
-                    isTemplate: checked,
-                    selectedSettingItem:
-                      !checked && prev.selectedSettingItem === "TEMPLATE"
-                        ? ""
-                        : prev.selectedSettingItem,
-                  }))
-                }
-              />
-            }
-          />
-        </div>
-      </div>
-      <div
         className={` 
                 ${
                   settingsPage.selectedSettingItem === "ACCESS_LEVEL"
@@ -111,6 +56,7 @@ const SettingsEditor = ({
             }`}
             suffix={
               <Switch
+                value={settingsPage.isAccessLevel}
                 onChange={(checked) =>
                   setSettingsPage((prev) => ({
                     ...prev,
@@ -143,6 +89,7 @@ const SettingsEditor = ({
             }`}
             suffix={
               <Switch
+                value={settingsPage.isTimeSelected}
                 onChange={(checked) =>
                   setSettingsPage((prev) => ({
                     ...prev,
@@ -211,6 +158,7 @@ const SettingsEditor = ({
             }`}
             suffix={
               <Switch
+                value={settingsPage.isDuration}
                 onChange={(checked) =>
                   setSettingsPage((prev) => ({ ...prev, isDuration: checked }))
                 }
@@ -251,6 +199,7 @@ const SettingsEditor = ({
             }`}
             suffix={
               <Switch
+                value={settingsPage.isPollsterNumber}
                 onChange={(checked) =>
                   setSettingsPage((prev) => ({
                     ...prev,
@@ -276,39 +225,6 @@ const SettingsEditor = ({
             />
           </div>
         )}
-      </div>
-      <div
-        className={`
-          ${
-            settingsPage.selectedSettingItem === "EMPLOYEE_MANAGE"
-              ? "bg-first-gray"
-              : "bg-second-bg"
-          }
-          rounded-[10px] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between`}
-      >
-        <div
-          onClick={() => {
-            setSettingsPage((prev) => ({
-              ...prev,
-              selectedSettingItem:
-                prev.selectedSettingItem === "EMPLOYEE_MANAGE"
-                  ? ""
-                  : "EMPLOYEE_MANAGE",
-            }));
-          }}
-          className="cursor-pointer flex items-center"
-        >
-          <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-            Ажилчдын хяналт
-          </p>
-        </div>
-        <div className="flex flex-row items-center">
-          <CustomInput
-            value="Хэн хандаж болохыг тохируулах"
-            className={`${startPageInputClass}`}
-            disabled={true}
-          />
-        </div>
       </div>
     </div>
   );

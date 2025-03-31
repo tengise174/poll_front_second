@@ -12,11 +12,68 @@ import SettingsEditor from "@/components/editor/SettingsEditor";
 import SettingsDisplay from "@/components/editor/SettingsDisplay";
 import { dualColors } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
+import { createPoll, getPollById } from "@/api/action";
+import { useQuery } from "@tanstack/react-query";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
+
+  const { data, isFetching } = useQuery({
+    queryKey: ["survey_detail", [id]],
+    refetchOnWindowFocus: false,
+    queryFn: () => getPollById(id as string),
+    retry: false,
+    enabled: id !== "new",
+  });
+
+  useEffect(() => {
+    if (data) {
+      setSettingsPage((prev) => ({
+        ...prev,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        duration: data.duration,
+        pollsterNumber: data.pollsterNumber,
+        isAccessLevel: data.isAccessLevel,
+        isTimeSelected: data.isTimeSelected,
+        isDuration: data.isDuration,
+        isPollsterNumber: data.isPollsterNumber,
+      }));
+
+      setStartPage((prev) => ({
+        ...prev,
+        title: data.title,
+        greetingMessage: data.greetingMessage,
+        btnLabel: data.btnLabel,
+      }));
+
+      setEndPage((prev) => ({
+        ...prev,
+        endTitle: data.endTitle,
+        thankYouMessage: data.thankYouMessage,
+      }));
+
+      const transformedQuestions = data.questions.map(
+        (question: any, index: any) => ({
+          content: question.content,
+          questionType: question.questionType,
+          minAnswerCount: question.minAnswerCount || 1,
+          rateNumber: question.rateNumber || 4,
+          rateType: question.rateType || "STAR",
+          order: question.order,
+          options:
+            question.options?.map((option: any) => ({
+              content: option.content,
+            })) || [],
+        })
+      ).sort((a: any, b: any) => a.order - b.order);
+      setChosenType(transformedQuestions[0].questionType);
+      setCurrentQuestion(transformedQuestions[0]);
+      setNewQuestions(transformedQuestions);
+    }
+  }, [id, data]);
+
   const [activeSection, setActiveSection] = useState(0);
-  const [logoPosition, setLogoPosition] = useState<string>("TOP_MIDDLE");
   const [activeColor, setActiveColor] = useState<number>(0);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [chosenType, setChosenType] = useState<
@@ -25,7 +82,6 @@ export default function SurveyDetailPage() {
   const [currentPage, setCurrentPage] = useState(0);
 
   const [settingsPage, setSettingsPage] = useState<{
-    isTemplate: boolean;
     isAccessLevel: boolean;
     isTimeSelected: boolean;
     isDuration: boolean;
@@ -35,22 +91,10 @@ export default function SurveyDetailPage() {
     duration: number | null;
     pollsterNumber: number | null;
     selectedSettingItem:
-      | "TEMPLATE"
       | "ACCESS_LEVEL"
       | "POLLSTER_NUMBER"
-      | "EMPLOYEE_MANAGE"
       | "";
-    templateProps: {
-      tempTitle: string;
-      extraDesc: string;
-      useFields: {
-        EDUCATION: boolean;
-        HUMAN_RESOURCES: boolean;
-        OTHER: boolean;
-      };
-    };
   }>({
-    isTemplate: false,
     isAccessLevel: false,
     isTimeSelected: false,
     isDuration: false,
@@ -60,15 +104,6 @@ export default function SurveyDetailPage() {
     duration: null,
     pollsterNumber: null,
     selectedSettingItem: "",
-    templateProps: {
-      tempTitle: "",
-      extraDesc: "",
-      useFields: {
-        EDUCATION: true,
-        HUMAN_RESOURCES: false,
-        OTHER: false,
-      },
-    },
   });
 
   const [startPage, setStartPage] = useState<{
@@ -90,13 +125,8 @@ export default function SurveyDetailPage() {
   });
 
   const [themePage, setThemePage] = useState<{
-    logoPosition: string;
     themeId: number;
   }>();
-
-  const [templateQuestions, setTemplateQuestions] = useState<
-    Array<{ id: string; options: Array<any>; content: string }>
-  >([]);
 
   const [currentQuestion, setCurrentQuestion] = useState<{
     content: string;
@@ -144,6 +174,35 @@ export default function SurveyDetailPage() {
     },
   ]);
 
+  const questionData = {
+    title: startPage.title,
+    greetingMessage: startPage.greetingMessage,
+    btnLabel: startPage.btnLabel,
+    endTitle: endPage.endTitle,
+    thankYouMessage: endPage.thankYouMessage,
+    themeId: themePage?.themeId,
+    startDate: settingsPage.startDate,
+    endDate: settingsPage.endDate,
+    duration: settingsPage.duration,
+    pollsterNumber: settingsPage.pollsterNumber,
+    questions: newQuestions,
+    isAccessLevel: settingsPage.isAccessLevel,
+    isTimeSelected: settingsPage.isTimeSelected,
+    isDuration: settingsPage.isDuration,
+    isPollsterNumber: settingsPage.isPollsterNumber,
+  };
+
+  console.log(newQuestions);
+
+  const handleCreatePoll = async () => {
+    try {
+      const result = await createPoll(questionData);
+      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const handleAdd = () => {
     setChosenType(null);
   };
@@ -155,13 +214,6 @@ export default function SurveyDetailPage() {
         : newQuestions.length - 1;
     setCurrentQuestion(newQuestions[currentPage]);
   }, [currentPage, chosenType]);
-
-  useEffect(() => {
-    if (themePage) {
-      setLogoPosition(themePage.logoPosition);
-    }
-  }, [themePage]);
-
 
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">
@@ -202,8 +254,6 @@ export default function SurveyDetailPage() {
               uploadedImage={uploadedImage}
               setUploadedImage={setUploadedImage}
               themePage={themePage}
-              logoPosition={logoPosition}
-              setLogoPosition={setLogoPosition}
               startPage={startPage}
               setStartPage={setStartPage}
             />
@@ -215,7 +265,6 @@ export default function SurveyDetailPage() {
                   id={String(id)}
                   setChosenType={setChosenType}
                   setCurrentPage={setCurrentPage}
-                  templateQuestions={templateQuestions}
                   newQuestions={newQuestions}
                   setNewQuestions={setNewQuestions}
                   currentPage={currentPage}
@@ -241,6 +290,7 @@ export default function SurveyDetailPage() {
               id={String(id)}
               endPage={endPage}
               setEndPage={setEndPage}
+              handleCreatPoll={handleCreatePoll}
             />
           )}
         </div>
@@ -256,7 +306,6 @@ export default function SurveyDetailPage() {
               startPage={startPage}
               dualColors={dualColors}
               activeColor={activeColor}
-              logoPosition={logoPosition}
               uploadedImage={uploadedImage}
             />
           )}
@@ -279,7 +328,6 @@ export default function SurveyDetailPage() {
               endPage={endPage}
               dualColors={dualColors}
               activeColor={activeColor}
-              logoPosition={logoPosition}
               uploadedImage={uploadedImage}
             />
           )}
