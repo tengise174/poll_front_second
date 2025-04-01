@@ -67,7 +67,6 @@ export default function TestPage() {
         };
         return updatedAnswers;
       } else {
-        // If it doesn't exist, add a new object to the array
         return [...prevAnswers, { questionId, option: value }];
       }
     });
