@@ -105,3 +105,12 @@ export const getPollById = async (id: string) => {
     throw error;
   }
 };
+
+export const createAnswer = async (data: any) => {
+  try {
+    const response = await instance.post(`/answer`, data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};

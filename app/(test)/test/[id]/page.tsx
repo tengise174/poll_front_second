@@ -10,7 +10,7 @@ import BoxIcon from "@/public/icons/box_icon";
 import ArrowRightIcon from "@/public/icons/arrow_right";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { getPollById } from "@/api/action";
+import { createAnswer, getPollById } from "@/api/action";
 
 export default function TestPage() {
   const { id } = useParams();
@@ -18,7 +18,7 @@ export default function TestPage() {
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [answers, setAnswers] = useState<
-    { questionId: number; option: any[] }[]
+    { questionId: string; option: any[] }[]
   >([]);
   const [rateValue, setRateValue] = useState<number>(0);
   const [custStyle, setCustStyle] = useState<{
@@ -53,7 +53,7 @@ export default function TestPage() {
     }
   }, [data]);
 
-  const handleChange = (questionId: number, value: any[] = []) => {
+  const handleChange = (questionId: string, value: any[] = []) => {
     setAnswers((prevAnswers) => {
       const existingAnswerIndex = prevAnswers.findIndex(
         (answer) => answer.questionId === questionId
@@ -72,11 +72,7 @@ export default function TestPage() {
     });
   };
 
-  useEffect(() => {
-    if (answers) console.log(answers);
-  }, [answers]);
-
-  const hasAnswered = (id: number, minAnswerCount: number, type: string) => {
+  const hasAnswered = (id: string, minAnswerCount: number, type: string) => {
     // Find the answer for the given question ID
     const answer = answers.find((ans) => ans.questionId === id);
 
