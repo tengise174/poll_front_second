@@ -77,22 +77,27 @@ export default function TestPage() {
     if (answers) console.log(answers);
   }, [answers]);
 
-  // const hasAnswered = (id: number, minAnswerCount: number, type: string) => {
-  //   if (type === "MULTI_CHOICE") {
-  //     if (answers[id] === undefined) return false;
-  //     else {
-  //       return answers[id] ? answers[id].length >= minAnswerCount : false;
-  //     }
-  //   }
+  const hasAnswered = (id: number, minAnswerCount: number, type: string) => {
+    // Find the answer for the given question ID
+    const answer = answers.find((ans) => ans.questionId === id);
 
-  //   if (type === "SINGLE_CHOICE" || type === "RATING" || type === "YES_NO")
-  //     return answers[id] !== undefined;
+    if (type === "MULTI_CHOICE") {
+      if (!answer || !answer.option) return false;
+      return answer.option.length >= minAnswerCount;
+    }
 
-  //   if (type === "TEXT")
-  //     return answers[id] !== undefined && answers[id].trim().length > 0;
+    if (type === "SINGLE_CHOICE" || type === "RATING" || type === "YES_NO") {
+      return answer !== undefined && answer.option?.length > 0;
+    }
 
-  //   return true;
-  // };
+    if (type === "TEXT") {
+      return (
+        answer !== undefined && answer.option?.[0]?.content?.trim().length > 0
+      );
+    }
+
+    return true;
+  };
 
   const orderedQuestions = data?.questions
     .sort((a: any, b: any) => a.order - b.order)
@@ -266,10 +271,12 @@ export default function TestPage() {
                           (answer) =>
                             answer.questionId ===
                             orderedQuestions[questionNo].id
-                        )?.option?.[0] || 0
+                        )?.option?.[0]?.content || 0
                       }
                       onChange={(value) => {
-                        handleChange(orderedQuestions[questionNo].id, [value]); // Wrap the value in an array
+                        handleChange(orderedQuestions[questionNo].id, [
+                          { content: value },
+                        ]); // Save as [{ content: value }]
                         setRateValue(value);
                       }}
                       character={({ index = 0 }) =>
@@ -283,7 +290,7 @@ export default function TestPage() {
                                   (answer) =>
                                     answer.questionId ===
                                     orderedQuestions[questionNo].id
-                                )?.option?.[0] || 0)
+                                )?.option?.[0]?.content || 0)
                                   ? custStyle.primaryColor
                                   : "#E0E8F1",
                             }}
@@ -298,7 +305,7 @@ export default function TestPage() {
                                 (answer) =>
                                   answer.questionId ===
                                   orderedQuestions[questionNo].id
-                              )?.option?.[0] || 0)
+                              )?.option?.[0]?.content || 0)
                                 ? custStyle.primaryColor
                                 : "#E0E8F1"
                             }
@@ -315,14 +322,14 @@ export default function TestPage() {
                     buttonStyle="solid"
                     onChange={(e) =>
                       handleChange(orderedQuestions[questionNo].id, [
-                        e.target.value,
+                        { content: e.target.value },
                       ])
                     }
                     value={
                       answers.find(
                         (answer) =>
                           answer.questionId === orderedQuestions[questionNo].id
-                      )?.option?.[0] || undefined
+                      )?.option?.[0]?.content || undefined
                     }
                     className="flex flex-col w-full"
                   >
@@ -350,14 +357,14 @@ export default function TestPage() {
                     onChange={
                       (e) =>
                         handleChange(orderedQuestions[questionNo].id, [
-                          e.target.value,
-                        ]) // Wrap value in an array
+                          { content: e.target.value },
+                        ]) // Save as [{ content: value }]
                     }
                     value={
                       answers.find(
                         (answer) =>
                           answer.questionId === orderedQuestions[questionNo].id
-                      )?.option?.[0] || ""
+                      )?.option?.[0]?.content || ""
                     }
                     style={{
                       backgroundColor: custStyle.backgroundColor,
@@ -390,23 +397,23 @@ export default function TestPage() {
                       : "Цааш"
                   }
                   className="h-9 w-[220px] rounded-[99px] text-[13px] font-semibold cursor-pointer"
-                  // style={{
-                  //   color: custStyle.backgroundColor,
-                  //   backgroundColor: hasAnswered(
-                  //     orderedQuestions[questionNo].id,
-                  //     orderedQuestions[questionNo].minAnswerCount,
-                  //     orderedQuestions[questionNo].type
-                  //   )
-                  //     ? custStyle.primaryColor
-                  //     : "#D9D9D9",
-                  // }}
-                  // disabled={
-                  //   !hasAnswered(
-                  //     orderedQuestions[questionNo].id,
-                  //     orderedQuestions[questionNo].minAnswerCount,
-                  //     orderedQuestions[questionNo].type
-                  //   )
-                  // }
+                  style={{
+                    color: custStyle.backgroundColor,
+                    backgroundColor: hasAnswered(
+                      orderedQuestions[questionNo].id,
+                      orderedQuestions[questionNo].minAnswerCount,
+                      orderedQuestions[questionNo].questionType
+                    )
+                      ? custStyle.primaryColor
+                      : "#D9D9D9",
+                  }}
+                  disabled={
+                    !hasAnswered(
+                      orderedQuestions[questionNo].id,
+                      orderedQuestions[questionNo].minAnswerCount,
+                      orderedQuestions[questionNo].questionType
+                    )
+                  }
                   onClick={() => {
                     questionNo === orderedQuestions.length - 1
                       ? setStep("end")
