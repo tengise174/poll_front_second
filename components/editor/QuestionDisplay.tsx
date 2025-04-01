@@ -167,7 +167,14 @@ const QuestionDisplay = ({
                                 questionType: item.questionType,
 
                                 ...(shouldAddAnswers && {
-                                  options: [{ content: "", order: 1 }, { content: "", order: 2 }],
+                                  options: [
+                                    { content: "", order: 1 },
+                                    { content: "", order: 2 },
+                                  ],
+                                }),
+                                ...(item.questionType === "RATING" && {
+                                  rateNumber: 5,
+                                  rateType: "STAR",
                                 }),
                                 order: lastIndex + 1,
                               }
@@ -182,9 +189,16 @@ const QuestionDisplay = ({
                           questionType: item.questionType,
                           ...(shouldAddAnswers
                             ? {
-                              options: [{ content: "", order: 1 }, { content: "", order: 2 }],
+                                options: [
+                                  { content: "", order: 1 },
+                                  { content: "", order: 2 },
+                                ],
                               }
                             : { options: [] }),
+                            ...(item.questionType === "RATING" && {
+                              rateNumber: 5,
+                              rateType: "STAR", 
+                            }), 
                           order: lastIndex + 2,
                         },
                       ];

@@ -275,7 +275,7 @@ export default function TestPage() {
                       onChange={(value) => {
                         handleChange(orderedQuestions[questionNo].id, [
                           { content: value },
-                        ]); // Save as [{ content: value }]
+                        ]);
                         setRateValue(value);
                       }}
                       character={({ index = 0 }) =>
