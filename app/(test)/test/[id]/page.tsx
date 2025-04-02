@@ -11,12 +11,15 @@ import ArrowRightIcon from "@/public/icons/arrow_right";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { createAnswer, getPollById } from "@/api/action";
+import { useAlert } from "@/context/AlertProvider";
 
 export default function TestPage() {
   const { id } = useParams();
+  const { showAlert } = useAlert();
   const [data, setData] = useState<any>(null);
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [answers, setAnswers] = useState<
     { questionId: string; option: any[]; textAnswer: string }[]
   >([]);
@@ -90,12 +93,31 @@ export default function TestPage() {
     }
 
     if (type === "TEXT") {
-      return (
-        answer !== undefined && answer.textAnswer?.trim().length > 0
-      );
+      return answer !== undefined && answer.textAnswer?.trim().length > 0;
     }
 
     return true;
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const formattedAnswers = answers.map((answer) => ({
+        questionId: answer.questionId,
+        optionIds: answer.option.length
+          ? answer.option.map((opt) => opt.id)
+          : undefined,
+        textAnswer: answer.textAnswer || undefined,
+      }));
+
+      await createAnswer(formattedAnswers);
+      showAlert("Амжилттай", "success", "", true);
+      setStep("end");
+    } catch (error: any) {
+      showAlert("Амжилтгүй", "warning", "", true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const orderedQuestions = data?.questions
@@ -430,9 +452,11 @@ export default function TestPage() {
                     )
                   }
                   onClick={() => {
-                    questionNo === orderedQuestions.length - 1
-                      ? setStep("end")
-                      : setQuestionNo(questionNo + 1);
+                    if (questionNo === orderedQuestions.length - 1) {
+                      handleSubmit();
+                    } else {
+                      setQuestionNo(questionNo + 1);
+                    }
                   }}
                 />
               </div>

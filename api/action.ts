@@ -162,7 +162,7 @@ export const deletePollById = async (id: string) => {
 
 export const createAnswer = async (data: any) => {
   try {
-    const response = await instance.post(`/answer`, data);
+    const response = await instance.post(`/answers`, data);
     return response.data;
   } catch (error: any) {
     throw error;
