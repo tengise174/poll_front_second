@@ -151,6 +151,15 @@ export const getPollById = async (id: string) => {
   }
 };
 
+export const deletePollById = async (id: string) => {
+  try {
+    const response = await instance.delete(`/polls/${id}`);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const createAnswer = async (data: any) => {
   try {
     const response = await instance.post(`/answer`, data);

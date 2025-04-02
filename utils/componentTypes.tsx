@@ -12,6 +12,7 @@ export interface PollCardType {
   poster: string;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
   setCurrentId: Function;
+  onDelete: Function;
 }
 
 export interface FormItemProps {

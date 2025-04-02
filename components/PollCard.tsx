@@ -1,9 +1,14 @@
 "use client";
 import { PollCardType } from "@/utils/componentTypes";
-import { Card, Tooltip } from "antd";
+import { Button, Card, Popover, Tooltip } from "antd";
 import Meta from "antd/es/card/Meta";
-import { BarChartOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  BarChartOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const PollCard = ({
   id,
@@ -15,8 +20,32 @@ const PollCard = ({
   poster,
   setIsModalOpen,
   setCurrentId,
+  onDelete,
 }: PollCardType) => {
   const router = useRouter();
+  const [isPopoverVisible, setIsPopoverVisible] = useState(false);
+
+  const handleDeleteConfirm = () => {
+    if (onDelete) {
+      onDelete(id);
+    }
+    setIsPopoverVisible(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setIsPopoverVisible(false);
+  };
+
+  const popoverContent = (
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2 justify-end">
+        <Button onClick={handleDeleteCancel}>Үгүй</Button>
+        <Button type="primary" danger onClick={handleDeleteConfirm}>
+          Тийм
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <Card
@@ -43,6 +72,20 @@ const PollCard = ({
             onClick={() => router.push(`/stat/${id}`)}
           />
         </Tooltip>,
+        <Popover
+          content={popoverContent}
+          title="Асуулгыг устгахдаа итгэлтэй байна уу?"
+          trigger="click"
+          open={isPopoverVisible}
+          onOpenChange={(visible) => setIsPopoverVisible(visible)}
+        >
+          <Tooltip title="Устгах">
+            <DeleteOutlined
+              key="delete"
+              onClick={() => setIsPopoverVisible(true)}
+            />
+          </Tooltip>
+        </Popover>,
       ]}
     >
       <div

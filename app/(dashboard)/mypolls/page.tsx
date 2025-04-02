@@ -1,16 +1,22 @@
 "use client";
-import { getAllPoll, getAllPollBasic, getPollById } from "@/api/action";
+import {
+  deletePollById,
+  getAllPoll,
+  getAllPollBasic,
+  getPollById,
+} from "@/api/action";
 import CustomButton from "@/components/CustomButton";
 import PollCard from "@/components/PollCard";
 import { useAlert } from "@/context/AlertProvider";
 import { PollCardType } from "@/utils/componentTypes";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Card, Modal, Skeleton } from "antd";
 import Meta from "antd/es/card/Meta";
 import { useEffect, useState } from "react";
 
 const MyPollsPage = () => {
   const { showAlert } = useAlert();
+  const queryClient = useQueryClient();
   const [data, setData] = useState<any>(null);
   const [currentId, setCurrentId] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,6 +46,21 @@ const MyPollsPage = () => {
     refetchOnWindowFocus: false,
     retry: false,
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: deletePollById,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mypolls"] });
+      showAlert("Амжилттай устгалаа", "success", "", true);
+    },
+    onError: (error: any) => {
+      showAlert("Алдаа гарлаа", "error", "", true);
+    },
+  });
+
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
+  };
 
   useEffect(() => {
     if (fetchedData) {
@@ -87,6 +108,7 @@ const MyPollsPage = () => {
               {...item}
               setCurrentId={setCurrentId}
               setIsModalOpen={setIsModalOpen}
+              onDelete={handleDelete}
               key={index}
             />
           ))}
