@@ -6,7 +6,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/editor");
+    router.push("/mypolls");
   }, []);
   return <div></div>;
 }

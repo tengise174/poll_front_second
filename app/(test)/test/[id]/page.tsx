@@ -73,7 +73,6 @@ export default function TestPage() {
   };
 
   const hasAnswered = (id: string, minAnswerCount: number, type: string) => {
-    // Find the answer for the given question ID
     const answer = answers.find((ans) => ans.questionId === id);
 
     if (type === "MULTI_CHOICE") {

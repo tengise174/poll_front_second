@@ -66,7 +66,7 @@ const CustomMenu = () => {
       }
       case "2": {
         setSelectedKey("2");
-        router.push("/editor");
+        router.push("/editor/new");
         break;
       }
       case "3": {

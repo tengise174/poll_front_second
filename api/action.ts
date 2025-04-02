@@ -1,8 +1,12 @@
 "use client";
+import { useAlert } from "@/context/AlertProvider";
+import { message } from "antd";
 import axios from "axios";
 
 const baseURL = "http://localhost:5000";
+import { useRouter } from "next/navigation"; // For client-side navigation (if applicable)
 
+// Create Axios instance
 const instance = axios.create({
   baseURL: baseURL,
   headers: {
@@ -11,6 +15,7 @@ const instance = axios.create({
   timeout: 1000000,
 });
 
+// Request Interceptor: Add token to headers
 instance.interceptors.request.use(
   async (config) => {
     const tokenString = localStorage.getItem("token");
@@ -27,6 +32,25 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      message.error("Дахин нэвтрэнэ үү", 5, () => {
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+      });
+
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Sign-up request
 export const signup = async (body: any) => {
   try {
@@ -39,6 +63,7 @@ export const signup = async (body: any) => {
   }
 };
 
+// Sign-in request
 export const signin = async (body: any) => {
   try {
     const response = await instance.post("/auth/signin", body);
@@ -49,6 +74,8 @@ export const signin = async (body: any) => {
     throw error;
   }
 };
+
+export default instance;
 
 export const getProfile = async () => {
   try {
@@ -91,6 +118,24 @@ export const createPoll = async (data: any) => {
 export const updatePoll = async (id: string, data: any) => {
   try {
     const response = await instance.put(`/polls/${id}`, data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getAllPoll = async () => {
+  try {
+    const response = await instance.get("/polls");
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getAllPollBasic = async () => {
+  try {
+    const response = await instance.get("/polls/all");
     return response.data;
   } catch (error: any) {
     throw error;

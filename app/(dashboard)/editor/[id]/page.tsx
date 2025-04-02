@@ -14,69 +14,11 @@ import { dualColors } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { createPoll, getPollById, updatePoll } from "@/api/action";
 import { useQuery } from "@tanstack/react-query";
+import { useAlert } from "@/context/AlertProvider";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
-
-  const { data, isFetching } = useQuery({
-    queryKey: ["survey_detail", [id]],
-    refetchOnWindowFocus: false,
-    queryFn: () => getPollById(id as string),
-    retry: false,
-    enabled: id !== "new",
-  });
-
-  useEffect(() => {
-    if (data) {
-      setThemeId(data.themeId);
-
-      setSettingsPage((prev) => ({
-        ...prev,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        duration: data.duration,
-        pollsterNumber: data.pollsterNumber,
-        isAccessLevel: data.isAccessLevel,
-        isTimeSelected: data.isTimeSelected,
-        isDuration: data.isDuration,
-        isPollsterNumber: data.isPollsterNumber,
-        pollsters: data.pollsters,
-      }));
-
-      setStartPage((prev) => ({
-        ...prev,
-        title: data.title,
-        greetingMessage: data.greetingMessage,
-        btnLabel: data.btnLabel,
-      }));
-
-      setEndPage((prev) => ({
-        ...prev,
-        endTitle: data.endTitle,
-        thankYouMessage: data.thankYouMessage,
-      }));
-
-      const transformedQuestions = data.questions
-        .map((question: any, index: any) => ({
-          content: question.content,
-          questionType: question.questionType,
-          minAnswerCount: question.minAnswerCount || 1,
-          rateNumber: question.rateNumber || 4,
-          rateType: question.rateType || "STAR",
-          order: question.order,
-          options:
-            question.options?.map((option: any) => ({
-              content: option.content,
-              order: option.order,
-            })).sort((a: any, b: any) => a.order - b.order) || [],
-        }))
-        .sort((a: any, b: any) => a.order - b.order);
-      setChosenType(transformedQuestions[0].questionType);
-      setCurrentQuestion(transformedQuestions[0]);
-      setNewQuestions(transformedQuestions);
-    }
-  }, [id, data]);
-
+  const { showAlert } = useAlert();
   const [activeSection, setActiveSection] = useState(0);
   const [themeId, setThemeId] = useState<number>(0);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -173,6 +115,67 @@ export default function SurveyDetailPage() {
     },
   ]);
 
+  const { data, isFetching } = useQuery({
+    queryKey: ["survey_detail", [id]],
+    refetchOnWindowFocus: false,
+    queryFn: () => getPollById(id as string),
+    retry: false,
+    enabled: id !== "new",
+  });
+
+  useEffect(() => {
+    if (data) {
+      setThemeId(data.themeId);
+
+      setSettingsPage((prev) => ({
+        ...prev,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        duration: data.duration,
+        pollsterNumber: data.pollsterNumber,
+        isAccessLevel: data.isAccessLevel,
+        isTimeSelected: data.isTimeSelected,
+        isDuration: data.isDuration,
+        isPollsterNumber: data.isPollsterNumber,
+        pollsters: data.pollsters,
+      }));
+
+      setStartPage((prev) => ({
+        ...prev,
+        title: data.title,
+        greetingMessage: data.greetingMessage,
+        btnLabel: data.btnLabel,
+      }));
+
+      setEndPage((prev) => ({
+        ...prev,
+        endTitle: data.endTitle,
+        thankYouMessage: data.thankYouMessage,
+      }));
+
+      const transformedQuestions = data.questions
+        .map((question: any, index: any) => ({
+          content: question.content,
+          questionType: question.questionType,
+          minAnswerCount: question.minAnswerCount || 1,
+          rateNumber: question.rateNumber || 4,
+          rateType: question.rateType || "STAR",
+          order: question.order,
+          options:
+            question.options
+              ?.map((option: any) => ({
+                content: option.content,
+                order: option.order,
+              }))
+              .sort((a: any, b: any) => a.order - b.order) || [],
+        }))
+        .sort((a: any, b: any) => a.order - b.order);
+      setChosenType(transformedQuestions[0].questionType);
+      setCurrentQuestion(transformedQuestions[0]);
+      setNewQuestions(transformedQuestions);
+    }
+  }, [id, data]);
+
   const questionData = {
     title: startPage.title,
     greetingMessage: startPage.greetingMessage,
@@ -196,13 +199,21 @@ export default function SurveyDetailPage() {
     if (id === "new") {
       try {
         const result = await createPoll(questionData);
+        if (result) {
+          showAlert("Амжилттай нэмлээ", "success", "", true);
+        }
       } catch (e) {
+        showAlert("Амжилтгүй", "warning", "", true);
         console.log(e);
       }
     } else {
       try {
         const result = await updatePoll(id as string, questionData);
+        if (result) {
+          showAlert("Амжилттай заслаа", "success", "", true);
+        }
       } catch (e) {
+        showAlert("Амжилтгүй", "warning", "", true);
         console.log(e);
       }
     }

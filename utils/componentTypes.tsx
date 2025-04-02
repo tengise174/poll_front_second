@@ -2,6 +2,18 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface CustomHeaderProps {}
 
+export interface PollCardType {
+  id: string;
+  title: string;
+  owner: string;
+  greetingMessage: string;
+  startDate: string;
+  endDate: string;
+  poster: string;
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  setCurrentId: Function;
+}
+
 export interface FormItemProps {
   itemType?: string;
   span?: number;
@@ -98,12 +110,9 @@ interface SettingsPageProps {
   startDate: string;
   endDate: string;
   duration: number | null;
-  pollsterNumber: number| null;
+  pollsterNumber: number | null;
   pollsters: Array<{ username: string }>;
-  selectedSettingItem:
-    | "ACCESS_LEVEL"
-    | "POLLSTER_NUMBER"
-    | "";
+  selectedSettingItem: "ACCESS_LEVEL" | "POLLSTER_NUMBER" | "";
 }
 
 interface StartPageProps {
@@ -228,7 +237,7 @@ export interface StartEditorProps {
   id: string;
   endPage: endPageProps;
   setEndPage: Dispatch<SetStateAction<endPageProps>>;
-  handleCreatPoll : Function;
+  handleCreatPoll: Function;
 }
 
 export type CorporateType = {
