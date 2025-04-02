@@ -18,7 +18,7 @@ export default function TestPage() {
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [answers, setAnswers] = useState<
-    { questionId: string; option: any[] }[]
+    { questionId: string; option: any[]; textAnswer: string }[]
   >([]);
   const [rateValue, setRateValue] = useState<number>(0);
   const [custStyle, setCustStyle] = useState<{
@@ -53,7 +53,11 @@ export default function TestPage() {
     }
   }, [data]);
 
-  const handleChange = (questionId: string, value: any[] = []) => {
+  const handleChange = (
+    questionId: string,
+    value: any[] = [],
+    textAnswer: string
+  ) => {
     setAnswers((prevAnswers) => {
       const existingAnswerIndex = prevAnswers.findIndex(
         (answer) => answer.questionId === questionId
@@ -64,10 +68,11 @@ export default function TestPage() {
         updatedAnswers[existingAnswerIndex] = {
           ...updatedAnswers[existingAnswerIndex],
           option: value,
+          textAnswer: textAnswer,
         };
         return updatedAnswers;
       } else {
-        return [...prevAnswers, { questionId, option: value }];
+        return [...prevAnswers, { questionId, option: value, textAnswer }];
       }
     });
   };
@@ -86,7 +91,7 @@ export default function TestPage() {
 
     if (type === "TEXT") {
       return (
-        answer !== undefined && answer.option?.[0]?.content?.trim().length > 0
+        answer !== undefined && answer.textAnswer?.trim().length > 0
       );
     }
 
@@ -106,6 +111,8 @@ export default function TestPage() {
         <Skeleton />
       </div>
     );
+
+  console.log(answers);
 
   return (
     <ConfigProvider
@@ -204,7 +211,8 @@ export default function TestPage() {
                     onChange={(checkedValues) =>
                       handleChange(
                         orderedQuestions[questionNo].id,
-                        checkedValues
+                        checkedValues,
+                        ""
                       )
                     }
                     className="circle-checkbox flex gap-3 w-full max-h-full overflow-y-auto"
@@ -227,11 +235,12 @@ export default function TestPage() {
                 {orderedQuestions[questionNo].questionType ===
                   "SINGLE_CHOICE" && (
                   <Radio.Group
-                    onChange={
-                      (e) =>
-                        handleChange(orderedQuestions[questionNo].id, [
-                          e.target.value,
-                        ]) // Wrap the value in an array
+                    onChange={(e) =>
+                      handleChange(
+                        orderedQuestions[questionNo].id,
+                        [e.target.value],
+                        ""
+                      )
                     }
                     value={
                       answers.find(
@@ -260,18 +269,24 @@ export default function TestPage() {
                   <div className="w-full flex items-center justify-center">
                     <Rate
                       count={orderedQuestions[questionNo].rateNumber}
-                      value={
+                      value={Number(
                         answers.find(
                           (answer) =>
                             answer.questionId ===
                             orderedQuestions[questionNo].id
                         )?.option?.[0]?.content || 0
-                      }
+                      )}
                       onChange={(value) => {
-                        handleChange(orderedQuestions[questionNo].id, [
-                          { content: value },
-                        ]);
-                        setRateValue(value);
+                        const selectedOption = orderedQuestions[
+                          questionNo
+                        ].options.find(
+                          (opt: any) => opt.content === String(value)
+                        );
+                        handleChange(
+                          orderedQuestions[questionNo].id,
+                          [selectedOption],
+                          ""
+                        );
                       }}
                       character={({ index = 0 }) =>
                         orderedQuestions[questionNo].rateType === "NUMBER" ? (
@@ -280,26 +295,33 @@ export default function TestPage() {
                             style={{
                               color:
                                 index <
-                                (answers.find(
-                                  (answer) =>
-                                    answer.questionId ===
-                                    orderedQuestions[questionNo].id
-                                )?.option?.[0]?.content || 0)
+                                Number(
+                                  answers.find(
+                                    (answer) =>
+                                      answer.questionId ===
+                                      orderedQuestions[questionNo].id
+                                  )?.option?.[0]?.content || 0
+                                )
                                   ? custStyle.primaryColor
                                   : "#E0E8F1",
                             }}
                           >
-                            {index + 1}
+                            {
+                              orderedQuestions[questionNo].options[index]
+                                .content
+                            }
                           </span>
                         ) : (
                           <RateStarIcon
                             fill={
                               index <
-                              (answers.find(
-                                (answer) =>
-                                  answer.questionId ===
-                                  orderedQuestions[questionNo].id
-                              )?.option?.[0]?.content || 0)
+                              Number(
+                                answers.find(
+                                  (answer) =>
+                                    answer.questionId ===
+                                    orderedQuestions[questionNo].id
+                                )?.option?.[0]?.content || 0
+                              )
                                 ? custStyle.primaryColor
                                 : "#E0E8F1"
                             }
@@ -315,50 +337,49 @@ export default function TestPage() {
                     optionType="button"
                     buttonStyle="solid"
                     onChange={(e) =>
-                      handleChange(orderedQuestions[questionNo].id, [
-                        { content: e.target.value },
-                      ])
+                      handleChange(
+                        orderedQuestions[questionNo].id,
+                        [e.target.value],
+                        ""
+                      )
                     }
                     value={
                       answers.find(
                         (answer) =>
                           answer.questionId === orderedQuestions[questionNo].id
-                      )?.option?.[0]?.content || undefined
+                      )?.option?.[0] || undefined
                     }
-                    className="flex flex-col w-full"
+                    className="flex flex-col w-full max-h-full overflow-y-auto"
                   >
-                    <Radio
-                      style={{ color: custStyle.primaryColor }}
-                      key={1}
-                      value={"YES"}
-                      className="!w-full !mt-3"
-                    >
-                      YES
-                    </Radio>
-                    <Radio
-                      style={{ color: custStyle.primaryColor }}
-                      key={2}
-                      value={"NO"}
-                      className="!w-full !mt-3"
-                    >
-                      NO
-                    </Radio>
+                    {orderedQuestions[questionNo].options.map(
+                      (item: any, index: any) => (
+                        <Radio
+                          style={{ color: custStyle.primaryColor }}
+                          className={`custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent`}
+                          key={index}
+                          value={item}
+                        >
+                          {item.content}
+                        </Radio>
+                      )
+                    )}
                   </Radio.Group>
                 )}
 
                 {orderedQuestions[questionNo].questionType === "TEXT" && (
                   <TextArea
-                    onChange={
-                      (e) =>
-                        handleChange(orderedQuestions[questionNo].id, [
-                          { content: e.target.value },
-                        ]) // Save as [{ content: value }]
+                    onChange={(e) =>
+                      handleChange(
+                        orderedQuestions[questionNo].id,
+                        [],
+                        e.target.value
+                      )
                     }
                     value={
                       answers.find(
                         (answer) =>
                           answer.questionId === orderedQuestions[questionNo].id
-                      )?.option?.[0]?.content || ""
+                      )?.textAnswer || ""
                     }
                     style={{
                       backgroundColor: custStyle.backgroundColor,

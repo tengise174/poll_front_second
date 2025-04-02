@@ -175,6 +175,19 @@ const QuestionDisplay = ({
                                 ...(item.questionType === "RATING" && {
                                   rateNumber: 5,
                                   rateType: "STAR",
+                                  options: [
+                                    { content: "1", order: 1 },
+                                    { content: "2", order: 2 },
+                                    { content: "3", order: 3 },
+                                    { content: "4", order: 4 },
+                                    { content: "5", order: 5 },
+                                  ],
+                                }),
+                                ...(item.questionType === "YES_NO" && {
+                                  options: [
+                                    { content: "Тийм", order: 1 },
+                                    { content: "Үгүй", order: 2 },
+                                  ],
                                 }),
                                 order: lastIndex + 1,
                               }
@@ -195,10 +208,23 @@ const QuestionDisplay = ({
                                 ],
                               }
                             : { options: [] }),
-                            ...(item.questionType === "RATING" && {
-                              rateNumber: 5,
-                              rateType: "STAR", 
-                            }), 
+                          ...(item.questionType === "RATING" && {
+                            rateNumber: 5,
+                            rateType: "STAR",
+                            options: [
+                              { content: "1", order: 1 },
+                              { content: "2", order: 2 },
+                              { content: "3", order: 3 },
+                              { content: "4", order: 4 },
+                              { content: "5", order: 5 },
+                            ],
+                          }),
+                          ...(item.questionType === "YES_NO" && {
+                            options: [
+                              { content: "Тийм", order: 1 },
+                              { content: "Үгүй", order: 2 },
+                            ],
+                          }),
                           order: lastIndex + 2,
                         },
                       ];
