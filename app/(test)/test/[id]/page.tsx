@@ -9,13 +9,14 @@ import RateStarIcon from "@/public/icons/rate_star";
 import BoxIcon from "@/public/icons/box_icon";
 import ArrowRightIcon from "@/public/icons/arrow_right";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { createAnswer, getPollById } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 
 export default function TestPage() {
   const { id } = useParams();
   const { showAlert } = useAlert();
+  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
@@ -34,7 +35,7 @@ export default function TestPage() {
     isFetching,
     error,
   } = useQuery({
-    queryKey: [id],
+    queryKey: [id, 'test'],
     queryFn: () => getPollById(id as string),
     enabled: !!id && id !== "new",
     refetchOnWindowFocus: false,
@@ -471,7 +472,7 @@ export default function TestPage() {
                     color: custStyle.primaryColor,
                   }}
                 >
-                  Таны судалгаа амжилттай илгээгдлээ
+                  Таны асуулга амжилттай илгээгдлээ
                 </p>
                 <BoxIcon />
               </div>
@@ -482,16 +483,16 @@ export default function TestPage() {
                 }}
                 title={
                   <div className="flex flex-row items-center justify-center gap-[10px]">
-                    <span>Миний судалгаа</span>
+                    <span>Миний асуулга</span>
                     <ArrowRightIcon />
                   </div>
                 }
                 onClick={() => {
-                  setStep("start");
                   setAnswers([]);
                   setQuestionNo(0);
+                  router.push("/mypolls");
                 }}
-                className="text-[13px] font-semibold h-9 w-[220px] rounded-[99px]"
+                className="text-[13px] font-semibold h-9 w-[220px] rounded-[99px] hover:cursor-pointer"
               />
             </div>
           )}

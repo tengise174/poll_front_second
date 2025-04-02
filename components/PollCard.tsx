@@ -69,7 +69,7 @@ const PollCard = ({
         <Tooltip title="Хариу харах">
           <BarChartOutlined
             key="stat"
-            onClick={() => router.push(`/stat/${id}`)}
+            onClick={() => router.push(`/stats/${id}`)}
           />
         </Tooltip>,
         <Popover

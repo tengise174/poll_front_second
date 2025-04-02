@@ -85,16 +85,7 @@ const MyPollsPage = () => {
   }
 
   if (error) {
-    showAlert("Алдаа гарлаа", "error", "", true);
-    return (
-      <div>
-        <Button
-          type="primary"
-          title="Дахин оролдох"
-          onClick={() => window.location.reload()}
-        />
-      </div>
-    );
+    return <div>Алдаа гарлаа</div>;
   }
 
   return (
