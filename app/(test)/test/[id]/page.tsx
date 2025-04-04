@@ -10,7 +10,7 @@ import BoxIcon from "@/public/icons/box_icon";
 import ArrowRightIcon from "@/public/icons/arrow_right";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { createAnswer, getPollById } from "@/api/action";
+import { createAnswer, getPollById, getPollForTest } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 
 export default function TestPage() {
@@ -21,10 +21,12 @@ export default function TestPage() {
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderedQuestions, setOrderedQuestions] = useState<any[]>([]);
+  const [timeLeft, setTimeLeft] = useState<number>(0); // Timer in seconds
+  const [timerActive, setTimerActive] = useState(false);
   const [answers, setAnswers] = useState<
     { questionId: string; option: any[]; textAnswer: string }[]
   >([]);
-  const [rateValue, setRateValue] = useState<number>(0);
   const [custStyle, setCustStyle] = useState<{
     backgroundColor: string;
     primaryColor: string;
@@ -35,20 +37,37 @@ export default function TestPage() {
     isFetching,
     error,
   } = useQuery({
-    queryKey: [id, 'test'],
-    queryFn: () => getPollById(id as string),
+    queryKey: [id, "test"],
+    queryFn: () => getPollForTest(id as string),
     enabled: !!id && id !== "new",
     refetchOnWindowFocus: false,
     retry: false,
   });
 
   useEffect(() => {
-    if (fetchedData) {
+    if (fetchedData && !fetchedData.message) {
       setData(fetchedData);
     }
   }, [fetchedData]);
 
   useEffect(() => {
+    if (data) {
+      setOrderedQuestions(
+        data?.questions
+          .sort((a: any, b: any) => a.order - b.order)
+          .map((question: any) => ({
+            ...question,
+            options: question.options.sort(
+              (a: any, b: any) => a.order - b.order
+            ),
+          }))
+      );
+    }
+
+    if (data && data?.duration) {
+      setTimeLeft(fetchedData.duration * 60);
+    }
+
     if (data && data?.themeId) {
       setCustStyle({
         backgroundColor: dualColors[data?.themeId][0],
@@ -56,6 +75,43 @@ export default function TestPage() {
       });
     }
   }, [data]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (timerActive && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleTimeUp();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [timerActive, timeLeft]);
+
+  useEffect(() => {
+    if (step === "questions" && timeLeft > 0) {
+      setTimerActive(true);
+    }
+  }, [step]);
+
+  const handleTimeUp = async () => {
+    setTimerActive(false);
+    handleSubmit(); // Auto-submit when time is up
+    // showAlert("Хугацаа дууслаа", "warning", "Таны хариултыг илгээлээ", true);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
   const handleChange = (
     questionId: string,
@@ -113,6 +169,7 @@ export default function TestPage() {
 
       await createAnswer(formattedAnswers);
       showAlert("Амжилттай", "success", "", true);
+      setTimerActive(false);
       setStep("end");
     } catch (error: any) {
       showAlert("Амжилтгүй", "warning", "", true);
@@ -121,13 +178,6 @@ export default function TestPage() {
     }
   };
 
-  const orderedQuestions = data?.questions
-    .sort((a: any, b: any) => a.order - b.order)
-    .map((question: any) => ({
-      ...question,
-      options: question.options.sort((a: any, b: any) => a.order - b.order),
-    }));
-
   if (isFetching)
     return (
       <div>
@@ -135,7 +185,29 @@ export default function TestPage() {
       </div>
     );
 
-  console.log(answers);
+  if (fetchedData?.message) {
+    // showAlert("You already answered", "warning", "", true);
+    return (
+      <div className="items-center justify-center flex flex-col h-screen">
+        <p>
+          {fetchedData?.message === "Poll has not started yet"
+            ? "Асуулга эхлээгүй байна"
+            : fetchedData?.message === "Poll has already ended"
+            ? "Асуулга дууссан байна"
+            : fetchedData?.message === "User has already answered"
+            ? "Аль хэдийн хариулсан байна"
+            : fetchedData?.message === "Poll not found"
+            ? "Энэ асуулга байхгүй байна"
+            : "Алдаа гарлаа"}
+        </p>
+        <CustomButton
+          title={"Миний асуулга"}
+          onClick={() => router.push("/mypolls")}
+          className="bg-second-bg text-black !text-xs px-4 rounded-2xl cursor-pointer"
+        />
+      </div>
+    );
+  }
 
   return (
     <ConfigProvider
@@ -213,6 +285,7 @@ export default function TestPage() {
           )}
           {step === "questions" && (
             <div className="flex flex-col gap-5 items-center max-w-[430px] max-h-full">
+              <div>{formatTime(timeLeft)}</div>
               <div
                 style={{ color: custStyle.primaryColor }}
                 className="font-semibold text-sm flex flex-row gap-1"

@@ -51,6 +51,15 @@ instance.interceptors.response.use(
   }
 );
 
+export const getPollForTest = async (id: string) => {
+  try {
+    const response = await instance.get(`/polls/test/${id}`);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 // Sign-up request
 export const signup = async (body: any) => {
   try {
@@ -151,6 +160,8 @@ export const getPollById = async (id: string) => {
   }
 };
 
+
+
 export const getStatById = async (id: string) => {
   try {
     const response = await instance.get(`/polls/stats/${id}`);
@@ -172,6 +183,15 @@ export const deletePollById = async (id: string) => {
 export const createAnswer = async (data: any) => {
   try {
     const response = await instance.post(`/answers`, data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const createEmptyAnswer = async () => {
+  try {
+    const response = await instance.post(`/answers/empty`);
     return response.data;
   } catch (error: any) {
     throw error;
