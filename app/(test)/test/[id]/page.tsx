@@ -198,6 +198,8 @@ export default function TestPage() {
             ? "Аль хэдийн хариулсан байна"
             : fetchedData?.message === "Poll not found"
             ? "Энэ асуулга байхгүй байна"
+            : fetchedData?.message === "Dont have access"
+            ? "Та энэ санал асуулгад оролцох эрхгүй байна"
             : "Алдаа гарлаа"}
         </p>
         <CustomButton
