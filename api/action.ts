@@ -160,8 +160,6 @@ export const getPollById = async (id: string) => {
   }
 };
 
-
-
 export const getStatById = async (id: string) => {
   try {
     const response = await instance.get(`/polls/stats/${id}`);
@@ -192,6 +190,24 @@ export const createAnswer = async (data: any) => {
 export const createEmptyAnswer = async () => {
   try {
     const response = await instance.post(`/answers/empty`);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getAnsweredPolls = async () => {
+  try {
+    const response = await instance.get(`/answers/my-polls`);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getAnsweredPollDetail = async (id: string) => {
+  try {
+    const response = await instance.get(`/answers/poll/${id}`);
     return response.data;
   } catch (error: any) {
     throw error;

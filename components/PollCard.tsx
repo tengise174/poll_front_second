@@ -13,14 +13,13 @@ import { useState } from "react";
 const PollCard = ({
   id,
   title,
-  owner,
   greetingMessage,
-  startDate,
-  endDate,
   poster,
+  cardType,
   setIsModalOpen,
   setCurrentId,
   onDelete,
+  pushToId,
 }: PollCardType) => {
   const router = useRouter();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
@@ -36,6 +35,16 @@ const PollCard = ({
     setIsPopoverVisible(false);
   };
 
+  const handleCardClick = () => {
+    if (cardType === "POLL" && setCurrentId && setIsModalOpen) {
+      setCurrentId(id);
+      setIsModalOpen(true);
+    } else if (cardType === "ANSWER" && pushToId) {
+      console.log('aaa');
+      pushToId(id);
+    }
+  };
+
   const popoverContent = (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2 justify-end">
@@ -46,6 +55,38 @@ const PollCard = ({
       </div>
     </div>
   );
+
+  const cardActions =
+    cardType === "POLL"
+      ? [
+          <Tooltip title="Өөрчлөх">
+            <EditOutlined
+              key="edit"
+              onClick={() => router.push(`/editor/${id}`)}
+            />
+          </Tooltip>,
+          <Tooltip title="Хариу харах">
+            <BarChartOutlined
+              key="stat"
+              onClick={() => router.push(`/stats/${id}`)}
+            />
+          </Tooltip>,
+          <Popover
+            content={popoverContent}
+            title="Асуулгыг устгахдаа итгэлтэй байна уу?"
+            trigger="click"
+            open={isPopoverVisible}
+            onOpenChange={(visible) => setIsPopoverVisible(visible)}
+          >
+            <Tooltip title="Устгах">
+              <DeleteOutlined
+                key="delete"
+                onClick={() => setIsPopoverVisible(true)}
+              />
+            </Tooltip>
+          </Popover>,
+        ]
+      : [];
 
   return (
     <Card
@@ -59,37 +100,10 @@ const PollCard = ({
           }
         />
       }
-      actions={[
-        <Tooltip title="Өөрчлөх">
-          <EditOutlined
-            key="edit"
-            onClick={() => router.push(`/editor/${id}`)}
-          />
-        </Tooltip>,
-        <Tooltip title="Хариу харах">
-          <BarChartOutlined
-            key="stat"
-            onClick={() => router.push(`/stats/${id}`)}
-          />
-        </Tooltip>,
-        <Popover
-          content={popoverContent}
-          title="Асуулгыг устгахдаа итгэлтэй байна уу?"
-          trigger="click"
-          open={isPopoverVisible}
-          onOpenChange={(visible) => setIsPopoverVisible(visible)}
-        >
-          <Tooltip title="Устгах">
-            <DeleteOutlined
-              key="delete"
-              onClick={() => setIsPopoverVisible(true)}
-            />
-          </Tooltip>
-        </Popover>,
-      ]}
+      actions={cardActions}
     >
       <div
-        onClick={() => (setCurrentId(id), setIsModalOpen(true))}
+        onClick={handleCardClick}
         className="hover:cursor-pointer hover:underline"
       >
         <Meta title={title} description={greetingMessage} />

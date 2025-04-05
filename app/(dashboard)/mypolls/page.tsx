@@ -10,7 +10,7 @@ import PollCard from "@/components/PollCard";
 import { useAlert } from "@/context/AlertProvider";
 import { PollCardType } from "@/utils/componentTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Card, Modal, Skeleton } from "antd";
+import { Card, Modal, Skeleton } from "antd";
 import Meta from "antd/es/card/Meta";
 import { useEffect, useState } from "react";
 
@@ -97,6 +97,7 @@ const MyPollsPage = () => {
           {data.map((item: any, index: number) => (
             <PollCard
               {...item}
+              cardType="POLL"
               setCurrentId={setCurrentId}
               setIsModalOpen={setIsModalOpen}
               onDelete={handleDelete}

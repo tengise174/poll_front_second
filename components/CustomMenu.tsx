@@ -22,8 +22,8 @@ const baseItems: MenuItem[] = [
     className: "custom-divider-1",
   },
   {
-    key: "4",
-    label: "Асуулгын сан",
+    key: "3",
+    label: "Миний оролцсон",
   },
 ];
 
@@ -42,18 +42,6 @@ const CustomMenu = () => {
     if (profile) {
       const parsedProfile = JSON.parse(profile);
       setUserProfile(parsedProfile);
-
-      if (parsedProfile.usertype === "COMPANY") {
-        const updatedItems = [
-          ...baseItems.slice(0, 2),
-          {
-            key: "3",
-            label: "Ажилчид",
-          },
-          ...baseItems.slice(2),
-        ];
-        setItems(updatedItems);
-      }
     }
   }, []);
 
@@ -71,7 +59,7 @@ const CustomMenu = () => {
       }
       case "3": {
         setSelectedKey("3");
-        router.push("/employees");
+        router.push("/myanswers");
         break;
       }
       case "4": {

@@ -5,14 +5,13 @@ export interface CustomHeaderProps {}
 export interface PollCardType {
   id: string;
   title: string;
-  owner: string;
   greetingMessage: string;
-  startDate: string;
-  endDate: string;
   poster: string;
-  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
-  setCurrentId: Function;
-  onDelete: Function;
+  cardType: "POLL" | "ANSWER";
+  setIsModalOpen?: Dispatch<SetStateAction<boolean>>;
+  setCurrentId?: Function;
+  onDelete?: Function;
+  pushToId?: Function;
 }
 
 export interface FormItemProps {
