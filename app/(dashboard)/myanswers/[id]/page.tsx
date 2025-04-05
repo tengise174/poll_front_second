@@ -70,6 +70,8 @@ const MyAnswersDetail = () => {
     );
   }
 
+  if(!answerDetails)
+
   return <div>bfdb</div>;
 };
 
