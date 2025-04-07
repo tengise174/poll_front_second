@@ -15,6 +15,9 @@ import AddIcon from "@/public/icons/add";
 import { createPoll, getPollById, updatePoll } from "@/api/action";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "@/context/AlertProvider";
+import { Button, Modal, QRCode } from "antd";
+import Link from "next/link";
+import { CopyOutlined } from "@ant-design/icons";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
@@ -26,6 +29,19 @@ export default function SurveyDetailPage() {
     "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | null
   >(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reqUrl, setReqUrl] = useState<string>("");
+
+  const handleCopyUrl = () => {
+    navigator.clipboard
+      .writeText(reqUrl)
+      .then(() => {
+        showAlert("Copied URL to clipboard", "success", "", true);
+      })
+      .catch(() => {
+        showAlert("Failed to copy URL", "warning", "", true);
+      });
+  };
 
   const [settingsPage, setSettingsPage] = useState<{
     isAccessLevel: boolean;
@@ -201,6 +217,8 @@ export default function SurveyDetailPage() {
         const result = await createPoll(questionData);
         if (result) {
           showAlert("Амжилттай нэмлээ", "success", "", true);
+          setReqUrl(`http://localhost:3000/test/${result.id}`);
+          setIsModalOpen(true);
         }
       } catch (e) {
         showAlert("Амжилтгүй", "warning", "", true);
@@ -211,6 +229,8 @@ export default function SurveyDetailPage() {
         const result = await updatePoll(id as string, questionData);
         if (result) {
           showAlert("Амжилттай заслаа", "success", "", true);
+          setReqUrl(`http://localhost:3000/test/${result.id}`);
+          setIsModalOpen(true);
         }
       } catch (e) {
         showAlert("Амжилтгүй", "warning", "", true);
@@ -348,6 +368,25 @@ export default function SurveyDetailPage() {
           )}
         </div>
       </div>
+      <Modal open={isModalOpen} onCancel={() => setIsModalOpen(false)}>
+        <div className="flex flex-col gap-4">
+          <div>
+            <p>Хүсэлтийн URL</p>
+            <div className="flex fle-row gap-2">
+              <Link href={reqUrl}>{reqUrl}</Link>
+              <Button
+                icon={<CopyOutlined />}
+                onClick={handleCopyUrl}
+                style={{ marginTop: "10px" }}
+              ></Button>
+            </div>
+          </div>
+          <div>
+            <p>Хүсэлтийн QR код</p>
+            <QRCode value={reqUrl || "-"} />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

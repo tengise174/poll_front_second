@@ -88,3 +88,13 @@ body {
 .circle-checkbox .ant-checkbox-checked .ant-checkbox-inner::after {
   display: block;
 }
+
+.custom-checkbox-wrapper .custom-checkbox-inner {
+  border-radius: 50% !important; 
+  width: 18px;
+  height: 18px;
+}
+
+.custom-checkbox-wrapper .custom-checkbox-inner::after {
+  border-radius: 50% !important; /* Ensure the check mark is circular */
+}

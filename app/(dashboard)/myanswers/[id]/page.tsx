@@ -1,21 +1,41 @@
 "use client";
 import { getAnsweredPollDetail } from "@/api/action";
+import { dualColors } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Skeleton } from "antd";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Skeleton,
+  Typography,
+  Input,
+  Rate,
+} from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+const { TextArea } = Input;
+
+interface OptionsProps {
+  id: string;
+  content: string;
+}
 
 interface QuestionProps {
   questionId: string;
   content: string;
   questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE";
-  selectedOptions?: { id: string; content: string }[];
+  rateNumber: number;
+  rateType: "STAR" | "NUMBER";
+  allOptions?: OptionsProps[];
+  selectedOptions?: OptionsProps[];
   textAnswer?: string;
 }
 
 interface PollProps {
   id: string;
   title: string;
+  greetingMessage: string;
   themeId: number;
   startDate?: string;
   endDate?: string;
@@ -31,6 +51,10 @@ const MyAnswersDetail = () => {
     poll: {} as PollProps,
     questions: [],
   });
+  const [custStyle, setCustStyle] = useState<{
+    backgroundColor: string;
+    primaryColor: string;
+  }>({ backgroundColor: "#FDFDFD", primaryColor: "#2C2C2C" });
 
   const {
     data: fetchedAnswerDetails,
@@ -51,9 +75,14 @@ const MyAnswersDetail = () => {
     }
   }, [fetchedAnswerDetails]);
 
-  const pushToId = (id: string) => {
-    router.push(`/myanswers/${id}`);
-  };
+  useEffect(() => {
+    if (answerDetails && answerDetails?.poll.themeId) {
+      setCustStyle({
+        backgroundColor: dualColors[answerDetails?.poll.themeId][0],
+        primaryColor: dualColors[answerDetails?.poll.themeId][1],
+      });
+    }
+  }, [answerDetails]);
 
   if (isLoadingAnswerDetails || isFetchingAnswerDetails)
     return (
@@ -70,9 +99,68 @@ const MyAnswersDetail = () => {
     );
   }
 
-  if(!answerDetails)
+  if (!answerDetails) return <div>Алдаа гарсан</div>;
 
-  return <div>bfdb</div>;
+  return (
+    <div
+      className="w-full flex flex-col items-center justify-center"
+      style={{
+        backgroundColor: custStyle.backgroundColor,
+      }}
+    >
+      <div>
+        <h1>Асуулга: {answerDetails.poll.title}</h1>
+        <p>Тайлбар: {answerDetails.poll.greetingMessage}</p>
+      </div>
+      <div className="flex flex-col gap-4 w-full">
+        {answerDetails.questions.map((question, index) => (
+          <Card key={question.questionId}>
+            <h2 className="mb-6">
+              {index + 1}. {question.content}
+            </h2>
+            {question.questionType === "RATING" ? (
+              <Rate
+                defaultValue={Number(question.selectedOptions?.[0].content)}
+                count={question.rateNumber}
+                disabled
+                character={
+                  question.rateType === "NUMBER"
+                    ? ({ index = 0 }) => index + 1
+                    : undefined
+                }
+              />
+            ) : question.questionType === "TEXT" ? (
+              <TextArea
+                value={question.textAnswer}
+                readOnly
+                rows={4}
+                style={{ marginTop: 8 }}
+              />
+            ) : (
+              <div>
+                {question.allOptions?.map((option) => {
+                  const isChecked = question.selectedOptions?.some(
+                    (selected) => selected.id === option.id
+                  );
+                  return (
+                    <Checkbox
+                      key={option.id}
+                      checked={isChecked}
+                      disabled
+                      style={{ marginBottom: 8 }}
+                      className="custom-checkbox"
+                    >
+                      {option.content}
+                    </Checkbox>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default MyAnswersDetail;
