@@ -8,6 +8,7 @@ export interface PollCardType {
   greetingMessage: string;
   poster: string;
   cardType: "POLL" | "ANSWER";
+  hasAnswers?: boolean;
   setIsModalOpen?: Dispatch<SetStateAction<boolean>>;
   setCurrentId?: Function;
   onDelete?: Function;

@@ -187,6 +187,15 @@ export const createAnswer = async (data: any) => {
   }
 };
 
+export const recordFailedAttendance = async (id: string) => {
+  try {
+    const response = await instance.post(`/polls/failed-attendance/${id}`);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const createEmptyAnswer = async () => {
   try {
     const response = await instance.post(`/answers/empty`);

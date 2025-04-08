@@ -1,6 +1,6 @@
 "use client";
 import { PollCardType } from "@/utils/componentTypes";
-import { Button, Card, Popover, Tooltip } from "antd";
+import { Button, Card, Popover, Tag, Tooltip } from "antd";
 import Meta from "antd/es/card/Meta";
 import {
   BarChartOutlined,
@@ -20,6 +20,7 @@ const PollCard = ({
   setCurrentId,
   onDelete,
   pushToId,
+  hasAnswers,
 }: PollCardType) => {
   const router = useRouter();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
@@ -107,6 +108,11 @@ const PollCard = ({
         className="hover:cursor-pointer hover:underline"
       >
         <Meta title={title} description={greetingMessage} />
+        {cardType === "ANSWER" && hasAnswers ? (
+          <Tag>Хариулсан</Tag>
+        ) : (
+          <Tag>Амжаагүй</Tag>
+        )}
       </div>
     </Card>
   );

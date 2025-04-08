@@ -10,7 +10,7 @@ import BoxIcon from "@/public/icons/box_icon";
 import ArrowRightIcon from "@/public/icons/arrow_right";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { createAnswer, getPollById, getPollForTest } from "@/api/action";
+import { createAnswer, getPollById, getPollForTest, recordFailedAttendance } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 
 export default function TestPage() {
@@ -101,8 +101,7 @@ export default function TestPage() {
 
   const handleTimeUp = async () => {
     setTimerActive(false);
-    handleSubmit(); // Auto-submit when time is up
-    // showAlert("Хугацаа дууслаа", "warning", "Таны хариултыг илгээлээ", true);
+    await recordFailedAttendance(id as string);
   };
 
   const formatTime = (seconds: number) => {
@@ -186,7 +185,6 @@ export default function TestPage() {
     );
 
   if (fetchedData?.message) {
-    // showAlert("You already answered", "warning", "", true);
     return (
       <div className="items-center justify-center flex flex-col h-screen">
         <p>
@@ -198,8 +196,10 @@ export default function TestPage() {
             ? "Аль хэдийн хариулсан байна"
             : fetchedData?.message === "Poll not found"
             ? "Энэ асуулга байхгүй байна"
-            : fetchedData?.message === "Dont have access"
+            : fetchedData?.message === "Don't have access"
             ? "Та энэ санал асуулгад оролцох эрхгүй байна"
+            : fetchedData?.message === "User has already attended"
+            ? "Та асуулгад оролцсон боловч амжаагүй"
             : "Алдаа гарлаа"}
         </p>
         <CustomButton
