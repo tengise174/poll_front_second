@@ -41,7 +41,7 @@ const PollCard = ({
       setCurrentId(id);
       setIsModalOpen(true);
     } else if (cardType === "ANSWER" && pushToId) {
-      console.log('aaa');
+      console.log("aaa");
       pushToId(id);
     }
   };
@@ -105,14 +105,15 @@ const PollCard = ({
     >
       <div
         onClick={handleCardClick}
-        className="hover:cursor-pointer hover:underline"
+        className="flex flex-row justify-between items-center"
       >
-        <Meta title={title} description={greetingMessage} />
-        {cardType === "ANSWER" && hasAnswers ? (
-          <Tag>Хариулсан</Tag>
-        ) : (
-          <Tag>Амжаагүй</Tag>
-        )}
+        <Meta title={title} description={greetingMessage} className="hover:cursor-pointer hover:underline "/>
+        {cardType === "ANSWER" &&
+          (hasAnswers ? (
+            <Tag color="green">Хариулсан</Tag>
+          ) : (
+            <Tag color="red">Амжаагүй</Tag>
+          ))}
       </div>
     </Card>
   );

@@ -10,7 +10,12 @@ import BoxIcon from "@/public/icons/box_icon";
 import ArrowRightIcon from "@/public/icons/arrow_right";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { createAnswer, getPollById, getPollForTest, recordFailedAttendance } from "@/api/action";
+import {
+  createAnswer,
+  getPollById,
+  getPollForTest,
+  recordFailedAttendance,
+} from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 
 export default function TestPage() {
@@ -101,7 +106,13 @@ export default function TestPage() {
 
   const handleTimeUp = async () => {
     setTimerActive(false);
-    await recordFailedAttendance(id as string);
+    try {
+      await recordFailedAttendance(id as string);
+      showAlert("Хугацаа дууслаа", "warning", "", true);
+    } catch (error: any) {
+      console.log(error);
+    }
+    setStep("end");
   };
 
   const formatTime = (seconds: number) => {
