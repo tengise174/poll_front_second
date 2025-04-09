@@ -24,38 +24,52 @@ const COLORS = ["#0088FE", "#FFBB28", "#FF8042", "#00C49F"];
 
 type ChartType = "pie" | "bar" | "line";
 
+interface AnsweredByProp {
+  username: string;
+  count: number;
+}
+
 // Define interfaces for your poll data structure
 interface PollOption {
   optionId: string;
   content: string;
   selectionCount: number;
-  answeredBy: string[];
+  answeredBy: AnsweredByProp[];
 }
 
 interface PollAnswer {
   textAnswer: string;
   answeredBy: string;
   createdAt: string;
+  timeTaken: string;
 }
 
 interface PollQuestion {
   questionId: string;
   content: string;
   questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE";
+  avgTimeTaken: number;
   options?: PollOption[];
   answers?: PollAnswer[];
+}
+
+interface SubmittedUserProp {
+  id: string;
+  username: string;
+  totalTimeTaken: number;
 }
 
 interface PollData {
   pollId: string;
   title: string;
+  createdAt: string;
   status: "YET_OPEN" | "CLOSED" | "PULL" | "OPEN";
   submittedUserCount: number;
   pollsterNumber: number;
+  avgPollTime: number;
   poster: string;
-  createdAt: string;
   questions: PollQuestion[];
-  submittedUsers: any[];
+  submittedUsers: SubmittedUserProp[];
   failedAttendees: any[];
 }
 

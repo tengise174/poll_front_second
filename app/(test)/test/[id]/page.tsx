@@ -29,7 +29,6 @@ export default function TestPage() {
   const [orderedQuestions, setOrderedQuestions] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0); // Timer in seconds
   const [timerActive, setTimerActive] = useState(false);
-  const [startTime, setStartTime] = useState<number | null>(null);
   const [answers, setAnswers] = useState<
     { questionId: string; option: any[]; textAnswer: string }[]
   >([]);
@@ -37,6 +36,12 @@ export default function TestPage() {
     backgroundColor: string;
     primaryColor: string;
   }>({ backgroundColor: "#FDFDFD", primaryColor: "#2C2C2C" });
+  const [timeTakenPerQuestion, setTimeTakenPerQuestion] = useState<{
+    [questionId: string]: number;
+  }>({});
+  const [questionStartTime, setQuestionStartTime] = useState<number>(
+    Date.now()
+  );
 
   const {
     data: fetchedData,
@@ -105,6 +110,10 @@ export default function TestPage() {
     }
   }, [step]);
 
+  useEffect(() => {
+    setQuestionStartTime(Date.now());
+  }, [questionNo]);
+
   const handleTimeUp = async () => {
     setTimerActive(false);
     try {
@@ -170,16 +179,24 @@ export default function TestPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const timeToComp = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+      const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
+      setTimeTakenPerQuestion((prev) => ({
+        ...prev,
+        [orderedQuestions[questionNo].id]: timeSpent,
+      }));
+
       const formattedAnswers = answers.map((answer) => ({
         questionId: answer.questionId,
         optionIds: answer.option.length
           ? answer.option.map((opt) => opt.id)
           : undefined,
         textAnswer: answer.textAnswer || undefined,
-        timeToComp: timeToComp,
+        timeTaken:
+        answer.questionId === orderedQuestions[questionNo].id
+          ? timeSpent
+          : timeTakenPerQuestion[answer.questionId] || 0,
       }));
-      
+
       await createAnswer(formattedAnswers);
       showAlert("Амжилттай", "success", "", true);
       setTimerActive(false);
@@ -296,7 +313,6 @@ export default function TestPage() {
                 }}
                 title={data?.btnLabel || "Эхлэх"}
                 onClick={() => {
-                  setStartTime(Date.now());
                   setStep("questions");
                 }}
               />
@@ -512,7 +528,16 @@ export default function TestPage() {
                   className="text-[#B3B3B3] text-[13px] font-semibold h-9 w-[79px]"
                   onClick={() => {
                     if (questionNo > 0) {
+                      // Record time spent on current question before moving back
+                      const timeSpent = Math.round(
+                        (Date.now() - questionStartTime) / 1000
+                      ); // Convert to seconds
+                      setTimeTakenPerQuestion((prev) => ({
+                        ...prev,
+                        [orderedQuestions[questionNo].id]: timeSpent,
+                      }));
                       setQuestionNo(questionNo - 1);
+                      setQuestionStartTime(Date.now()); // Reset start time for previous question
                     } else {
                       setStep("start");
                       setQuestionNo(0);
@@ -545,10 +570,20 @@ export default function TestPage() {
                     )
                   }
                   onClick={() => {
+                    // Record time spent on current question
+                    const timeSpent = Math.round(
+                      (Date.now() - questionStartTime) / 1000
+                    );
+                    setTimeTakenPerQuestion((prev) => ({
+                      ...prev,
+                      [orderedQuestions[questionNo].id]: timeSpent,
+                    }));
+
                     if (questionNo === orderedQuestions.length - 1) {
                       handleSubmit();
                     } else {
                       setQuestionNo(questionNo + 1);
+                      setQuestionStartTime(Date.now()); // Reset start time for next question
                     }
                   }}
                 />
