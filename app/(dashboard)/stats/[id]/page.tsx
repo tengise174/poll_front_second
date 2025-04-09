@@ -1,7 +1,15 @@
 "use client";
 import { getStatById } from "@/api/action";
 import { useQuery } from "@tanstack/react-query";
-import { Card, Divider, Skeleton, Table } from "antd";
+import {
+  Card,
+  Collapse,
+  Descriptions,
+  Divider,
+  Skeleton,
+  Table,
+  Tag,
+} from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Image } from "antd";
@@ -20,16 +28,25 @@ import {
   Line,
 } from "recharts";
 
+const { Panel } = Collapse;
+
 const COLORS = ["#0088FE", "#FFBB28", "#FF8042", "#00C49F"];
 
 type ChartType = "pie" | "bar" | "line";
+
+const questionTypeTranslations: Record<string, string> = {
+  MULTI_CHOICE: "Олон сонголттой",
+  RATING: "Үнэлгээ",
+  YES_NO: "Тийм/Үгүй",
+  TEXT: "Текст",
+  SINGLE_CHOICE: "Ганц сонголттой",
+};
 
 interface AnsweredByProp {
   username: string;
   count: number;
 }
 
-// Define interfaces for your poll data structure
 interface PollOption {
   optionId: string;
   content: string;
@@ -53,6 +70,11 @@ interface PollQuestion {
   answers?: PollAnswer[];
 }
 
+interface UserProp {
+  id: string;
+  username: string;
+}
+
 interface SubmittedUserProp {
   id: string;
   username: string;
@@ -63,12 +85,19 @@ interface PollData {
   pollId: string;
   title: string;
   createdAt: string;
+  isAccessLevel: boolean;
+  isDuration: boolean;
+  duration: number | null;
+  isPollsterNumber: boolean;
+  startDate: string | null;
+  endDate: string | null;
   status: "YET_OPEN" | "CLOSED" | "PULL" | "OPEN";
   submittedUserCount: number;
-  pollsterNumber: number;
+  pollsterNumber: number | null;
   avgPollTime: number;
   poster: string;
   questions: PollQuestion[];
+  pollsters: UserProp[];
   submittedUsers: SubmittedUserProp[];
   failedAttendees: any[];
 }
@@ -164,7 +193,7 @@ const StatsPage = () => {
     }
   };
 
-  const columns = [
+  const optionColumns = [
     {
       title: "Option",
       dataIndex: "content",
@@ -174,10 +203,41 @@ const StatsPage = () => {
       title: "Users",
       dataIndex: "answeredBy",
       key: "answeredBy",
-      render: (answeredBy: string[]) =>
+      render: (answeredBy: { username: string; timeTaken: number }[]) =>
         answeredBy && answeredBy.length > 0
-          ? answeredBy.join(", ")
+          ? answeredBy.map((user) => user.username).join(", ")
           : "No users",
+    },
+  ];
+
+  const pollsterColumns = [
+    {
+      title: "Хэрэглэгчийн нэр",
+      dataIndex: "username",
+      key: "username",
+    },
+    {
+      title: "Төлөв",
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => {
+        switch (status) {
+          case "submitted":
+            return <Tag color="green">Хариулсан</Tag>;
+          case "failed":
+            return <Tag color="yellow">Амжаагүй</Tag>;
+          case "not_attended":
+            return <Tag color="red">Оролцоогүй</Tag>;
+          default:
+            return <Tag color="gray">Тодорхойгүй</Tag>;
+        }
+      },
+    },
+    {
+      title: "Зарцуулсан хугацаа (секунд)",
+      dataIndex: "takenTime",
+      key: "takenTime",
+      render: (text: number | null) => (text ? text.toFixed(2) : "-"),
     },
   ];
 
@@ -189,11 +249,114 @@ const StatsPage = () => {
     return <div>Something went wrong</div>;
   }
 
+  const questionTypeCounts =
+    data?.questions.reduce((acc, question) => {
+      acc[question.questionType] = (acc[question.questionType] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>) || {};
+
+  const questionTypeList = Object.entries(questionTypeCounts).map(
+    ([type, count]) => ({
+      type: questionTypeTranslations[type] || type,
+      count,
+    })
+  );
+
+  const PollDetails = ({ data }: { data: PollData }) => {
+    return (
+      <Card title="Санал асуулгын мэдээлэл" className="mb-6">
+        <Descriptions
+          column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 3 }}
+          bordered
+          size="middle"
+          styles={{ label: { fontWeight: "bold" } }}
+        >
+          <Descriptions.Item label="Үүсгэсэн огноо">
+            {new Date(data.createdAt).toLocaleDateString()}
+          </Descriptions.Item>
+          <Descriptions.Item label="Төлөв">
+            {statusConv[data.status]}
+          </Descriptions.Item>
+          <Descriptions.Item label="Хариулсан">
+            {data.submittedUserCount}
+          </Descriptions.Item>
+          <Descriptions.Item label="Эхлэх огноо">
+            {data.startDate
+              ? new Date(data.startDate).toLocaleString("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })
+              : "Сонгоогүй"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Дуусах огноо">
+            {data.endDate
+              ? new Date(data.endDate).toLocaleString("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })
+              : "Сонгоогүй"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Хаалттай эсэх">
+            {data.isAccessLevel ? (
+              <Tag color="green">Тийм</Tag>
+            ) : (
+              <Tag color="red">Үгүй</Tag>
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Хугацаа">
+            {data.isDuration ? data.duration : "Сонгоогүй"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Оролцогчийн тоо">
+            {data.isPollsterNumber ? data.pollsterNumber : "Сонгоогүй"}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+    );
+  };
+
+  // Prepare pollster data when isAccessLevel is true
+  const getPollsterData = (data: PollData) => {
+    if (!data.isAccessLevel) return [];
+
+    const submittedUserIds = new Set(data.submittedUsers.map((u) => u.id));
+    const failedAttendeeUsernames = new Set(
+      data.failedAttendees.map((a) => a.username)
+    );
+
+    return data.pollsters.map((pollster) => {
+      if (submittedUserIds.has(pollster.id)) {
+        const submittedUser = data.submittedUsers.find(
+          (u) => u.id === pollster.id
+        );
+        return {
+          key: pollster.id,
+          username: pollster.username,
+          status: "submitted",
+          takenTime: submittedUser?.totalTimeTaken || null,
+        };
+      } else if (failedAttendeeUsernames.has(pollster.username)) {
+        return {
+          key: pollster.id,
+          username: pollster.username,
+          status: "failed",
+          takenTime: null,
+        };
+      } else {
+        return {
+          key: pollster.id,
+          username: pollster.username,
+          status: "not_attended",
+          takenTime: null,
+        };
+      }
+    });
+  };
+
   return (
     <div className="p-6">
       {data && (
         <div className="flex flex-col gap-2">
-          <div className="bg-second-bg  rounded p-4">
+          <div className="bg-second-bg rounded p-4">
             <div>
               <div className="flex flex-row gap-4 items-center">
                 <Image
@@ -209,32 +372,119 @@ const StatsPage = () => {
                   {data.title}
                 </h1>
               </div>
-              <div className="flex flex-row items-center">
-                <p>
-                  Үүсгэсэн огноо:{" "}
-                  {new Date(data.createdAt).toLocaleDateString()}
-                </p>
-                <Divider type="vertical" className="border" />
-                <p>Төлөв: {statusConv[data.status]}</p>
-                <Divider type="vertical" className="border" />
-                <p>
-                  Хариулт: {data.submittedUserCount} /{" "}
-                  {data.pollsterNumber || "-"}
-                </p>
-              </div>
+              <PollDetails data={data} />
             </div>
             <Divider className="border" />
-            <div>
-              <p>Асуулгын тойм</p>
-              <div>
-                <Card title="Оролцсон тоо">
-                  <p>{data.submittedUserCount}</p>
-                </Card>
-                <Card title="Оролцсон тоо">
-                  <p>{data.failedAttendees.length}</p>
-                </Card>
-              </div>
-              <div></div>
+            <div className="flex flex-col gap-4">
+              <Collapse defaultActiveKey={["1"]} expandIconPosition="end">
+                <Panel header="Асуулгын тойм" key="1">
+                  <div className="flex flex-row gap-2 w-full">
+                    <Card title="Оролцсон" className="flex-1">
+                      <p className="font-bold text-xl text-end">
+                        {data.submittedUserCount}
+                      </p>
+                    </Card>
+                    <Card title="Амжаагүй" className="flex-1">
+                      <p className="font-bold text-xl text-end">
+                        {data.failedAttendees.length}
+                      </p>
+                    </Card>
+                    <Card title="Дундаж" className="flex-1">
+                      <p className="font-bold text-xl text-end">
+                        {data.avgPollTime.toFixed(2)}
+                      </p>
+                    </Card>
+                  </div>
+                </Panel>
+              </Collapse>
+              <Collapse defaultActiveKey={["1"]} expandIconPosition="end">
+                <Panel header="Асуултууд" key="1">
+                  <Card>
+                    <div>
+                      <p className="font-bold text-xl flex flex-row justify-between">
+                        <span>Нийт</span>
+                        <span>{data.questions.length}</span>
+                      </p>
+                      <ul className="text-sm text-gray-600 mt-2">
+                        {questionTypeList.map((item) => (
+                          <li
+                            key={item.type}
+                            className="flex flex-row justify-between"
+                          >
+                            <span>{item.type} :</span>
+                            <span>{item.count}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Card>
+                </Panel>
+              </Collapse>
+              <Collapse defaultActiveKey={["1"]} expandIconPosition="end">
+                <Panel header="Оролцогчдын мэдээлэл" key="1">
+                  <Card>
+                    <Table
+                      columns={[
+                        {
+                          title: "Хэрэглэгчийн нэр",
+                          dataIndex: "username",
+                          key: "username",
+                        },
+                        {
+                          title: "Төлөв",
+                          dataIndex: "status",
+                          key: "status",
+                          render: (text) =>
+                            text === "submitted" ? (
+                              <Tag color="green">Хариулсан</Tag>
+                            ) : (
+                              <Tag color="yellow">Амжаагүй</Tag>
+                            ),
+                        },
+                        {
+                          title: "Зарцуулсан хугацаа (секунд)",
+                          dataIndex: "takenTime",
+                          key: "takenTime",
+                          render: (text) => (text ? text.toFixed(2) : "-"),
+                        },
+                      ]}
+                      dataSource={[
+                        ...data.submittedUsers.map((user) => ({
+                          key: user.id,
+                          username: user.username,
+                          status: "submitted",
+                          takenTime: user.totalTimeTaken,
+                        })),
+                        ...data.failedAttendees.map((attendee, index) => ({
+                          key: `failed-${index}`,
+                          username:
+                            attendee.username || `Хэрэглэгч ${index + 1}`,
+                          status: "failed",
+                          takenTime: null,
+                        })),
+                      ]}
+                      pagination={{ pageSize: 10 }}
+                      bordered
+                      size="middle"
+                    />
+                  </Card>
+                </Panel>
+              </Collapse>
+              {data.isAccessLevel && (
+                <Collapse defaultActiveKey={["1"]} expandIconPosition="end">
+                  <Panel header="Уригдсан Оролцогчид" key="1">
+                    <Card>
+                      <Table
+                        columns={pollsterColumns}
+                        dataSource={getPollsterData(data)}
+                        pagination={{ pageSize: 10 }}
+                        bordered
+                        size="middle"
+                      />
+                    </Card>
+                  </Panel>
+                </Collapse>
+              )}
             </div>
           </div>
           <div className="space-y-6">
@@ -316,9 +566,9 @@ const StatsPage = () => {
                       User Responses
                     </h3>
                     <Table
-                      columns={columns}
+                      columns={optionColumns}
                       dataSource={tableData}
-                      rowKey={(record) => record.optionId} // Safe now with proper typing
+                      rowKey={(record) => record.optionId}
                       pagination={false}
                       bordered
                       size="middle"
