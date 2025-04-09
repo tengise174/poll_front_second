@@ -29,6 +29,7 @@ export default function TestPage() {
   const [orderedQuestions, setOrderedQuestions] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0); // Timer in seconds
   const [timerActive, setTimerActive] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
   const [answers, setAnswers] = useState<
     { questionId: string; option: any[]; textAnswer: string }[]
   >([]);
@@ -169,14 +170,16 @@ export default function TestPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      const timeToComp = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
       const formattedAnswers = answers.map((answer) => ({
         questionId: answer.questionId,
         optionIds: answer.option.length
           ? answer.option.map((opt) => opt.id)
           : undefined,
         textAnswer: answer.textAnswer || undefined,
+        timeToComp: timeToComp,
       }));
-
+      
       await createAnswer(formattedAnswers);
       showAlert("Амжилттай", "success", "", true);
       setTimerActive(false);
@@ -211,6 +214,8 @@ export default function TestPage() {
             ? "Та энэ санал асуулгад оролцох эрхгүй байна"
             : fetchedData?.message === "User has already attended"
             ? "Та асуулгад оролцсон боловч амжаагүй"
+            : fetchedData?.message === "Poll is full"
+            ? "Санал асуулга дүүрсэн байна"
             : "Алдаа гарлаа"}
         </p>
         <CustomButton
@@ -289,8 +294,9 @@ export default function TestPage() {
                   backgroundColor: custStyle.primaryColor,
                   color: custStyle.backgroundColor,
                 }}
-                title={data?.btnLabel}
+                title={data?.btnLabel || "Эхлэх"}
                 onClick={() => {
+                  setStartTime(Date.now());
                   setStep("questions");
                 }}
               />

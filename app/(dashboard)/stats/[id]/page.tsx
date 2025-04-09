@@ -1,9 +1,10 @@
 "use client";
 import { getStatById } from "@/api/action";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton, Table } from "antd";
+import { Card, Divider, Skeleton, Table } from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Image } from "antd";
 import {
   PieChart,
   Pie,
@@ -48,8 +49,22 @@ interface PollQuestion {
 interface PollData {
   pollId: string;
   title: string;
+  status: "YET_OPEN" | "CLOSED" | "PULL" | "OPEN";
+  submittedUserCount: number;
+  pollsterNumber: number;
+  poster: string;
+  createdAt: string;
   questions: PollQuestion[];
+  submittedUsers: any[];
+  failedAttendees: any[];
 }
+
+const statusConv = {
+  YET_OPEN: "Эхлээгүй",
+  CLOSED: "Дууссан",
+  PULL: "Дүүрсэн",
+  OPEN: "Нээлттэй",
+};
 
 const StatsPage = () => {
   const { id } = useParams();
@@ -71,9 +86,7 @@ const StatsPage = () => {
   useEffect(() => {
     if (fetchedData) {
       setData(fetchedData);
-      setChartTypes(
-        fetchedData.questions.map(() => "pie" as ChartType)
-      );
+      setChartTypes(fetchedData.questions.map(() => "pie" as ChartType));
     }
   }, [fetchedData]);
 
@@ -148,7 +161,9 @@ const StatsPage = () => {
       dataIndex: "answeredBy",
       key: "answeredBy",
       render: (answeredBy: string[]) =>
-        answeredBy && answeredBy.length > 0 ? answeredBy.join(", ") : "No users",
+        answeredBy && answeredBy.length > 0
+          ? answeredBy.join(", ")
+          : "No users",
     },
   ];
 
@@ -163,8 +178,51 @@ const StatsPage = () => {
   return (
     <div className="p-6">
       {data && (
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Title: {data.title}</h1>
+        <div className="flex flex-col gap-2">
+          <div className="bg-second-bg  rounded p-4">
+            <div>
+              <div className="flex flex-row gap-4 items-center">
+                <Image
+                  src={
+                    data.poster ||
+                    "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                  }
+                  alt="poster"
+                  width={200}
+                  height={200}
+                />
+                <h1 className="text-2xl font-bold text-gray-800 mb-6">
+                  {data.title}
+                </h1>
+              </div>
+              <div className="flex flex-row items-center">
+                <p>
+                  Үүсгэсэн огноо:{" "}
+                  {new Date(data.createdAt).toLocaleDateString()}
+                </p>
+                <Divider type="vertical" className="border" />
+                <p>Төлөв: {statusConv[data.status]}</p>
+                <Divider type="vertical" className="border" />
+                <p>
+                  Хариулт: {data.submittedUserCount} /{" "}
+                  {data.pollsterNumber || "-"}
+                </p>
+              </div>
+            </div>
+            <Divider className="border" />
+            <div>
+              <p>Асуулгын тойм</p>
+              <div>
+                <Card title="Оролцсон тоо">
+                  <p>{data.submittedUserCount}</p>
+                </Card>
+                <Card title="Оролцсон тоо">
+                  <p>{data.failedAttendees.length}</p>
+                </Card>
+              </div>
+              <div></div>
+            </div>
+          </div>
           <div className="space-y-6">
             {data.questions.map((question: PollQuestion, qIndex: number) => {
               if (question.questionType === "TEXT") {
@@ -183,8 +241,10 @@ const StatsPage = () => {
                       <ul className="list-disc pl-5 space-y-2">
                         {question.answers.map((answer, aIndex) => (
                           <li key={aIndex} className="text-gray-800">
-                            <span className="font-medium">{answer.answeredBy}</span>:{" "}
-                            {answer.textAnswer}
+                            <span className="font-medium">
+                              {answer.answeredBy}
+                            </span>
+                            : {answer.textAnswer}
                           </li>
                         ))}
                       </ul>
@@ -216,7 +276,10 @@ const StatsPage = () => {
                     <select
                       value={chartTypes[qIndex]}
                       onChange={(e) =>
-                        handleChartTypeChange(qIndex, e.target.value as ChartType)
+                        handleChartTypeChange(
+                          qIndex,
+                          e.target.value as ChartType
+                        )
                       }
                       className="p-2 border rounded"
                     >
@@ -228,7 +291,9 @@ const StatsPage = () => {
 
                   <div className="h-80 mb-6">
                     <ResponsiveContainer width="100%" height="100%">
-                    {renderChart(chartTypes[qIndex], chartData) ?? <div>No chart available</div>}
+                      {renderChart(chartTypes[qIndex], chartData) ?? (
+                        <div>No chart available</div>
+                      )}
                     </ResponsiveContainer>
                   </div>
 
