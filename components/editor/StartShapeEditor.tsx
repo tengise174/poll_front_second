@@ -3,11 +3,8 @@ import React, { useRef, useState } from "react";
 import { message, Modal } from "antd";
 import CustomButton from "../CustomButton";
 import CustomInput from "../CustomInput";
-import LogoAlignSection from "../LogoAlignSection";
 import { StartShapeEditorProps } from "@/utils/componentTypes";
 import { dualColors } from "@/utils/utils";
-import GalleryEditIcon from "@/public/icons/gallery_edit";
-import GalleryIcon from "@/public/icons/gallery";
 import SendSquareIcon from "@/public/icons/send_quare";
 
 const startPageInputClass =
@@ -139,39 +136,7 @@ const StartShapeEditor = ({
             ))}
           </div>
         </div>
-        <div className="rounded-[10px] bg-[#F5F5F5] w-full mt-[10px] p-[10px]">
-          <div className="flex items-center">
-            <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-              Дүрс & Лого
-            </p>
-          </div>
-          {!uploadedImage ? (
-            <div
-              onClick={() => setIsModalOpen(true)}
-              className="bg-[#E6E6E6] rounded-[10px] w-full h-[100px] flex justify-center items-center text-[#303030] mt-[14px] cursor-pointer"
-            >
-              <GalleryIcon className="w-6 h-6" />
-            </div>
-          ) : (
-            <div className="bg-black w-full flex items-center justify-center mt-[14px] rounded-[10px] h-[100px] gap-x-5">
-              <img
-                src={uploadedImage}
-                className="rounded-[5px]"
-                style={{ width: 80, height: 80 }}
-                alt="Uploaded Preview"
-              />
-              <GalleryEditIcon
-                className="w-6 h-6 cursor-pointer text-[#FDFDFD]"
-                onClick={() => setIsModalOpen(true)}
-              />
-            </div>
-          )}
-
-          <LogoAlignSection
-          />
-        </div>
       </div>
-
       <Modal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
