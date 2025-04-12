@@ -9,6 +9,12 @@ const items: MenuProps["items"] = [
   {
     key: "1",
     label: (
+      <>Хувийн тохиргоо</>
+    )
+  },
+  {
+    key: "2",
+    label: (
       <>Гарах</>
     ),
     icon: <LogoutOutlined/>
@@ -32,14 +38,15 @@ const CustomHeader = ({}: CustomHeaderProps) => {
     switch (e.key) {
       case "1":
         {
-          localStorage.removeItem('profile');
-          localStorage.removeItem('token');
-          setUserProfile(null);
-          router.push('/login');
+          router.push('/profile');
         }
         break;
       case "2":
         {
+          localStorage.removeItem('profile');
+          localStorage.removeItem('token');
+          setUserProfile(null);
+          router.push('/login');
         }
         break;
     }

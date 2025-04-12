@@ -95,9 +95,19 @@ export const getProfile = async () => {
   }
 };
 
+export const changePassword = async (data: any) => {
+  try {
+    const response = await instance.post("/auth/change-password", data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+
 export const updateProfile = async (data: any) => {
   try {
-    const response = await instance.post("/auth/update-profile");
+    const response = await instance.post("/auth/update-profile", data);
     return response.data;
   } catch (error: any) {
     throw error;
