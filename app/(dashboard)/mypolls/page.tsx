@@ -74,8 +74,6 @@ const MyPollsPage = () => {
     }
   }, [currentPollData]);
 
-  console.log(data);
-
   if (isFetching) {
     return (
       <div>

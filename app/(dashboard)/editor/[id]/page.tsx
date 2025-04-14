@@ -145,6 +145,9 @@ export default function SurveyDetailPage() {
     enabled: id !== "new",
   });
 
+
+  console.log(newQuestions);
+
   useEffect(() => {
     if (data) {
       setThemeId(data.themeId);

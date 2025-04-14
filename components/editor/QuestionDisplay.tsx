@@ -52,7 +52,7 @@ const QuestionDisplay = ({
                     color: dualColors[themeId][1],
                     borderRadius: "10px",
                   }}
-                  bodyStyle={{ padding: "16px" }}
+                  styles={{ body: { padding: "16px" } }}
                 >
                   <div className="flex flex-col">
                     <p

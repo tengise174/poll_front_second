@@ -1,7 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Checkbox, ConfigProvider, Radio, Rate, Skeleton } from "antd";
+import {
+  Checkbox,
+  ConfigProvider,
+  Radio,
+  Rate,
+  Skeleton,
+  Switch,
+  Card,
+  Button,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import CustomButton from "@/components/CustomButton";
 import { dualColors } from "@/utils/utils";
@@ -12,7 +21,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import {
   createAnswer,
-  getPollById,
   getPollForTest,
   recordFailedAttendance,
 } from "@/api/action";
@@ -25,7 +33,9 @@ interface Question {
   minAnswerCount: number;
   options: any[];
   order: number;
-  required?: boolean; // Add required field
+  required?: boolean;
+  rateNumber?: number;
+  rateType?: string;
 }
 
 export default function TestPage() {
@@ -38,7 +48,7 @@ export default function TestPage() {
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderedQuestions, setOrderedQuestions] = useState<any[]>([]);
-  const [timeLeft, setTimeLeft] = useState<number>(0); // Timer in seconds
+  const [timeLeft, setTimeLeft] = useState<number>(0);
   const [timerActive, setTimerActive] = useState(false);
   const [answers, setAnswers] = useState<
     { questionId: string; option: any[]; textAnswer: string }[]
@@ -53,6 +63,8 @@ export default function TestPage() {
   const [questionStartTime, setQuestionStartTime] = useState<number>(
     Date.now()
   );
+  // New state for display mode
+  const [displayMode, setDisplayMode] = useState<"single" | "all">("single");
 
   const {
     data: fetchedData,
@@ -188,11 +200,9 @@ export default function TestPage() {
   };
 
   const isButtonDisabled = (question: Question) => {
-    // If question is not required, button is never disabled
     if (!question.required) {
       return false;
     }
-    // For required questions, check if answered
     return !hasAnswered(
       question.id,
       question.minAnswerCount,
@@ -217,8 +227,12 @@ export default function TestPage() {
     return unansweredRequired;
   };
 
+  // New function to check if all required questions are answered
+  const areAllRequiredAnswered = () => {
+    return validateRequiredQuestions().length === 0;
+  };
+
   const handleSubmit = async () => {
-    // Check required questions first
     const requiredErrors = validateRequiredQuestions();
     if (requiredErrors.length > 0) {
       setRequiredError(requiredErrors);
@@ -231,7 +245,7 @@ export default function TestPage() {
       const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
       setTimeTakenPerQuestion((prev) => ({
         ...prev,
-        [orderedQuestions[questionNo].id]: timeSpent,
+        [orderedQuestions[questionNo]?.id || "all"]: timeSpent,
       }));
 
       const formattedAnswers = answers.map((answer) => ({
@@ -240,10 +254,7 @@ export default function TestPage() {
           ? answer.option.map((opt) => opt.id)
           : undefined,
         textAnswer: answer.textAnswer || undefined,
-        timeTaken:
-          answer.questionId === orderedQuestions[questionNo].id
-            ? timeSpent
-            : timeTakenPerQuestion[answer.questionId] || 0,
+        timeTaken: timeTakenPerQuestion[answer.questionId] || timeSpent,
       }));
 
       await createAnswer(formattedAnswers);
@@ -255,6 +266,173 @@ export default function TestPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Render individual question component
+  const renderQuestion = (question: Question, index?: number) => {
+    const isError = requiredError.includes(question.id);
+    return (
+      <Card
+        key={question.id}
+        title={
+          <div className="flex items-center gap-2">
+            <span>
+              {index !== undefined
+                ? `${index + 1}. ${question.content}`
+                : question.content}
+            </span>
+            {question.required && <span className="text-red-500">*</span>}
+          </div>
+        }
+        className="w-full shadow-xl hover:scale-102 transition-all duration-300 ease-in-out"
+        style={{ marginBottom: 16, backgroundColor: custStyle.backgroundColor }}
+        headStyle={{ color: custStyle.primaryColor }}
+        styles={{ body: { color: custStyle.primaryColor } }}
+      >
+        {isError && (
+          <div className="text-red-500 text-xs mb-2">
+            Энэ асуултад заавал хариулах шаардлагатай
+          </div>
+        )}
+
+        {question.questionType === "MULTI_CHOICE" && (
+          <Checkbox.Group
+            value={
+              answers.find((answer) => answer.questionId === question.id)
+                ?.option || []
+            }
+            onChange={(checkedValues) =>
+              handleChange(question.id, checkedValues, "")
+            }
+            className="circle-checkbox flex gap-3 w-full max-h-full overflow-y-auto"
+          >
+            {question.options.map((item: any, idx: any) => (
+              <Checkbox
+                value={item}
+                key={idx}
+                style={{ color: custStyle.primaryColor }}
+                className="custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3"
+              >
+                {item.content}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
+        )}
+
+        {question.questionType === "SINGLE_CHOICE" && (
+          <Radio.Group
+            onChange={(e) => handleChange(question.id, [e.target.value], "")}
+            value={
+              answers.find((answer) => answer.questionId === question.id)
+                ?.option?.[0] || undefined
+            }
+            className="flex flex-col w-full max-h-full overflow-y-auto"
+          >
+            {question.options.map((item: any, idx: any) => (
+              <Radio
+                style={{ color: custStyle.primaryColor }}
+                className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
+                key={idx}
+                value={item}
+              >
+                {item.content}
+              </Radio>
+            ))}
+          </Radio.Group>
+        )}
+
+        {question.questionType === "RATING" && (
+          <div className="w-full flex items-center justify-center">
+            <Rate
+              count={question.rateNumber}
+              value={Number(
+                answers.find((answer) => answer.questionId === question.id)
+                  ?.option?.[0]?.content || 0
+              )}
+              onChange={(value) => {
+                const selectedOption = question.options.find(
+                  (opt: any) => opt.content === String(value)
+                );
+                handleChange(question.id, [selectedOption], "");
+              }}
+              character={({ index = 0 }) =>
+                question.rateType === "NUMBER" ? (
+                  <span
+                    className="text-base font-semibold font-open"
+                    style={{
+                      color:
+                        index <
+                        Number(
+                          answers.find(
+                            (answer) => answer.questionId === question.id
+                          )?.option?.[0]?.content || 0
+                        )
+                          ? custStyle.primaryColor
+                          : "#E0E8F1",
+                    }}
+                  >
+                    {question.options[index].content}
+                  </span>
+                ) : (
+                  <RateStarIcon
+                    fill={
+                      index <
+                      Number(
+                        answers.find(
+                          (answer) => answer.questionId === question.id
+                        )?.option?.[0]?.content || 0
+                      )
+                        ? custStyle.primaryColor
+                        : "#E0E8F1"
+                    }
+                  />
+                )
+              }
+            />
+          </div>
+        )}
+
+        {question.questionType === "YES_NO" && (
+          <Radio.Group
+            optionType="button"
+            buttonStyle="solid"
+            onChange={(e) => handleChange(question.id, [e.target.value], "")}
+            value={
+              answers.find((answer) => answer.questionId === question.id)
+                ?.option?.[0] || undefined
+            }
+            className="flex flex-col w-full max-h-full overflow-y-auto"
+          >
+            {question.options.map((item: any, idx: any) => (
+              <Radio
+                style={{ color: custStyle.primaryColor }}
+                className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
+                key={idx}
+                value={item}
+              >
+                {item.content}
+              </Radio>
+            ))}
+          </Radio.Group>
+        )}
+
+        {question.questionType === "TEXT" && (
+          <TextArea
+            onChange={(e) => handleChange(question.id, [], e.target.value)}
+            value={
+              answers.find((answer) => answer.questionId === question.id)
+                ?.textAnswer || ""
+            }
+            style={{
+              backgroundColor: custStyle.backgroundColor,
+              color: custStyle.primaryColor,
+            }}
+            placeholder="Enter text"
+            className=""
+          />
+        )}
+      </Card>
+    );
   };
 
   if (isFetching)
@@ -305,6 +483,15 @@ export default function TestPage() {
             buttonSolidCheckedBg: "#777",
             buttonSolidCheckedHoverBg: "#888",
           },
+          Switch: {
+            handleBg: custStyle.primaryColor,
+            trackHeight: 22,
+            trackPadding: 4,
+          },
+          Card: {
+            headerBg: custStyle.backgroundColor,
+            borderRadiusLG: 10,
+          },
         },
       }}
     >
@@ -316,46 +503,59 @@ export default function TestPage() {
             "--bg-color": custStyle.backgroundColor,
           } as React.CSSProperties
         }
-        className={`p-[30px] flex flex-col font-open h-screen`}
+        className="flex flex-col font-open h-screen pt-10"
       >
-        <div className={`h-[49px] flex flex-row items-center justify-center`}>
-          <BoxIcon className={`h-full w-auto`} />
+        <div className="h-[49px] flex flex-row items-center justify-center">
+          <BoxIcon className="h-full w-auto" />
         </div>
-        <div
-          className={`flex flex-1 flex-col items-center py-[72px] overflow-hidden`}
-        >
+        <div className="flex flex-1 flex-col items-center overflow-hidden">
           {step === "start" && (
-            <div className={`flex flex-col gap-20 items-center max-w-[630px]`}>
+            <div className="flex flex-col gap-20 items-center max-w-[630px]">
               <div className="flex flex-col gap-5">
                 <h1
                   style={{ color: custStyle.primaryColor }}
-                  className={`text-center text-5xl font-semibold`}
+                  className="text-center text-5xl font-semibold"
                 >
                   {data?.title}
                 </h1>
                 <p
                   style={{ color: custStyle.primaryColor }}
-                  className={`text-center text-base font-medium`}
+                  className="text-center text-base font-medium"
                 >
                   {data?.greetingMessage}
                 </p>
-                <div className={`flex flex-col items-center gap-[10px]`}>
+                <div className="flex flex-col items-center gap-[10px]">
                   <p
                     style={{ color: custStyle.primaryColor }}
-                    className={`text-[13px] font-mediu`}
+                    className="text-[13px] font-medium"
                   >
                     Судалгааны хугацаа
                   </p>
-                  <div
-                    className={`rounded-[99px] px-5 py-[5px] bg-[#434343] text-white text-sm font-medium`}
-                  >
+                  <div className="rounded-[99px] px-5 py-[5px] bg-[#434343] text-white text-sm font-medium">
                     {data?.duration} мин
                   </div>
                 </div>
+                {/* New Switch for display mode */}
+                <div className="flex items-center gap-4">
+                  <p
+                    style={{ color: custStyle.primaryColor }}
+                    className="text-[13px] font-medium"
+                  >
+                    {displayMode === "single" ? "Нэг асуулт" : "Бүх асуултууд"}
+                  </p>
+                  <Switch
+                    checked={displayMode === "all"}
+                    onChange={(checked) =>
+                      setDisplayMode(checked ? "all" : "single")
+                    }
+                    checkedChildren="Бүгд"
+                    unCheckedChildren="Нэг"
+                  />
+                </div>
               </div>
               <CustomButton
-                titleClassname={`text-base font-medium`}
-                className={`h-[42px] w-[200px] rounded-[999px]`}
+                titleClassname="text-base font-medium"
+                className="h-[42px] w-[200px] rounded-[999px] hover:cursor-pointer"
                 style={{
                   backgroundColor: custStyle.primaryColor,
                   color: custStyle.backgroundColor,
@@ -367,7 +567,7 @@ export default function TestPage() {
               />
             </div>
           )}
-          {step === "questions" && (
+          {step === "questions" && displayMode === "single" && (
             <div className="flex flex-col gap-5 items-center max-w-[430px] max-h-full">
               <div>{formatTime(timeLeft)}</div>
               <div
@@ -381,7 +581,6 @@ export default function TestPage() {
                 )}
               </div>
 
-              {/* Show error message if this question is required and unanswered */}
               {requiredError.includes(orderedQuestions[questionNo].id) && (
                 <div className="text-red-500 text-xs">
                   Энэ асуултад заавал хариулах шаардлагатай
@@ -389,201 +588,12 @@ export default function TestPage() {
               )}
 
               <div className="w-full h-[90%]">
-                {orderedQuestions[questionNo].questionType ===
-                  "MULTI_CHOICE" && (
-                  <Checkbox.Group
-                    value={
-                      answers.find(
-                        (answer) =>
-                          answer.questionId === orderedQuestions[questionNo].id
-                      )?.option || []
-                    }
-                    onChange={(checkedValues) =>
-                      handleChange(
-                        orderedQuestions[questionNo].id,
-                        checkedValues,
-                        ""
-                      )
-                    }
-                    className="circle-checkbox flex gap-3 w-full max-h-full overflow-y-auto"
-                  >
-                    {orderedQuestions[questionNo].options.map(
-                      (item: any, index: any) => (
-                        <Checkbox
-                          value={item}
-                          key={index}
-                          style={{ color: custStyle.primaryColor }}
-                          className={`custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3`}
-                        >
-                          {item.content}
-                        </Checkbox>
-                      )
-                    )}
-                  </Checkbox.Group>
-                )}
-
-                {orderedQuestions[questionNo].questionType ===
-                  "SINGLE_CHOICE" && (
-                  <Radio.Group
-                    onChange={(e) =>
-                      handleChange(
-                        orderedQuestions[questionNo].id,
-                        [e.target.value],
-                        ""
-                      )
-                    }
-                    value={
-                      answers.find(
-                        (answer) =>
-                          answer.questionId === orderedQuestions[questionNo].id
-                      )?.option?.[0] || undefined
-                    }
-                    className="flex flex-col w-full max-h-full overflow-y-auto"
-                  >
-                    {orderedQuestions[questionNo].options.map(
-                      (item: any, index: any) => (
-                        <Radio
-                          style={{ color: custStyle.primaryColor }}
-                          className={`custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent`}
-                          key={index}
-                          value={item}
-                        >
-                          {item.content}
-                        </Radio>
-                      )
-                    )}
-                  </Radio.Group>
-                )}
-
-                {orderedQuestions[questionNo].questionType === "RATING" && (
-                  <div className="w-full flex items-center justify-center">
-                    <Rate
-                      count={orderedQuestions[questionNo].rateNumber}
-                      value={Number(
-                        answers.find(
-                          (answer) =>
-                            answer.questionId ===
-                            orderedQuestions[questionNo].id
-                        )?.option?.[0]?.content || 0
-                      )}
-                      onChange={(value) => {
-                        const selectedOption = orderedQuestions[
-                          questionNo
-                        ].options.find(
-                          (opt: any) => opt.content === String(value)
-                        );
-                        handleChange(
-                          orderedQuestions[questionNo].id,
-                          [selectedOption],
-                          ""
-                        );
-                      }}
-                      character={({ index = 0 }) =>
-                        orderedQuestions[questionNo].rateType === "NUMBER" ? (
-                          <span
-                            className={`text-base font-semibold font-open`}
-                            style={{
-                              color:
-                                index <
-                                Number(
-                                  answers.find(
-                                    (answer) =>
-                                      answer.questionId ===
-                                      orderedQuestions[questionNo].id
-                                  )?.option?.[0]?.content || 0
-                                )
-                                  ? custStyle.primaryColor
-                                  : "#E0E8F1",
-                            }}
-                          >
-                            {
-                              orderedQuestions[questionNo].options[index]
-                                .content
-                            }
-                          </span>
-                        ) : (
-                          <RateStarIcon
-                            fill={
-                              index <
-                              Number(
-                                answers.find(
-                                  (answer) =>
-                                    answer.questionId ===
-                                    orderedQuestions[questionNo].id
-                                )?.option?.[0]?.content || 0
-                              )
-                                ? custStyle.primaryColor
-                                : "#E0E8F1"
-                            }
-                          />
-                        )
-                      }
-                    />
-                  </div>
-                )}
-
-                {orderedQuestions[questionNo].questionType === "YES_NO" && (
-                  <Radio.Group
-                    optionType="button"
-                    buttonStyle="solid"
-                    onChange={(e) =>
-                      handleChange(
-                        orderedQuestions[questionNo].id,
-                        [e.target.value],
-                        ""
-                      )
-                    }
-                    value={
-                      answers.find(
-                        (answer) =>
-                          answer.questionId === orderedQuestions[questionNo].id
-                      )?.option?.[0] || undefined
-                    }
-                    className="flex flex-col w-full max-h-full overflow-y-auto"
-                  >
-                    {orderedQuestions[questionNo].options.map(
-                      (item: any, index: any) => (
-                        <Radio
-                          style={{ color: custStyle.primaryColor }}
-                          className={`custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent`}
-                          key={index}
-                          value={item}
-                        >
-                          {item.content}
-                        </Radio>
-                      )
-                    )}
-                  </Radio.Group>
-                )}
-
-                {orderedQuestions[questionNo].questionType === "TEXT" && (
-                  <TextArea
-                    onChange={(e) =>
-                      handleChange(
-                        orderedQuestions[questionNo].id,
-                        [],
-                        e.target.value
-                      )
-                    }
-                    value={
-                      answers.find(
-                        (answer) =>
-                          answer.questionId === orderedQuestions[questionNo].id
-                      )?.textAnswer || ""
-                    }
-                    style={{
-                      backgroundColor: custStyle.backgroundColor,
-                      color: custStyle.primaryColor,
-                    }}
-                    placeholder="Enter text"
-                    className=""
-                  />
-                )}
+                {renderQuestion(orderedQuestions[questionNo])}
               </div>
 
               <div className="w-full flex flex-row gap-24 justify-between items-center">
                 <CustomButton
-                  title={"Буцах"}
+                  title="Буцах"
                   className="text-[#B3B3B3] text-[13px] font-semibold h-9 w-[79px]"
                   onClick={() => {
                     if (questionNo > 0) {
@@ -651,14 +661,48 @@ export default function TestPage() {
               </div>
             </div>
           )}
+          {step === "questions" && displayMode === "all" && (
+            <div className="flex flex-col items-center gap-5 w-220 max-h-full h-full">
+              <div>{formatTime(timeLeft)}</div>
+              <div className="flex flex-col gap-5 items-center w-full max-w-[630px] max-h-full h-full overflow-y-auto px-6">
+                {orderedQuestions.map((question, index) =>
+                  renderQuestion(question, index)
+                )}
+              </div>
+              <div className="flex flex-row gap-4">
+                <CustomButton
+                  title={"Буцах"}
+                  onClick={() => setStep("start")}
+                  className="bg-[#888] !text-xs px-8 rounded-[99px] !h-10 hover:cursor-pointer hover:bg-main-purple"
+                />
+                <Button
+                  type="primary"
+                  size="large"
+                  className="hover:cursor-pointer"
+                  loading={isSubmitting}
+                  disabled={!areAllRequiredAnswered()}
+                  onClick={handleSubmit}
+                  style={{
+                    backgroundColor: areAllRequiredAnswered()
+                      ? custStyle.primaryColor
+                      : "#D9D9D9",
+                    color: custStyle.backgroundColor,
+                    borderRadius: 99,
+                    height: 40,
+                    width: 280,
+                  }}
+                >
+                  Дуусгах
+                </Button>
+              </div>
+            </div>
+          )}
           {step === "end" && (
             <div className="flex flex-col items-center gap-10">
               <div className="flex flex-col items-center gap-4">
                 <p
                   className="text-base font-medium"
-                  style={{
-                    color: custStyle.primaryColor,
-                  }}
+                  style={{ color: custStyle.primaryColor }}
                 >
                   Таны асуулга амжилттай илгээгдлээ
                 </p>
@@ -670,7 +714,7 @@ export default function TestPage() {
                   backgroundColor: custStyle.primaryColor,
                 }}
                 title={
-                  <div className="flex flex-row items-center justify-center gap-[10px]">
+                  <div className="flex flex-row items-center justify-center gap-[10px] text-xs">
                     <span>Миний асуулга</span>
                     <ArrowRightIcon />
                   </div>
@@ -689,7 +733,7 @@ export default function TestPage() {
           className={`h-[30px] relative flex items-end ${
             step === "start"
               ? "justify-center"
-              : step === "questions"
+              : step === "questions" && displayMode === "single"
               ? "justify-end"
               : ""
           }`}
@@ -697,20 +741,20 @@ export default function TestPage() {
           {step === "start" && (
             <div className="text-center">
               <p
-                className={`text-[8px] font-normal`}
+                className="text-[8px] font-normal"
                 style={{ color: custStyle.primaryColor }}
               >
                 Асуулга үүсгэгч
               </p>
               <p
-                className={`text-sm font-medium`}
+                className="text-sm font-medium"
                 style={{ color: custStyle.primaryColor }}
               >
                 MPoll
               </p>
             </div>
           )}
-          {step === "questions" && (
+          {step === "questions" && displayMode === "single" && (
             <div
               className="text-2xl font-medium"
               style={{ color: custStyle.primaryColor }}

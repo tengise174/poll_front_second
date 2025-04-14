@@ -96,5 +96,5 @@ body {
 }
 
 .custom-checkbox-wrapper .custom-checkbox-inner::after {
-  border-radius: 50% !important; /* Ensure the check mark is circular */
+  border-radius: 50% !important;
 }
