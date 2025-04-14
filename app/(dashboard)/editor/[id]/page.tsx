@@ -10,7 +10,7 @@ import EndEditor from "@/components/editor/EndEditor";
 import EndDisplay from "@/components/editor/EndDisplay";
 import SettingsEditor from "@/components/editor/SettingsEditor";
 import SettingsDisplay from "@/components/editor/SettingsDisplay";
-import { dualColors } from "@/utils/utils";
+import { dualColors, questionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { createPoll, getPollById, updatePoll } from "@/api/action";
 import { useQuery } from "@tanstack/react-query";
@@ -18,12 +18,15 @@ import { useAlert } from "@/context/AlertProvider";
 import { Button, Modal, QRCode } from "antd";
 import Link from "next/link";
 import { CopyOutlined } from "@ant-design/icons";
+import { QuestionProps } from "@/utils/componentTypes";
+import RateStarIcon from "@/public/icons/rate_star";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
   const { showAlert } = useAlert();
   const [activeSection, setActiveSection] = useState(0);
   const [themeId, setThemeId] = useState<number>(0);
+  const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [chosenType, setChosenType] = useState<
     "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | null
@@ -247,6 +250,78 @@ export default function SurveyDetailPage() {
     setChosenType(null);
   };
 
+  const handleQuestionAdd = () => {
+    setIsQuestionTypeModalOpen(true);
+  };
+
+  const handleQuestionTypeSelect = (
+    questionType:
+      | "MULTI_CHOICE"
+      | "SINGLE_CHOICE"
+      | "RATING"
+      | "YES_NO"
+      | "TEXT"
+  ) => {
+    const lastIndex =
+      newQuestions.length === 1 && newQuestions[0].content === ""
+        ? 0
+        : newQuestions.length;
+
+    const shouldAddAnswers =
+      questionType === "SINGLE_CHOICE" || questionType === "MULTI_CHOICE";
+
+    const newQuestion: QuestionProps = {
+      content: "",
+      questionType,
+      required: false,
+      order: lastIndex + 1,
+      options: shouldAddAnswers
+        ? [
+            { content: "", order: 1 },
+            { content: "", order: 2 },
+          ]
+        : [],
+      ...(questionType === "RATING" && {
+        rateNumber: 5,
+        rateType: "STAR",
+        options: [
+          { content: "1", order: 1 },
+          { content: "2", order: 2 },
+          { content: "3", order: 3 },
+          { content: "4", order: 4 },
+          { content: "5", order: 5 },
+        ],
+      }),
+      ...(questionType === "YES_NO" && {
+        options: [
+          { content: "Тийм", order: 1 },
+          { content: "Үгүй", order: 2 },
+        ],
+      }),
+    };
+
+    setNewQuestions((prev) => {
+      const emptyTitleIndex = prev.findIndex(
+        (question) => question.content === ""
+      );
+
+      if (
+        emptyTitleIndex !== -1 &&
+        prev[emptyTitleIndex].questionType === null
+      ) {
+        return prev.map((question, index) =>
+          index === emptyTitleIndex ? newQuestion : question
+        );
+      }
+      return [...prev, newQuestion];
+    });
+
+    setCurrentPage(lastIndex);
+    setCurrentQuestion(newQuestion);
+    setChosenType(questionType);
+    setIsQuestionTypeModalOpen(false); // Close modal after selection
+  };
+
   useEffect(() => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[currentPage].content === ""
@@ -313,7 +388,7 @@ export default function SurveyDetailPage() {
                 <p className="p-5">Асуултын төрлийг сонгоно уу!</p>
               )}
               <div
-                onClick={handleAdd}
+                onClick={handleQuestionAdd}
                 className="h-[40px] w-full bg-[#FDFDFD] border-t border-[#D9D9D9] cursor-pointer flex items-center justify-center gap-x-[10px]"
               >
                 <AddIcon className="text-[#071522]" />
@@ -371,10 +446,31 @@ export default function SurveyDetailPage() {
           )}
         </div>
       </div>
+      <Modal
+        title="Асуултын төрөл сонгох"
+        open={isQuestionTypeModalOpen}
+        onCancel={() => setIsQuestionTypeModalOpen(false)}
+        footer={null}
+      >
+        <div className="flex flex-col gap-y-[10px]">
+          {questionTypes.map((item, index) => (
+            <div
+              key={index}
+              onClick={() => handleQuestionTypeSelect(item.questionType)}
+              className="w-full group relative h-12 rounded-[10px] bg-[#FDFDFD] border border-[#D9D9D9] shadow-custom-100 flex items-center cursor-pointer px-2 hover:bg-gray-100"
+            >
+              {item.icon}
+              <p className="text-[#071522] text-[13px] font-medium ml-[5px]">
+                {item.title}
+              </p>
+            </div>
+          ))}
+        </div>
+      </Modal>
       <Modal open={isModalOpen} onCancel={() => setIsModalOpen(false)}>
         <div className="flex flex-col gap-4">
           <div>
-            <p>Хүсэлтийн URL</p>
+            <p>Хүсэлтийн URL</p>
             <div className="flex fle-row gap-2">
               <Link href={reqUrl}>{reqUrl}</Link>
               <Button
@@ -385,7 +481,7 @@ export default function SurveyDetailPage() {
             </div>
           </div>
           <div>
-            <p>Хүсэлтийн QR код</p>
+            <p>Хүсэлтийн QR код</p>
             <QRCode value={reqUrl || "-"} />
           </div>
         </div>

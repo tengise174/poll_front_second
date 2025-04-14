@@ -78,28 +78,28 @@ export const manualStatusTag = ({ status }: { status: string }) => {
 
 export const questionTypes: QuestionTypeProps[] = [
   {
-    icon: <MultipleChoiceIcon />,
-    title: "Олон сонголт",
+    icon: <div>📝</div>, // Replace with actual icon component
+    title: "Олон сонголттой",
     questionType: "MULTI_CHOICE",
   },
   {
-    icon: <SingleChoiceIcon />,
-    title: "Нэг сонголт",
+    icon: <div>🔘</div>, // Replace with actual icon component
+    title: "Нэг сонголттой",
     questionType: "SINGLE_CHOICE",
   },
   {
-    icon: <RatingChoiceIcon />,
+    icon: <div>⭐</div>, // Replace with actual icon component
     title: "Үнэлгээ",
     questionType: "RATING",
   },
   {
-    icon: <YesNoChoiceIcon />,
+    icon: <div>✅</div>, // Replace with actual icon component
     title: "Тийм/Үгүй",
     questionType: "YES_NO",
   },
   {
-    icon: <TextChoiceIcon />,
-    title: "Сэтгэгдэл",
+    icon: <div>📜</div>, // Replace with actual icon component
+    title: "Текст",
     questionType: "TEXT",
   },
 ];

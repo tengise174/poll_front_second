@@ -78,13 +78,6 @@ export interface CustomAlertType {
   duration?: number;
 }
 
-export interface UserManualProps {
-  title: string;
-  desc: string;
-  dialog?: string;
-  image?: any;
-}
-
 export interface SurveyProps {
   name: string;
   status: "PUBLISHED" | "CREATED" | "CLOSED";
@@ -101,7 +94,6 @@ export interface QuestionTypeProps {
     | "RATING"
     | "YES_NO"
     | "TEXT"
-    | null;
 }
 interface SettingsPageProps {
   isAccessLevel: boolean;
@@ -147,11 +139,6 @@ export interface StartShapeEditorProps {
   setStartPage: Dispatch<SetStateAction<StartPageProps>>;
 }
 
-export interface StartTextEditorProps {
-  id: string;
-  startPage: StartPageProps;
-  setStartPage: Dispatch<SetStateAction<StartPageProps>>;
-}
 
 export interface QuestionProps {
   content: string;
@@ -179,18 +166,6 @@ type ChosenTypeProps =
   | "TEXT"
   | null;
 
-export interface QuestionSquareEditorProps {
-  id: string;
-  newQuestions: QuestionProps[];
-  setNewQuestions: Dispatch<SetStateAction<Array<QuestionProps>>>;
-  setChosenType: Dispatch<SetStateAction<ChosenTypeProps>>;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
-  templateQuestions: {
-    id: string;
-    options: Array<any>;
-    content: string;
-  }[];
-}
 
 export interface QuestionTextEditorProps {
   id: string;
@@ -242,35 +217,3 @@ export interface StartEditorProps {
   handleCreatPoll: Function;
 }
 
-export type CorporateType = {
-  name: string;
-  regNum: string;
-  employees: string;
-  operation: string;
-} | null;
-
-export type IndividualType = {
-  work: string;
-  use: string;
-} | null;
-
-export interface CorporatePageProps {
-  step: number;
-  setShowButton: Dispatch<SetStateAction<{ [step: number]: boolean }>>;
-  data: CorporateType | null;
-  setData: Dispatch<SetStateAction<CorporateType | null>>;
-}
-
-export interface IndividualPageProps {
-  step: number;
-  setShowButton: Dispatch<SetStateAction<{ [step: number]: boolean }>>;
-  data: IndividualType | null;
-  setData: Dispatch<SetStateAction<IndividualType | null>>;
-}
-
-export interface OnboardingPageProps {
-  step: number;
-  setShowButton: Dispatch<SetStateAction<{ [step: number]: boolean }>>;
-  data: CorporateType | IndividualType;
-  setData: Dispatch<SetStateAction<CorporateType | IndividualType>>;
-}
