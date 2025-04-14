@@ -165,7 +165,7 @@ const QuestionDisplay = ({
                             ? {
                                 ...question,
                                 questionType: item.questionType,
-
+                                required: false,
                                 ...(shouldAddAnswers && {
                                   options: [
                                     { content: "", order: 1 },
@@ -200,6 +200,7 @@ const QuestionDisplay = ({
                         {
                           content: "",
                           questionType: item.questionType,
+                          required: false,
                           ...(shouldAddAnswers
                             ? {
                                 options: [

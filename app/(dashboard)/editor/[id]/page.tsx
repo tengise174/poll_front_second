@@ -100,6 +100,7 @@ export default function SurveyDetailPage() {
     rateType?: "STAR" | "NUMBER";
     order: number;
     id?: number;
+    required: boolean;
   }>();
 
   const [newQuestions, setNewQuestions] = useState<
@@ -118,6 +119,7 @@ export default function SurveyDetailPage() {
       rateNumber?: number;
       rateType?: "STAR" | "NUMBER";
       id?: number;
+      required: boolean;
     }>
   >([
     {
@@ -128,6 +130,7 @@ export default function SurveyDetailPage() {
       rateNumber: 4,
       rateType: "STAR",
       options: [],
+      required: false,
     },
   ]);
 
@@ -177,6 +180,7 @@ export default function SurveyDetailPage() {
           rateNumber: question.rateNumber || 4,
           rateType: question.rateType || "STAR",
           order: question.order,
+          required: question.required || false,
           options:
             question.options
               ?.map((option: any) => ({
@@ -250,7 +254,6 @@ export default function SurveyDetailPage() {
         : newQuestions.length - 1;
     setCurrentQuestion(newQuestions[currentPage]);
   }, [currentPage, chosenType]);
-
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">
       <div className="flex flex-col md:flex-row h-auto md:h-full md:max-h-[calc(100vh-56px)]">

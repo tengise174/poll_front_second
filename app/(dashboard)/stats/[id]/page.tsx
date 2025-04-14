@@ -52,6 +52,7 @@ interface PollOption {
   content: string;
   selectionCount: number;
   answeredBy: AnsweredByProp[];
+  order: number; // Added order field for options
 }
 
 interface PollAnswer {
@@ -66,6 +67,7 @@ interface PollQuestion {
   content: string;
   questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE";
   avgTimeTaken: number;
+  order: number; // Added order field for questions
   options?: PollOption[];
   answers?: PollAnswer[];
 }
@@ -128,8 +130,12 @@ const StatsPage = () => {
 
   useEffect(() => {
     if (fetchedData) {
-      setData(fetchedData);
-      setChartTypes(fetchedData.questions.map(() => "pie" as ChartType));
+      // Sort questions by order field
+      const sortedQuestions = [...fetchedData.questions].sort(
+        (a, b) => a.order - b.order
+      );
+      setData({ ...fetchedData, questions: sortedQuestions });
+      setChartTypes(sortedQuestions.map(() => "pie" as ChartType));
     }
   }, [fetchedData]);
 
@@ -519,12 +525,17 @@ const StatsPage = () => {
                 );
               }
 
-              const chartData = question.options!.map((option) => ({
+              // Sort options by order field for non-TEXT questions
+              const sortedOptions = [...(question.options || [])].sort(
+                (a, b) => a.order - b.order
+              );
+
+              const chartData = sortedOptions.map((option) => ({
                 name: option.content,
                 value: option.selectionCount,
               }));
 
-              const tableData = question.options!;
+              const tableData = sortedOptions;
 
               return (
                 <div

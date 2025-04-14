@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { InputNumber, Radio } from "antd";
+import { InputNumber, Radio, Switch } from "antd";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
 import { QuestionTextEditorProps } from "@/utils/componentTypes";
@@ -33,6 +33,7 @@ const QuestionTextEditor = ({
           minAnswerCount: 1,
           rateNumber: 5,
           options: [],
+          required: false,
         },
       ]);
       setCurrentQuestion({
@@ -42,6 +43,7 @@ const QuestionTextEditor = ({
         minAnswerCount: 1,
         rateNumber: 5,
         options: [],
+        required: false,
       });
       setChosenType(null);
       setCurrentPage(0);
@@ -91,6 +93,7 @@ const QuestionTextEditor = ({
                   order: currentPage,
                   options: [],
                   minAnswerCount: 1,
+                  required: false,
                 });
               }
             }}
@@ -98,8 +101,29 @@ const QuestionTextEditor = ({
             className={questionInputClass}
             placeholder="Асуултаа энд бичнэ үү?"
           />
+          <div className="flex items-center gap-2 mt-2">
+            <Switch
+              checked={currentQuestion?.required || false}
+              onChange={(checked) => {
+                const updatedQuestions = newQuestions.map((item, index) =>
+                  index === currentPage
+                    ? { ...item, required: checked }
+                    : item
+                );
+                setNewQuestions(updatedQuestions);
+                if (currentQuestion) {
+                  setCurrentQuestion({
+                    ...currentQuestion,
+                    required: checked,
+                  });
+                }
+              }}
+            />
+            <p className="text-[13px] text-[#1E1E1E]">
+              Заавал бөглөх
+            </p>
+          </div>
         </div>
-
         {/* New Rate Number Input for STAR_RATING and NUMBER_RATING */}
         {["RATING"].includes(currentQuestion?.questionType ?? "") && (
           <div>

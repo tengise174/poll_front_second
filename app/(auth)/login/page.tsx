@@ -17,27 +17,42 @@ const Login = () => {
   const router = useRouter();
 
   const handleLogIn = async () => {
-    const signInData = {
-      username: form.getFieldValue("username"),
-      password: form.getFieldValue("password"),
-    };
-
+    setLoading(true);
     try {
+      const signInData = {
+        username: form.getFieldValue("username"),
+        password: form.getFieldValue("password"),
+      };
+
       const result = await signin(signInData);
-      router.push("/");
-      showAlert("Амжилттай нэвтэрлээ", "success", "", true);
+      const { accessToken } = result;
+
+      localStorage.setItem("token", accessToken);
 
       const profile = await getProfile();
-
       if (profile) {
         localStorage.setItem("profile", JSON.stringify(profile));
       }
+
+      router.push("/");
+      showAlert("Амжилттай нэвтэрлээ", "success", "", true);
     } catch (error: any) {
-      if (error.status === 401) {
-        showAlert("Нэвтрэх мэдээлэл буруу", "warning", "", true);
+      let errorMessage = "Нэвтрэхэд алдаа гарлаа";
+      if (error.response) {
+        if (error.response.status === 400) {
+          errorMessage = "Хэрэглэгчийн нэр эсвэл нууц үг буруу байна";
+        } else if (error.response.status === 401) {
+          errorMessage = "Нэвтрэх мэдээлэл буруу";
+        } else if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
       } else {
-        showAlert("Нэвтрэх мэдээлэл буруу", "warning", "", true);
+        errorMessage = "Сүлжээний алдаа гарлаа. Дахин оролдоно уу.";
       }
+
+      showAlert(errorMessage, "error", "", true);
+    } finally {
+      setLoading(false);
     }
   };
 

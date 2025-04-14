@@ -153,7 +153,7 @@ export interface StartTextEditorProps {
   setStartPage: Dispatch<SetStateAction<StartPageProps>>;
 }
 
-interface QuestionProps {
+export interface QuestionProps {
   content: string;
   options?: Array<{ content: string; order: number }>;
   questionType:
@@ -168,6 +168,7 @@ interface QuestionProps {
   rateNumber?: number;
   rateType?: "STAR" | "NUMBER";
   id?: number;
+  required: boolean;
 }
 
 type ChosenTypeProps =

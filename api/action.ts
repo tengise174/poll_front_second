@@ -51,9 +51,10 @@ instance.interceptors.response.use(
   }
 );
 
-export const getPollForTest = async (id: string) => {
+// Sign-in request
+export const signin = async (body: any) => {
   try {
-    const response = await instance.get(`/polls/test/${id}`);
+    const response = await instance.post("/auth/signin", body);
     return response.data;
   } catch (error: any) {
     throw error;
@@ -72,17 +73,19 @@ export const signup = async (body: any) => {
   }
 };
 
-// Sign-in request
-export const signin = async (body: any) => {
+export const getPollForTest = async (id: string) => {
   try {
-    const response = await instance.post("/auth/signin", body);
-    const { accessToken } = response.data;
-    localStorage.setItem("token", accessToken);
+    const response = await instance.get(`/polls/test/${id}`);
     return response.data;
   } catch (error: any) {
     throw error;
   }
 };
+
+
+
+
+
 
 export default instance;
 
@@ -108,6 +111,15 @@ export const changePassword = async (data: any) => {
 export const updateProfile = async (data: any) => {
   try {
     const response = await instance.post("/auth/update-profile", data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const deleteProfile = async () => {
+  try {
+    const response = await instance.post("/auth/delete-account");
     return response.data;
   } catch (error: any) {
     throw error;

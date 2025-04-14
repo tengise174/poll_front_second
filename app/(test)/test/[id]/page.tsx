@@ -18,11 +18,22 @@ import {
 } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 
+interface Question {
+  id: string;
+  content: string;
+  questionType: string;
+  minAnswerCount: number;
+  options: any[];
+  order: number;
+  required?: boolean; // Add required field
+}
+
 export default function TestPage() {
   const { id } = useParams();
   const { showAlert } = useAlert();
   const router = useRouter();
   const [data, setData] = useState<any>(null);
+  const [requiredError, setRequiredError] = useState<string[]>([]);
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -176,7 +187,45 @@ export default function TestPage() {
     return true;
   };
 
+  const isButtonDisabled = (question: Question) => {
+    // If question is not required, button is never disabled
+    if (!question.required) {
+      return false;
+    }
+    // For required questions, check if answered
+    return !hasAnswered(
+      question.id,
+      question.minAnswerCount,
+      question.questionType
+    );
+  };
+
+  const validateRequiredQuestions = () => {
+    const unansweredRequired: string[] = [];
+    orderedQuestions.forEach((question: Question) => {
+      if (
+        question.required &&
+        !hasAnswered(
+          question.id,
+          question.minAnswerCount,
+          question.questionType
+        )
+      ) {
+        unansweredRequired.push(question.id);
+      }
+    });
+    return unansweredRequired;
+  };
+
   const handleSubmit = async () => {
+    // Check required questions first
+    const requiredErrors = validateRequiredQuestions();
+    if (requiredErrors.length > 0) {
+      setRequiredError(requiredErrors);
+      showAlert("Бүх шаардлагатай асуултуудад хариулна уу", "error", "", true);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
@@ -192,9 +241,9 @@ export default function TestPage() {
           : undefined,
         textAnswer: answer.textAnswer || undefined,
         timeTaken:
-        answer.questionId === orderedQuestions[questionNo].id
-          ? timeSpent
-          : timeTakenPerQuestion[answer.questionId] || 0,
+          answer.questionId === orderedQuestions[questionNo].id
+            ? timeSpent
+            : timeTakenPerQuestion[answer.questionId] || 0,
       }));
 
       await createAnswer(formattedAnswers);
@@ -327,7 +376,17 @@ export default function TestPage() {
               >
                 <span className="block">{questionNo + 1 + "."}</span>
                 <span>{orderedQuestions[questionNo].content}</span>
+                {orderedQuestions[questionNo].required && (
+                  <span className="text-red-500 ml-1">*</span>
+                )}
               </div>
+
+              {/* Show error message if this question is required and unanswered */}
+              {requiredError.includes(orderedQuestions[questionNo].id) && (
+                <div className="text-red-500 text-xs">
+                  Энэ асуултад заавал хариулах шаардлагатай
+                </div>
+              )}
 
               <div className="w-full h-[90%]">
                 {orderedQuestions[questionNo].questionType ===
@@ -528,20 +587,25 @@ export default function TestPage() {
                   className="text-[#B3B3B3] text-[13px] font-semibold h-9 w-[79px]"
                   onClick={() => {
                     if (questionNo > 0) {
-                      // Record time spent on current question before moving back
                       const timeSpent = Math.round(
                         (Date.now() - questionStartTime) / 1000
-                      ); // Convert to seconds
+                      );
                       setTimeTakenPerQuestion((prev) => ({
                         ...prev,
                         [orderedQuestions[questionNo].id]: timeSpent,
                       }));
                       setQuestionNo(questionNo - 1);
-                      setQuestionStartTime(Date.now()); // Reset start time for previous question
+                      setQuestionStartTime(Date.now());
+                      setRequiredError((prev) =>
+                        prev.filter(
+                          (id) => id !== orderedQuestions[questionNo].id
+                        )
+                      );
                     } else {
                       setStep("start");
                       setQuestionNo(0);
                       setAnswers([]);
+                      setRequiredError([]);
                     }
                   }}
                 />
@@ -554,23 +618,14 @@ export default function TestPage() {
                   className="h-9 w-[220px] rounded-[99px] text-[13px] font-semibold cursor-pointer"
                   style={{
                     color: custStyle.backgroundColor,
-                    backgroundColor: hasAnswered(
-                      orderedQuestions[questionNo].id,
-                      orderedQuestions[questionNo].minAnswerCount,
-                      orderedQuestions[questionNo].questionType
+                    backgroundColor: isButtonDisabled(
+                      orderedQuestions[questionNo]
                     )
-                      ? custStyle.primaryColor
-                      : "#D9D9D9",
+                      ? "#D9D9D9"
+                      : custStyle.primaryColor,
                   }}
-                  disabled={
-                    !hasAnswered(
-                      orderedQuestions[questionNo].id,
-                      orderedQuestions[questionNo].minAnswerCount,
-                      orderedQuestions[questionNo].questionType
-                    )
-                  }
+                  disabled={isButtonDisabled(orderedQuestions[questionNo])}
                   onClick={() => {
-                    // Record time spent on current question
                     const timeSpent = Math.round(
                       (Date.now() - questionStartTime) / 1000
                     );
@@ -579,11 +634,17 @@ export default function TestPage() {
                       [orderedQuestions[questionNo].id]: timeSpent,
                     }));
 
+                    setRequiredError((prev) =>
+                      prev.filter(
+                        (id) => id !== orderedQuestions[questionNo].id
+                      )
+                    );
+
                     if (questionNo === orderedQuestions.length - 1) {
                       handleSubmit();
                     } else {
                       setQuestionNo(questionNo + 1);
-                      setQuestionStartTime(Date.now()); // Reset start time for next question
+                      setQuestionStartTime(Date.now());
                     }
                   }}
                 />
