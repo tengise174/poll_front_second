@@ -1,6 +1,6 @@
 "use client";
 import { PollCardType } from "@/utils/componentTypes";
-import { Button, Card, Popover, Tag, Tooltip } from "antd";
+import { Button, Card, Popover, Tag, Tooltip, Image } from "antd";
 import Meta from "antd/es/card/Meta";
 import {
   BarChartOutlined,
@@ -93,12 +93,14 @@ const PollCard = ({
     <Card
       className="w-full h-full transition-transform duration-300 ease-in-out hover:scale-103 overflow-hidden"
       cover={
-        <img
-          alt="poster"
+        <Image
           src={
             poster ||
             "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
           }
+          alt="poster"
+          width={`${poster} ? 'auto' : 'full`}
+          height={200}
         />
       }
       actions={cardActions}
@@ -107,7 +109,11 @@ const PollCard = ({
         onClick={handleCardClick}
         className="flex flex-row justify-between items-center"
       >
-        <Meta title={title} description={greetingMessage} className="hover:cursor-pointer hover:underline "/>
+        <Meta
+          title={title}
+          description={greetingMessage}
+          className="hover:cursor-pointer hover:underline "
+        />
         {cardType === "ANSWER" &&
           (hasAnswers ? (
             <Tag color="green">Хариулсан</Tag>

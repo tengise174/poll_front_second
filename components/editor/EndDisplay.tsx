@@ -6,7 +6,6 @@ const EndDisplay = ({
   endPage,
   dualColors,
   themeId,
-  uploadedImage,
 }: EndDisplayProps) => {
   return (
     <div
@@ -17,20 +16,6 @@ const EndDisplay = ({
       className={`border border-[#303030] rounded-[10px] w-full h-full flex flex-col justify-between pt-10 px-5 pb-5`}
     >
       <div className="w-full flex flex-col items-center">
-        <div
-          className={`w-full flex flex-col items-center`}
-        >
-          {!uploadedImage ? (
-            <BoxIcon className="w-11 h-11 rounded-md" />
-          ) : (
-            <img
-              src={uploadedImage}
-              className="rounded-md"
-              style={{ width: 44, height: 44 }}
-              alt="Uploaded Preview"
-            />
-          )}
-        </div>
         <p
           style={{ color: dualColors[themeId][1] }}
           className="text-[14px] leading-[17px] font-semibold mt-[100px]"

@@ -70,6 +70,7 @@ interface PollQuestion {
   order: number; // Added order field for questions
   options?: PollOption[];
   answers?: PollAnswer[];
+  poster?: string | null;
 }
 
 interface UserProp {
@@ -546,6 +547,15 @@ const StatsPage = () => {
                     Question: {question.content}
                   </h2>
 
+                  {question.poster && (
+                    <Image
+                      src={question.poster}
+                      height={100}
+                      style={{
+                        width: "auto",
+                      }}
+                    />
+                  )}
                   <div className="mb-4">
                     <label className="mr-2 text-gray-600">Chart Type:</label>
                     <select

@@ -19,7 +19,6 @@ import { Button, Modal, QRCode } from "antd";
 import Link from "next/link";
 import { CopyOutlined } from "@ant-design/icons";
 import { QuestionProps } from "@/utils/componentTypes";
-import RateStarIcon from "@/public/icons/rate_star";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
@@ -27,7 +26,6 @@ export default function SurveyDetailPage() {
   const [activeSection, setActiveSection] = useState(0);
   const [themeId, setThemeId] = useState<number>(0);
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [chosenType, setChosenType] = useState<
     "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | null
   >(null);
@@ -74,10 +72,12 @@ export default function SurveyDetailPage() {
     title: string;
     greetingMessage: string;
     btnLabel: string;
+    poster?: string | null;
   }>({
     title: "",
     greetingMessage: "",
     btnLabel: "",
+    poster: null,
   });
 
   const [endPage, setEndPage] = useState<{
@@ -88,43 +88,9 @@ export default function SurveyDetailPage() {
     thankYouMessage: "",
   });
 
-  const [currentQuestion, setCurrentQuestion] = useState<{
-    content: string;
-    options?: Array<{ content: string; order: number }>;
-    questionType:
-      | "MULTI_CHOICE"
-      | "SINGLE_CHOICE"
-      | "RATING"
-      | "YES_NO"
-      | "TEXT"
-      | null;
-    minAnswerCount?: number;
-    rateNumber?: number;
-    rateType?: "STAR" | "NUMBER";
-    order: number;
-    id?: number;
-    required: boolean;
-  }>();
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionProps>();
 
-  const [newQuestions, setNewQuestions] = useState<
-    Array<{
-      content: string;
-      options?: Array<{ content: string; order: number }>;
-      questionType:
-        | "MULTI_CHOICE"
-        | "SINGLE_CHOICE"
-        | "RATING"
-        | "YES_NO"
-        | "TEXT"
-        | null;
-      minAnswerCount?: number;
-      order: number;
-      rateNumber?: number;
-      rateType?: "STAR" | "NUMBER";
-      id?: number;
-      required: boolean;
-    }>
-  >([
+  const [newQuestions, setNewQuestions] = useState<QuestionProps[]>([
     {
       content: "",
       questionType: null,
@@ -134,6 +100,7 @@ export default function SurveyDetailPage() {
       rateType: "STAR",
       options: [],
       required: false,
+      poster: null,
     },
   ]);
 
@@ -144,7 +111,6 @@ export default function SurveyDetailPage() {
     retry: false,
     enabled: id !== "new",
   });
-
 
   console.log(newQuestions);
 
@@ -170,6 +136,7 @@ export default function SurveyDetailPage() {
         title: data.title,
         greetingMessage: data.greetingMessage,
         btnLabel: data.btnLabel,
+        poster: data.poster || null,
       }));
 
       setEndPage((prev) => ({
@@ -187,6 +154,7 @@ export default function SurveyDetailPage() {
           rateType: question.rateType || "STAR",
           order: question.order,
           required: question.required || false,
+          poster: question.poster || null,
           options:
             question.options
               ?.map((option: any) => ({
@@ -196,19 +164,20 @@ export default function SurveyDetailPage() {
               .sort((a: any, b: any) => a.order - b.order) || [],
         }))
         .sort((a: any, b: any) => a.order - b.order);
-      setChosenType(transformedQuestions[0].questionType);
+      setChosenType(transformedQuestions[0]?.questionType);
       setCurrentQuestion(transformedQuestions[0]);
       setNewQuestions(transformedQuestions);
     }
   }, [id, data]);
 
-  const questionData = {
+  const pollData = {
     title: startPage.title,
     greetingMessage: startPage.greetingMessage,
     btnLabel: startPage.btnLabel,
     endTitle: endPage.endTitle,
     thankYouMessage: endPage.thankYouMessage,
     themeId: themeId,
+    poster: startPage.poster,
     startDate: settingsPage.startDate,
     endDate: settingsPage.endDate,
     duration: settingsPage.duration,
@@ -224,7 +193,7 @@ export default function SurveyDetailPage() {
   const handleCreatePoll = async () => {
     if (id === "new") {
       try {
-        const result = await createPoll(questionData);
+        const result = await createPoll(pollData);
         if (result) {
           showAlert("Амжилттай нэмлээ", "success", "", true);
           setReqUrl(`http://localhost:3000/test/${result.id}`);
@@ -236,7 +205,7 @@ export default function SurveyDetailPage() {
       }
     } else {
       try {
-        const result = await updatePoll(id as string, questionData);
+        const result = await updatePoll(id as string, pollData);
         if (result) {
           showAlert("Амжилттай заслаа", "success", "", true);
           setReqUrl(`http://localhost:3000/test/${result.id}`);
@@ -263,7 +232,7 @@ export default function SurveyDetailPage() {
       | "SINGLE_CHOICE"
       | "RATING"
       | "YES_NO"
-      | "TEXT"
+      | "TEXT",
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
@@ -278,6 +247,7 @@ export default function SurveyDetailPage() {
       questionType,
       required: false,
       order: lastIndex + 1,
+      poster: null,
       options: shouldAddAnswers
         ? [
             { content: "", order: 1 },
@@ -305,7 +275,7 @@ export default function SurveyDetailPage() {
 
     setNewQuestions((prev) => {
       const emptyTitleIndex = prev.findIndex(
-        (question) => question.content === ""
+        (question) => question.content === "",
       );
 
       if (
@@ -313,7 +283,7 @@ export default function SurveyDetailPage() {
         prev[emptyTitleIndex].questionType === null
       ) {
         return prev.map((question, index) =>
-          index === emptyTitleIndex ? newQuestion : question
+          index === emptyTitleIndex ? newQuestion : question,
         );
       }
       return [...prev, newQuestion];
@@ -353,7 +323,7 @@ export default function SurveyDetailPage() {
                   >
                     {text}
                   </p>
-                )
+                ),
               )}
             </div>
           </div>
@@ -368,8 +338,6 @@ export default function SurveyDetailPage() {
               id={String(id)}
               themeId={themeId}
               setThemeId={setThemeId}
-              uploadedImage={uploadedImage}
-              setUploadedImage={setUploadedImage}
               startPage={startPage}
               setStartPage={setStartPage}
             />
@@ -422,7 +390,6 @@ export default function SurveyDetailPage() {
               startPage={startPage}
               dualColors={dualColors}
               themeId={themeId}
-              uploadedImage={uploadedImage}
             />
           )}
           {activeSection === 2 && (
@@ -444,7 +411,6 @@ export default function SurveyDetailPage() {
               endPage={endPage}
               dualColors={dualColors}
               themeId={themeId}
-              uploadedImage={uploadedImage}
             />
           )}
         </div>

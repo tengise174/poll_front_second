@@ -10,6 +10,7 @@ import {
   Switch,
   Card,
   Button,
+  Image,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import CustomButton from "@/components/CustomButton";
@@ -36,6 +37,7 @@ interface Question {
   required?: boolean;
   rateNumber?: number;
   rateType?: string;
+  poster?: string | null;
 }
 
 export default function TestPage() {
@@ -289,6 +291,18 @@ export default function TestPage() {
         headStyle={{ color: custStyle.primaryColor }}
         styles={{ body: { color: custStyle.primaryColor } }}
       >
+        {question.poster && (
+          <Image
+          src={question.poster}
+          height={100}
+          style={{
+            width: 'auto'
+          }}
+          onError={(e) => {
+                e.currentTarget.style.display = "none"; // Hide broken images
+              }}
+          />
+        )}
         {isError && (
           <div className="text-red-500 text-xs mb-2">
             Энэ асуултад заавал хариулах шаардлагатай

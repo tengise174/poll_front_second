@@ -5,8 +5,7 @@ import { questionTypes } from "@/utils/utils";
 import { QuestionDisplayProps } from "@/utils/componentTypes";
 import CloseCircleIcon from "@/public/icons/close_circle";
 import AddIcon from "@/public/icons/add";
-import { Card, Switch } from "antd";
-// Adjust import path as needed
+import { Card, Switch, Image } from "antd";
 
 const QuestionDisplay = ({
   chosenType,
@@ -55,12 +54,22 @@ const QuestionDisplay = ({
                   styles={{ body: { padding: "16px" } }}
                 >
                   <div className="flex flex-col">
+                    
                     <p
                       style={{ color: dualColors[themeId][1] }}
                       className="text-[14px] leading-[17px] font-semibold"
                     >
                       {index + 1}. {question.content || "Question"}
                     </p>
+                    {question.poster && (
+                      <Image
+                        src={question.poster}
+                        height={100}
+                        style={{
+                          width: "auto",
+                        }}
+                      />
+                    )}
                     <div className="flex flex-col gap-y-[18px] mt-[18px]">
                       {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
                         question.questionType ?? ""
@@ -153,6 +162,13 @@ const QuestionDisplay = ({
               className="rounded-[10px] w-full flex flex-col items-center p-5"
             >
               <div className="flex flex-col max-w-[430px] w-full">
+                {currentQuestion?.poster && (
+                  <img
+                    src={currentQuestion.poster}
+                    alt="Question poster"
+                    className="w-full h-32 object-cover rounded-[10px] mb-4"
+                  />
+                )}
                 <p
                   style={{ color: dualColors[themeId][1] }}
                   className="text-[14px] leading-[17px] font-semibold cursor-pointer"

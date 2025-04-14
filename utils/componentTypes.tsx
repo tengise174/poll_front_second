@@ -6,7 +6,7 @@ export interface PollCardType {
   id: string;
   title: string;
   greetingMessage: string;
-  poster: string;
+  poster?: string | null;
   cardType: "POLL" | "ANSWER";
   hasAnswers?: boolean;
   setIsModalOpen?: Dispatch<SetStateAction<boolean>>;
@@ -88,12 +88,7 @@ export interface SurveyProps {
 export interface QuestionTypeProps {
   icon: any;
   title: string;
-  questionType:
-    | "MULTI_CHOICE"
-    | "SINGLE_CHOICE"
-    | "RATING"
-    | "YES_NO"
-    | "TEXT"
+  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT";
 }
 interface SettingsPageProps {
   isAccessLevel: boolean;
@@ -112,6 +107,7 @@ interface StartPageProps {
   title: string;
   greetingMessage: string;
   btnLabel: string;
+  poster?: string | null;
 }
 
 export interface SettingsEditorProps {
@@ -133,12 +129,9 @@ export interface StartShapeEditorProps {
   id: string;
   themeId: number;
   setThemeId: Function;
-  uploadedImage: string | null;
-  setUploadedImage: Dispatch<SetStateAction<string | null>>;
   startPage: StartPageProps;
   setStartPage: Dispatch<SetStateAction<StartPageProps>>;
 }
-
 
 export interface QuestionProps {
   content: string;
@@ -156,6 +149,7 @@ export interface QuestionProps {
   rateType?: "STAR" | "NUMBER";
   id?: number;
   required: boolean;
+  poster?: string | null;
 }
 
 type ChosenTypeProps =
@@ -165,7 +159,6 @@ type ChosenTypeProps =
   | "YES_NO"
   | "TEXT"
   | null;
-
 
 export interface QuestionTextEditorProps {
   id: string;
@@ -182,7 +175,6 @@ export interface StartDisplayProps {
   startPage: StartPageProps;
   dualColors: string[][];
   themeId: number;
-  uploadedImage: string | null;
 }
 
 export interface QuestionDisplayProps {
@@ -207,7 +199,6 @@ export interface EndDisplayProps {
   endPage: endPageProps;
   dualColors: string[][];
   themeId: number;
-  uploadedImage: string | null;
 }
 
 export interface StartEditorProps {
@@ -216,4 +207,3 @@ export interface StartEditorProps {
   setEndPage: Dispatch<SetStateAction<endPageProps>>;
   handleCreatPoll: Function;
 }
-

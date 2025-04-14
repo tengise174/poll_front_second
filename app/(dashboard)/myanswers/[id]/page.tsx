@@ -10,6 +10,7 @@ import {
   Typography,
   Input,
   Rate,
+  Image,
 } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -30,6 +31,7 @@ interface QuestionProps {
   allOptions?: OptionsProps[];
   selectedOptions?: OptionsProps[];
   textAnswer?: string;
+  poster?: string | null;
 }
 
 interface PollProps {
@@ -39,6 +41,7 @@ interface PollProps {
   themeId: number;
   startDate?: string;
   endDate?: string;
+  poster?: string | null;
 }
 
 const MyAnswersDetail = () => {
@@ -111,6 +114,17 @@ const MyAnswersDetail = () => {
       <div>
         <h1>Асуулга: {answerDetails.poll.title}</h1>
         <p>Тайлбар: {answerDetails.poll.greetingMessage}</p>
+        {answerDetails.poll.poster && (
+          <Image
+            src={
+              answerDetails.poll.poster ||
+              "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+            }
+            alt="poster"
+            width={200}
+            height={200}
+          />
+        )}
       </div>
       <div className="flex flex-col gap-4 w-full">
         {answerDetails.questions.map((question, index) => (
@@ -118,6 +132,15 @@ const MyAnswersDetail = () => {
             <h2 className="mb-6">
               {index + 1}. {question.content}
             </h2>
+            {question.poster && (
+              <Image
+                src={question.poster}
+                height={100}
+                style={{
+                  width: "auto",
+                }}
+              />
+            )}
             {question.questionType === "RATING" ? (
               <Rate
                 defaultValue={Number(question.selectedOptions?.[0].content)}
