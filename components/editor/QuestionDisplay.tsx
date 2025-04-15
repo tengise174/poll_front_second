@@ -39,7 +39,7 @@ const QuestionDisplay = ({
       </div>
       {isCardView ? (
         <div className="w-full overflow-y-auto max-h-[calc(100vh-120px)]">
-          <div className="flex flex-col gap-4 max-w-[430px] mx-auto">
+          <div className="flex flex-col gap-4 mx-auto px-[5%] py-5">
             {newQuestions.length > 0 ? (
               newQuestions.map((question, index) => (
                 <Card
@@ -74,8 +74,11 @@ const QuestionDisplay = ({
                         question.questionType ?? ""
                       ) &&
                         question.options?.map((item, optIndex) => (
-                          <div className="flex flex-col gap-2" key={optIndex}>
-                            <div className="flex items-center">
+                          <div
+                            className="flex flex-row gap-2 w-full"
+                            key={optIndex}
+                          >
+                            <div className="flex flex-1 items-center">
                               <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
                                 <span className="mr-1.5 not-italic">
                                   {String.fromCharCode(65 + optIndex)}.
@@ -120,7 +123,7 @@ const QuestionDisplay = ({
                             {item.poster && (
                               <Image
                                 src={item.poster}
-                                height={80}
+                                height={60}
                                 style={{
                                   width: "auto",
                                   borderRadius: "8px",
@@ -173,26 +176,28 @@ const QuestionDisplay = ({
               className="rounded-[10px] w-full flex flex-col items-center p-5"
             >
               <div className="flex flex-col max-w-[430px] w-full">
-                {currentQuestion?.poster && (
-                  <img
-                    src={currentQuestion.poster}
-                    alt="Question poster"
-                    className="w-full h-32 object-cover rounded-[10px] mb-4"
-                  />
-                )}
                 <p
                   style={{ color: dualColors[themeId][1] }}
                   className="text-[14px] leading-[17px] font-semibold cursor-pointer"
                 >
                   {currentPage + 1}. {currentQuestion?.content}
                 </p>
+                {currentQuestion?.poster && (
+                  <Image
+                    src={currentQuestion?.poster}
+                    height={100}
+                    style={{
+                      width: "auto",
+                    }}
+                  />
+                )}
                 <div className="flex flex-col gap-y-[18px] mt-[18px]">
                   {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
                     currentQuestion?.questionType ?? ""
                   ) &&
                     currentQuestion?.options?.map((item, index) => (
-                      <div className="flex flex-col gap-2" key={index}>
-                        <div className="flex items-center">
+                      <div className="flex flex-row gap-2 w-full" key={index}>
+                        <div className="flex items-center flex-1">
                           <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
                             <span className="mr-1.5 not-italic">
                               {String.fromCharCode(65 + index)}.

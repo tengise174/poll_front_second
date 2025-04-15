@@ -327,14 +327,19 @@ export default function TestPage() {
             className="circle-checkbox flex flex-col gap-3 w-full max-h-full overflow-y-auto"
           >
             {question.options.map((item: Option, idx: number) => (
-              <div key={idx} className="flex flex-col gap-2">
-                <Checkbox
-                  value={item}
-                  style={{ color: custStyle.primaryColor }}
-                  className="custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3"
-                >
-                  {item.content}
-                </Checkbox>
+              <div
+                key={idx}
+                className="flex flex-row gap-2 w-full items-center"
+              >
+                <div className="flex-1">
+                  <Checkbox
+                    value={item}
+                    style={{ color: custStyle.primaryColor }}
+                    className="custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3"
+                  >
+                    {item.content}
+                  </Checkbox>
+                </div>
                 {item.poster && (
                   <Image
                     src={item.poster}
@@ -363,14 +368,19 @@ export default function TestPage() {
             className="flex flex-col w-full max-h-full overflow-y-auto"
           >
             {question.options.map((item: Option, idx: number) => (
-              <div key={idx} className="flex flex-col gap-2">
-                <Radio
-                  style={{ color: custStyle.primaryColor }}
-                  className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
-                  value={item}
-                >
-                  {item.content}
-                </Radio>
+              <div
+                key={idx}
+                className="flex flex-row w-full gap-2 items-center"
+              >
+                <div className="flex-1">
+                  <Radio
+                    style={{ color: custStyle.primaryColor }}
+                    className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
+                    value={item}
+                  >
+                    {item.content}
+                  </Radio>
+                </div>
                 {item.poster && (
                   <Image
                     src={item.poster}
@@ -452,14 +462,19 @@ export default function TestPage() {
             className="flex flex-col w-full max-h-full overflow-y-auto"
           >
             {question.options.map((item: Option, idx: number) => (
-              <div key={idx} className="flex flex-col gap-2">
-                <Radio
-                  style={{ color: custStyle.primaryColor }}
-                  className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
-                  value={item}
-                >
-                  {item.content}
-                </Radio>
+              <div
+                key={idx}
+                className="flex flex-row w-full items-center gap-2"
+              >
+                <div className="flex-1">
+                  <Radio
+                    style={{ color: custStyle.primaryColor }}
+                    className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
+                    value={item}
+                  >
+                    {item.content}
+                  </Radio>
+                </div>
                 {item.poster && (
                   <Image
                     src={item.poster}
@@ -629,7 +644,7 @@ export default function TestPage() {
             </div>
           )}
           {step === "questions" && displayMode === "single" && (
-            <div className="flex flex-col gap-5 items-center max-w-[430px] max-h-full">
+            <div className="flex flex-col gap-5 items-center max-h-full w-200">
               <div>{formatTime(timeLeft)}</div>
               <div
                 style={{ color: custStyle.primaryColor }}
@@ -723,9 +738,9 @@ export default function TestPage() {
             </div>
           )}
           {step === "questions" && displayMode === "all" && (
-            <div className="flex flex-col items-center gap-5 w-220 max-h-full h-full">
+            <div className="flex flex-col items-center gap-5 w-200 max-h-full h-full bg-red-200">
               <div>{formatTime(timeLeft)}</div>
-              <div className="flex flex-col gap-5 items-center w-full max-w-[630px] max-h-full h-full overflow-y-auto px-6">
+              <div className="flex flex-col gap-5 items-center w-full max-h-full h-full overflow-y-auto px-6">
                 {orderedQuestions.map((question, index) =>
                   renderQuestion(question, index)
                 )}

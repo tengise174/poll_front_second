@@ -9,6 +9,7 @@ import AddIcon from "@/public/icons/add";
 import RateStarIcon from "@/public/icons/rate_star";
 import { UploadOutlined } from "@ant-design/icons";
 import { useAlert } from "@/context/AlertProvider";
+import { FileImageOutlined } from "@ant-design/icons";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -195,64 +196,62 @@ const QuestionTextEditor = ({
     >
       <div className="">
         <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col justify-between gap-2 mt-5 p-[10px] relative">
-          <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-            Гарчиг
-          </p>
-          <CustomInput
-            onChange={(e: any) => {
-              const updatedQuestions = newQuestions.map((item, index) =>
-                index === currentPage
-                  ? { ...item, content: e.target.value }
-                  : item
-              );
-
-              setNewQuestions(updatedQuestions);
-
-              if (currentQuestion) {
-                setCurrentQuestion({
-                  ...currentQuestion,
-                  content: e.target.value,
-                });
-              } else {
-                setCurrentQuestion({
-                  content: e.target.value,
-                  questionType: null,
-                  order: currentPage,
-                  options: [],
-                  minAnswerCount: 1,
-                  required: false,
-                  poster: null,
-                });
-              }
-            }}
-            value={currentQuestion?.content || ""}
-            className={questionInputClass}
-            placeholder="Асуултаа энд бичнэ үү?"
-          />
-          <div className="flex items-center gap-2 mt-2">
-            <Switch
-              checked={currentQuestion?.required || false}
-              onChange={(checked) => {
+          <div className="flex flex-col justify-between gap-2 flex-1">
+            <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
+              Гарчиг
+            </p>
+            <CustomInput
+              onChange={(e: any) => {
                 const updatedQuestions = newQuestions.map((item, index) =>
-                  index === currentPage ? { ...item, required: checked } : item
+                  index === currentPage
+                    ? { ...item, content: e.target.value }
+                    : item
                 );
+
                 setNewQuestions(updatedQuestions);
+
                 if (currentQuestion) {
                   setCurrentQuestion({
                     ...currentQuestion,
-                    required: checked,
+                    content: e.target.value,
+                  });
+                } else {
+                  setCurrentQuestion({
+                    content: e.target.value,
+                    questionType: null,
+                    order: currentPage,
+                    options: [],
+                    minAnswerCount: 1,
+                    required: false,
+                    poster: null,
                   });
                 }
               }}
+              value={currentQuestion?.content || ""}
+              className={questionInputClass}
+              placeholder="Асуултаа энд бичнэ үү?"
             />
-            <p className="text-[13px] text-[#1E1E1E]">Заавал бөглөх</p>
+            <div className="flex items-center gap-2 mt-2">
+              <Switch
+                checked={currentQuestion?.required || false}
+                onChange={(checked) => {
+                  const updatedQuestions = newQuestions.map((item, index) =>
+                    index === currentPage
+                      ? { ...item, required: checked }
+                      : item
+                  );
+                  setNewQuestions(updatedQuestions);
+                  if (currentQuestion) {
+                    setCurrentQuestion({
+                      ...currentQuestion,
+                      required: checked,
+                    });
+                  }
+                }}
+              />
+              <p className="text-[13px] text-[#1E1E1E]">Заавал бөглөх</p>
+            </div>
           </div>
-        </div>
-        {/* Image Upload Section */}
-        <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
-          <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-            Зураг
-          </p>
           <Upload
             fileList={fileList}
             onChange={handleUploadChange}
@@ -271,11 +270,11 @@ const QuestionTextEditor = ({
             accept="image/*"
             listType="picture"
             maxCount={1}
+            // className="!max-w-20"
           >
-            <Button icon={<UploadOutlined />}>Зураг оруулах</Button>
+            <Button icon={<FileImageOutlined />}></Button>
           </Upload>
         </div>
-        {/* New Rate Number Input for STAR_RATING and NUMBER_RATING */}
         {["RATING"].includes(currentQuestion?.questionType ?? "") && (
           <div>
             <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
@@ -489,10 +488,9 @@ const QuestionTextEditor = ({
                             maxCount={1}
                           >
                             <Button
-                              icon={<UploadOutlined />}
+                              icon={<FileImageOutlined />}
                               style={{ marginTop: "8px" }}
                             >
-                              Сонголтын зураг оруулах
                             </Button>
                           </Upload>
                         </div>
@@ -520,7 +518,11 @@ const QuestionTextEditor = ({
                                 ...item,
                                 options: [
                                   ...item.options,
-                                  { content: "", order: newOrder, poster: null },
+                                  {
+                                    content: "",
+                                    order: newOrder,
+                                    poster: null,
+                                  },
                                 ],
                               }
                             : item

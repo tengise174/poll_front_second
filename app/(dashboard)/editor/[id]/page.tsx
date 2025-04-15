@@ -111,7 +111,7 @@ export default function SurveyDetailPage() {
     retry: false,
     enabled: id !== "new",
   });
-  
+
   useEffect(() => {
     if (data) {
       setThemeId(data.themeId);

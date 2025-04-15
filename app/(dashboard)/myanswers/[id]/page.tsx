@@ -106,14 +106,9 @@ const MyAnswersDetail = () => {
   if (!answerDetails) return <div>Алдаа гарсан</div>;
 
   return (
-    <div
-      className="w-full flex flex-col items-center justify-center"
-      style={{
-        backgroundColor: custStyle.backgroundColor,
-      }}
-    >
-      <div>
-        <h1>Асуулга: {answerDetails.poll.title}</h1>
+    <div className="w-200 flex flex-col items-center justify-center mx-auto">
+      <div className="w-full font-bold">
+        <h1>Асуулгын нэр: {answerDetails.poll.title}</h1>
         <p>Тайлбар: {answerDetails.poll.greetingMessage}</p>
         {answerDetails.poll.poster && (
           <Image
@@ -129,14 +124,18 @@ const MyAnswersDetail = () => {
       </div>
       <div className="flex flex-col gap-4 w-full">
         {answerDetails.questions.map((question, index) => (
-          <Card key={question.questionId}>
-            <h2 className="mb-6">
-              {index + 1}. {question.content}
-            </h2>
+          <Card
+            key={question.questionId}
+            title={
+              <h2 className="mb-6">
+                {index + 1}. {question.content}
+              </h2>
+            }
+          >
             {question.poster && (
               <Image
                 src={question.poster}
-                height={100}
+                height={150}
                 style={{
                   width: "auto",
                 }}
@@ -175,7 +174,7 @@ const MyAnswersDetail = () => {
                       className="custom-checkbox"
                     >
                       <div className="flex flex-row items-center gap-2">
-                        {option.content}
+                        <p className="fond-bold text-md">{option.content}</p>
                         <Image
                           src={option.poster || ""}
                           height={100}
