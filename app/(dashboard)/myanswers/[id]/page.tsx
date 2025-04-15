@@ -20,6 +20,7 @@ const { TextArea } = Input;
 interface OptionsProps {
   id: string;
   content: string;
+  poster?: string | null;
 }
 
 interface QuestionProps {
@@ -160,7 +161,7 @@ const MyAnswersDetail = () => {
                 style={{ marginTop: 8 }}
               />
             ) : (
-              <div>
+              <div className="flex flex-col">
                 {question.allOptions?.map((option) => {
                   const isChecked = question.selectedOptions?.some(
                     (selected) => selected.id === option.id
@@ -173,7 +174,16 @@ const MyAnswersDetail = () => {
                       style={{ marginBottom: 8 }}
                       className="custom-checkbox"
                     >
-                      {option.content}
+                      <div className="flex flex-row items-center gap-2">
+                        {option.content}
+                        <Image
+                          src={option.poster || ""}
+                          height={100}
+                          style={{
+                            width: "auto",
+                          }}
+                        />
+                      </div>
                     </Checkbox>
                   );
                 })}

@@ -9,10 +9,10 @@ import {
   Skeleton,
   Table,
   Tag,
+  Image,
 } from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Image } from "antd";
 import {
   PieChart,
   Pie,
@@ -50,9 +50,10 @@ interface AnsweredByProp {
 interface PollOption {
   optionId: string;
   content: string;
+  poster?: string | null;
   selectionCount: number;
   answeredBy: AnsweredByProp[];
-  order: number; // Added order field for options
+  order: number;
 }
 
 interface PollAnswer {
@@ -67,7 +68,7 @@ interface PollQuestion {
   content: string;
   questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE";
   avgTimeTaken: number;
-  order: number; // Added order field for questions
+  order: number;
   options?: PollOption[];
   answers?: PollAnswer[];
   poster?: string | null;
@@ -131,7 +132,6 @@ const StatsPage = () => {
 
   useEffect(() => {
     if (fetchedData) {
-      // Sort questions by order field
       const sortedQuestions = [...fetchedData.questions].sort(
         (a, b) => a.order - b.order
       );
@@ -205,6 +205,25 @@ const StatsPage = () => {
       title: "Option",
       dataIndex: "content",
       key: "content",
+      render: (text: string, record: PollOption) => (
+        <div className="flex items-center gap-2">
+          {record.poster && (
+            <Image
+              src={record.poster}
+              height={40}
+              style={{
+                width: "auto",
+                borderRadius: "4px",
+              }}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+              alt={`Option ${text} poster`}
+            />
+          )}
+          <span>{text}</span>
+        </div>
+      ),
     },
     {
       title: "Users",
@@ -321,7 +340,6 @@ const StatsPage = () => {
     );
   };
 
-  // Prepare pollster data when isAccessLevel is true
   const getPollsterData = (data: PollData) => {
     if (!data.isAccessLevel) return [];
 
@@ -526,7 +544,6 @@ const StatsPage = () => {
                 );
               }
 
-              // Sort options by order field for non-TEXT questions
               const sortedOptions = [...(question.options || [])].sort(
                 (a, b) => a.order - b.order
               );

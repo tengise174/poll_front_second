@@ -111,13 +111,11 @@ export default function SurveyDetailPage() {
     retry: false,
     enabled: id !== "new",
   });
-
-  console.log(newQuestions);
-
+  
   useEffect(() => {
     if (data) {
       setThemeId(data.themeId);
-
+  
       setSettingsPage((prev) => ({
         ...prev,
         startDate: data.startDate,
@@ -130,7 +128,7 @@ export default function SurveyDetailPage() {
         isPollsterNumber: data.isPollsterNumber,
         pollsters: data.pollsters,
       }));
-
+  
       setStartPage((prev) => ({
         ...prev,
         title: data.title,
@@ -138,13 +136,13 @@ export default function SurveyDetailPage() {
         btnLabel: data.btnLabel,
         poster: data.poster || null,
       }));
-
+  
       setEndPage((prev) => ({
         ...prev,
         endTitle: data.endTitle,
         thankYouMessage: data.thankYouMessage,
       }));
-
+  
       const transformedQuestions = data.questions
         .map((question: any, index: any) => ({
           content: question.content,
@@ -160,6 +158,7 @@ export default function SurveyDetailPage() {
               ?.map((option: any) => ({
                 content: option.content,
                 order: option.order,
+                poster: option.poster || null, // Add poster field
               }))
               .sort((a: any, b: any) => a.order - b.order) || [],
         }))
@@ -227,21 +226,16 @@ export default function SurveyDetailPage() {
   };
 
   const handleQuestionTypeSelect = (
-    questionType:
-      | "MULTI_CHOICE"
-      | "SINGLE_CHOICE"
-      | "RATING"
-      | "YES_NO"
-      | "TEXT",
+    questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT"
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
         ? 0
         : newQuestions.length;
-
+  
     const shouldAddAnswers =
       questionType === "SINGLE_CHOICE" || questionType === "MULTI_CHOICE";
-
+  
     const newQuestion: QuestionProps = {
       content: "",
       questionType,
@@ -250,49 +244,47 @@ export default function SurveyDetailPage() {
       poster: null,
       options: shouldAddAnswers
         ? [
-            { content: "", order: 1 },
-            { content: "", order: 2 },
+            { content: "", order: 1, poster: null },
+            { content: "", order: 2, poster: null },
           ]
         : [],
       ...(questionType === "RATING" && {
         rateNumber: 5,
         rateType: "STAR",
-        options: [
-          { content: "1", order: 1 },
-          { content: "2", order: 2 },
-          { content: "3", order: 3 },
-          { content: "4", order: 4 },
-          { content: "5", order: 5 },
-        ],
+        options: Array.from({ length: 5 }, (_, i) => ({
+          content: (i + 1).toString(),
+          order: i + 1,
+          poster: null,
+        })),
       }),
       ...(questionType === "YES_NO" && {
         options: [
-          { content: "Тийм", order: 1 },
-          { content: "Үгүй", order: 2 },
+          { content: "Тийм", order: 1, poster: null },
+          { content: "Үгүй", order: 2, poster: null },
         ],
       }),
     };
-
+  
     setNewQuestions((prev) => {
       const emptyTitleIndex = prev.findIndex(
-        (question) => question.content === "",
+        (question) => question.content === ""
       );
-
+  
       if (
         emptyTitleIndex !== -1 &&
         prev[emptyTitleIndex].questionType === null
       ) {
         return prev.map((question, index) =>
-          index === emptyTitleIndex ? newQuestion : question,
+          index === emptyTitleIndex ? newQuestion : question
         );
       }
       return [...prev, newQuestion];
     });
-
+  
     setCurrentPage(lastIndex);
     setCurrentQuestion(newQuestion);
     setChosenType(questionType);
-    setIsQuestionTypeModalOpen(false); // Close modal after selection
+    setIsQuestionTypeModalOpen(false);
   };
 
   useEffect(() => {

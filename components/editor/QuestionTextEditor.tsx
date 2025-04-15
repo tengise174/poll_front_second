@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react"; // Add useEffect import
+import React, { useState, useEffect } from "react";
 import { Button, InputNumber, Radio, Switch, Upload } from "antd";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
@@ -26,6 +26,9 @@ const QuestionTextEditor = ({
   const { showAlert } = useAlert();
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [fileList, setFileList] = useState<any[]>([]);
+  const [optionFileLists, setOptionFileLists] = useState<any[][]>(
+    currentQuestion?.options?.map(() => []) || []
+  );
 
   useEffect(() => {
     if (currentQuestion?.poster) {
@@ -40,6 +43,22 @@ const QuestionTextEditor = ({
     } else {
       setFileList([]);
     }
+
+    // Initialize file lists for options
+    setOptionFileLists(
+      currentQuestion?.options?.map((option) =>
+        option.poster
+          ? [
+              {
+                uid: `-${option.order}`,
+                name: `option-${option.order}.png`,
+                status: "done",
+                url: option.poster,
+              },
+            ]
+          : []
+      ) || []
+    );
   }, [currentQuestion]);
 
   const handleDeleteQuestion = () => {
@@ -84,7 +103,7 @@ const QuestionTextEditor = ({
 
   const handleUploadChange = ({ fileList }: { fileList: any[] }) => {
     const file = fileList[0];
-    setFileList(fileList.slice(-1)); // Keep only the latest file
+    setFileList(fileList.slice(-1));
 
     if (file && file.originFileObj) {
       const reader = new FileReader();
@@ -102,7 +121,6 @@ const QuestionTextEditor = ({
       };
       reader.readAsDataURL(file.originFileObj);
     } else if (!fileList.length) {
-      // Handle file removal
       setNewQuestions((prev) =>
         prev.map((item, index) =>
           index === currentPage ? { ...item, poster: null } : item
@@ -111,6 +129,61 @@ const QuestionTextEditor = ({
       setCurrentQuestion((prev) => ({
         ...prev!,
         poster: null,
+      }));
+    }
+  };
+
+  const handleOptionUploadChange = (
+    { fileList }: { fileList: any[] },
+    answerIndex: number
+  ) => {
+    const file = fileList[0];
+    const newOptionFileLists = [...optionFileLists];
+    newOptionFileLists[answerIndex] = fileList.slice(-1);
+    setOptionFileLists(newOptionFileLists);
+
+    if (file && file.originFileObj) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        setNewQuestions((prev) =>
+          prev.map((item, index) =>
+            index === currentPage && item.options
+              ? {
+                  ...item,
+                  options: item.options.map((opt, i) =>
+                    i === answerIndex ? { ...opt, poster: base64String } : opt
+                  ),
+                }
+              : item
+          )
+        );
+        setCurrentQuestion((prev) => ({
+          ...prev!,
+          options: prev?.options?.map((opt, i) =>
+            i === answerIndex ? { ...opt, poster: base64String } : opt
+          ),
+        }));
+      };
+      reader.readAsDataURL(file.originFileObj);
+    } else if (!fileList.length) {
+      setNewQuestions((prev) =>
+        prev.map((item, index) =>
+          index === currentPage && item.options
+            ? {
+                ...item,
+                options: item.options.map((opt, i) =>
+                  i === answerIndex ? { ...opt, poster: null } : opt
+                ),
+              }
+            : item
+        )
+      );
+      setCurrentQuestion((prev) => ({
+        ...prev!,
+        options: prev?.options?.map((opt, i) =>
+          i === answerIndex ? { ...opt, poster: null } : opt
+        ),
       }));
     }
   };
@@ -184,7 +257,7 @@ const QuestionTextEditor = ({
             fileList={fileList}
             onChange={handleUploadChange}
             beforeUpload={(file) => {
-              const isLt2M = file.size / 1024 / 1024 < 2; // Limit to 2MB
+              const isLt2M = file.size / 1024 / 1024 < 2;
               if (!isLt2M) {
                 showAlert(
                   "Image must be smaller than 2MB!",
@@ -211,13 +284,14 @@ const QuestionTextEditor = ({
               </p>
               <InputNumber
                 onChange={(value: number | null) => {
-                  const newValue = value || 5; // Default to 5 if null
+                  const newValue = value || 5;
 
                   const newOptions = Array.from(
                     { length: newValue },
                     (_, index) => ({
                       content: (index + 1).toString(),
                       order: index + 1,
+                      poster: null,
                     })
                   );
 
@@ -348,6 +422,7 @@ const QuestionTextEditor = ({
                                       option: {
                                         content: string;
                                         order: number;
+                                        poster?: string | null;
                                       },
                                       i: number
                                     ) =>
@@ -391,6 +466,35 @@ const QuestionTextEditor = ({
                               {item.content || "Хариулт"}
                             </div>
                           )}
+                          {/* Option Image Upload */}
+                          <Upload
+                            fileList={optionFileLists[answerIndex] || []}
+                            onChange={(info) =>
+                              handleOptionUploadChange(info, answerIndex)
+                            }
+                            beforeUpload={(file) => {
+                              const isLt2M = file.size / 1024 / 1024 < 2;
+                              if (!isLt2M) {
+                                showAlert(
+                                  "Image must be smaller than 2MB!",
+                                  "warning",
+                                  "",
+                                  true
+                                );
+                              }
+                              return isLt2M || Upload.LIST_IGNORE;
+                            }}
+                            accept="image/*"
+                            listType="picture"
+                            maxCount={1}
+                          >
+                            <Button
+                              icon={<UploadOutlined />}
+                              style={{ marginTop: "8px" }}
+                            >
+                              Сонголтын зураг оруулах
+                            </Button>
+                          </Upload>
                         </div>
                       );
                     })}
@@ -406,7 +510,7 @@ const QuestionTextEditor = ({
                         ...currentQuestion,
                         options: [
                           ...(prev.options || []),
-                          { content: "", order: newOrder },
+                          { content: "", order: newOrder, poster: null },
                         ],
                       }));
                       setNewQuestions((prev) =>
@@ -416,12 +520,13 @@ const QuestionTextEditor = ({
                                 ...item,
                                 options: [
                                   ...item.options,
-                                  { content: "", order: newOrder },
+                                  { content: "", order: newOrder, poster: null },
                                 ],
                               }
                             : item
                         )
                       );
+                      setOptionFileLists((prev) => [...prev, []]);
                     }}
                     className="bg-clicked w-full h-9 rounded-full flex items-center justify-between px-4 mt-[14px] cursor-pointer"
                   >

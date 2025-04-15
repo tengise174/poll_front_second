@@ -54,7 +54,6 @@ const QuestionDisplay = ({
                   styles={{ body: { padding: "16px" } }}
                 >
                   <div className="flex flex-col">
-                    
                     <p
                       style={{ color: dualColors[themeId][1] }}
                       className="text-[14px] leading-[17px] font-semibold"
@@ -75,47 +74,59 @@ const QuestionDisplay = ({
                         question.questionType ?? ""
                       ) &&
                         question.options?.map((item, optIndex) => (
-                          <div className="flex items-center" key={optIndex}>
-                            <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
-                              <span className="mr-1.5 not-italic">
-                                {String.fromCharCode(65 + optIndex)}.
-                              </span>
-                              {item.content || "Answer"}
-                            </div>
-                            {question.options &&
-                              question.options.length > 2 && (
-                                <CloseCircleIcon
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setNewQuestions((prev) =>
-                                      prev.map((q, qIndex) =>
-                                        qIndex === index && q.options
-                                          ? {
-                                              ...q,
-                                              options: q.options.filter(
-                                                (_, i) => i !== optIndex
-                                              ),
-                                            }
-                                          : q
-                                      )
-                                    );
-                                    if (currentPage === index) {
-                                      if (question.options) {
-                                        setCurrentQuestion({
-                                          ...question,
-                                          options: question.options.filter(
-                                            (_, i) => i !== optIndex
-                                          ),
-                                        });
+                          <div className="flex flex-col gap-2" key={optIndex}>
+                            <div className="flex items-center">
+                              <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
+                                <span className="mr-1.5 not-italic">
+                                  {String.fromCharCode(65 + optIndex)}.
+                                </span>
+                                {item.content || "Answer"}
+                              </div>
+                              {question.options &&
+                                question.options.length > 2 && (
+                                  <CloseCircleIcon
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setNewQuestions((prev) =>
+                                        prev.map((q, qIndex) =>
+                                          qIndex === index && q.options
+                                            ? {
+                                                ...q,
+                                                options: q.options.filter(
+                                                  (_, i) => i !== optIndex
+                                                ),
+                                              }
+                                            : q
+                                        )
+                                      );
+                                      if (currentPage === index) {
+                                        if (question.options) {
+                                          setCurrentQuestion({
+                                            ...question,
+                                            options: question.options.filter(
+                                              (_, i) => i !== optIndex
+                                            ),
+                                          });
+                                        }
                                       }
-                                    }
-                                  }}
-                                  style={{
-                                    color: dualColors[themeId][1],
-                                  }}
-                                  className="ml-[10px] cursor-pointer"
-                                />
-                              )}
+                                    }}
+                                    style={{
+                                      color: dualColors[themeId][1],
+                                    }}
+                                    className="ml-[10px] cursor-pointer"
+                                  />
+                                )}
+                            </div>
+                            {item.poster && (
+                              <Image
+                                src={item.poster}
+                                height={80}
+                                style={{
+                                  width: "auto",
+                                  borderRadius: "8px",
+                                }}
+                              />
+                            )}
                           </div>
                         ))}
                       {question.questionType === "YES_NO" && (
@@ -180,43 +191,55 @@ const QuestionDisplay = ({
                     currentQuestion?.questionType ?? ""
                   ) &&
                     currentQuestion?.options?.map((item, index) => (
-                      <div className="flex items-center" key={index}>
-                        <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
-                          <span className="mr-1.5 not-italic">
-                            {String.fromCharCode(65 + index)}.
-                          </span>
-                          {item.content || "Answer"}
+                      <div className="flex flex-col gap-2" key={index}>
+                        <div className="flex items-center">
+                          <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
+                            <span className="mr-1.5 not-italic">
+                              {String.fromCharCode(65 + index)}.
+                            </span>
+                            {item.content || "Answer"}
+                          </div>
+                          {currentQuestion?.options &&
+                            currentQuestion?.options.length > 2 && (
+                              <CloseCircleIcon
+                                onClick={() => {
+                                  setCurrentQuestion((prev: any) => ({
+                                    ...prev,
+                                    options: prev.options.filter(
+                                      (_: any, i: number) => i !== index
+                                    ),
+                                  }));
+                                  setNewQuestions((prev) =>
+                                    prev.map((question, questionIndex) =>
+                                      questionIndex === currentPage &&
+                                      question.options
+                                        ? {
+                                            ...question,
+                                            options: question.options.filter(
+                                              (_, i) => i !== index
+                                            ),
+                                          }
+                                        : question
+                                    )
+                                  );
+                                }}
+                                style={{
+                                  color: dualColors[themeId][1],
+                                }}
+                                className="ml-[10px] cursor-pointer"
+                              />
+                            )}
                         </div>
-                        {currentQuestion?.options &&
-                          currentQuestion?.options.length > 2 && (
-                            <CloseCircleIcon
-                              onClick={() => {
-                                setCurrentQuestion((prev: any) => ({
-                                  ...prev,
-                                  options: prev.options.filter(
-                                    (_: any, i: number) => i !== index
-                                  ),
-                                }));
-                                setNewQuestions((prev) =>
-                                  prev.map((question, questionIndex) =>
-                                    questionIndex === currentPage &&
-                                    question.options
-                                      ? {
-                                          ...question,
-                                          options: question.options.filter(
-                                            (_, i) => i !== index
-                                          ),
-                                        }
-                                      : question
-                                  )
-                                );
-                              }}
-                              style={{
-                                color: dualColors[themeId][1],
-                              }}
-                              className="ml-[10px] cursor-pointer"
-                            />
-                          )}
+                        {item.poster && (
+                          <Image
+                            src={item.poster}
+                            height={80}
+                            style={{
+                              width: "auto",
+                              borderRadius: "8px",
+                            }}
+                          />
+                        )}
                       </div>
                     ))}
                   {currentQuestion?.questionType === "YES_NO" && (

@@ -27,12 +27,19 @@ import {
 } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 
+interface Option {
+  id: string;
+  content: string;
+  order: number;
+  poster?: string | null; // Add poster field for options
+}
+
 interface Question {
   id: string;
   content: string;
   questionType: string;
   minAnswerCount: number;
-  options: any[];
+  options: Option[];
   order: number;
   required?: boolean;
   rateNumber?: number;
@@ -49,7 +56,7 @@ export default function TestPage() {
   const [step, setStep] = useState<"start" | "questions" | "end">("start");
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderedQuestions, setOrderedQuestions] = useState<any[]>([]);
+  const [orderedQuestions, setOrderedQuestions] = useState<Question[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [timerActive, setTimerActive] = useState(false);
   const [answers, setAnswers] = useState<
@@ -65,7 +72,6 @@ export default function TestPage() {
   const [questionStartTime, setQuestionStartTime] = useState<number>(
     Date.now()
   );
-  // New state for display mode
   const [displayMode, setDisplayMode] = useState<"single" | "all">("single");
 
   const {
@@ -229,7 +235,6 @@ export default function TestPage() {
     return unansweredRequired;
   };
 
-  // New function to check if all required questions are answered
   const areAllRequiredAnswered = () => {
     return validateRequiredQuestions().length === 0;
   };
@@ -270,7 +275,6 @@ export default function TestPage() {
     }
   };
 
-  // Render individual question component
   const renderQuestion = (question: Question, index?: number) => {
     const isError = requiredError.includes(question.id);
     return (
@@ -293,14 +297,16 @@ export default function TestPage() {
       >
         {question.poster && (
           <Image
-          src={question.poster}
-          height={100}
-          style={{
-            width: 'auto'
-          }}
-          onError={(e) => {
-                e.currentTarget.style.display = "none"; // Hide broken images
-              }}
+            src={question.poster}
+            height={100}
+            style={{
+              width: "auto",
+              borderRadius: "8px",
+              marginBottom: "16px",
+            }}
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
         )}
         {isError && (
@@ -318,17 +324,31 @@ export default function TestPage() {
             onChange={(checkedValues) =>
               handleChange(question.id, checkedValues, "")
             }
-            className="circle-checkbox flex gap-3 w-full max-h-full overflow-y-auto"
+            className="circle-checkbox flex flex-col gap-3 w-full max-h-full overflow-y-auto"
           >
-            {question.options.map((item: any, idx: any) => (
-              <Checkbox
-                value={item}
-                key={idx}
-                style={{ color: custStyle.primaryColor }}
-                className="custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3"
-              >
-                {item.content}
-              </Checkbox>
+            {question.options.map((item: Option, idx: number) => (
+              <div key={idx} className="flex flex-col gap-2">
+                <Checkbox
+                  value={item}
+                  style={{ color: custStyle.primaryColor }}
+                  className="custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3"
+                >
+                  {item.content}
+                </Checkbox>
+                {item.poster && (
+                  <Image
+                    src={item.poster}
+                    height={80}
+                    style={{
+                      width: "auto",
+                      borderRadius: "8px",
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                )}
+              </div>
             ))}
           </Checkbox.Group>
         )}
@@ -342,15 +362,29 @@ export default function TestPage() {
             }
             className="flex flex-col w-full max-h-full overflow-y-auto"
           >
-            {question.options.map((item: any, idx: any) => (
-              <Radio
-                style={{ color: custStyle.primaryColor }}
-                className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
-                key={idx}
-                value={item}
-              >
-                {item.content}
-              </Radio>
+            {question.options.map((item: Option, idx: number) => (
+              <div key={idx} className="flex flex-col gap-2">
+                <Radio
+                  style={{ color: custStyle.primaryColor }}
+                  className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
+                  value={item}
+                >
+                  {item.content}
+                </Radio>
+                {item.poster && (
+                  <Image
+                    src={item.poster}
+                    height={80}
+                    style={{
+                      width: "auto",
+                      borderRadius: "8px",
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                )}
+              </div>
             ))}
           </Radio.Group>
         )}
@@ -417,15 +451,29 @@ export default function TestPage() {
             }
             className="flex flex-col w-full max-h-full overflow-y-auto"
           >
-            {question.options.map((item: any, idx: any) => (
-              <Radio
-                style={{ color: custStyle.primaryColor }}
-                className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
-                key={idx}
-                value={item}
-              >
-                {item.content}
-              </Radio>
+            {question.options.map((item: Option, idx: number) => (
+              <div key={idx} className="flex flex-col gap-2">
+                <Radio
+                  style={{ color: custStyle.primaryColor }}
+                  className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
+                  value={item}
+                >
+                  {item.content}
+                </Radio>
+                {item.poster && (
+                  <Image
+                    src={item.poster}
+                    height={80}
+                    style={{
+                      width: "auto",
+                      borderRadius: "8px",
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                )}
+              </div>
             ))}
           </Radio.Group>
         )}
@@ -549,7 +597,6 @@ export default function TestPage() {
                     {data?.duration} мин
                   </div>
                 </div>
-                {/* New Switch for display mode */}
                 <div className="flex items-center gap-4">
                   <p
                     style={{ color: custStyle.primaryColor }}

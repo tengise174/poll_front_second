@@ -133,9 +133,15 @@ export interface StartShapeEditorProps {
   setStartPage: Dispatch<SetStateAction<StartPageProps>>;
 }
 
+export interface OptionProps {
+  content: string;
+  order: number;
+  poster?: string | null;
+}
+
 export interface QuestionProps {
   content: string;
-  options?: Array<{ content: string; order: number }>;
+  options?: OptionProps[];
   questionType:
     | "MULTI_CHOICE"
     | "SINGLE_CHOICE"
