@@ -10,6 +10,7 @@ import {
   Table,
   Tag,
   Image,
+  Button,
 } from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,6 +28,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
+import * as XLSX from "xlsx";
 
 const { Panel } = Collapse;
 
@@ -144,6 +146,90 @@ const StatsPage = () => {
     const newChartTypes = [...chartTypes];
     newChartTypes[index] = type;
     setChartTypes(newChartTypes);
+  };
+
+  const exportToExcel = () => {
+    if (!data) return;
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+
+    // Poll General Info Sheet
+    const generalInfo = [
+      ["Poll Title", data.title],
+      ["Created At", new Date(data.createdAt).toLocaleString()],
+      ["Status", statusConv[data.status]],
+      ["Submitted Users", data.submittedUserCount],
+      ["Average Poll Time (s)", data.avgPollTime.toFixed(2)],
+      ["Start Date", data.startDate ? new Date(data.startDate).toLocaleString() : "Not Set"],
+      ["End Date", data.endDate ? new Date(data.endDate).toLocaleString() : "Not Set"],
+      ["Access Level", data.isAccessLevel ? "Yes" : "No"],
+      ["Duration", data.isDuration ? data.duration : "Not Set"],
+      ["Pollster Number", data.isPollsterNumber ? data.pollsterNumber : "Not Set"],
+    ];
+
+    const wsGeneral = XLSX.utils.aoa_to_sheet(generalInfo);
+    XLSX.utils.book_append_sheet(wb, wsGeneral, "Poll Info");
+
+    // Questions Sheet
+    const questionHeaders = [
+      "Question ID",
+      "Order",
+      "Content",
+      "Type",
+      "Avg Time Taken (s)",
+      "Option/Answer",
+      "Selection Count",
+      "Answered By",
+    ];
+
+    const questionData: any[] = [questionHeaders];
+
+    data.questions.forEach((question) => {
+      if (question.questionType === "TEXT" && question.answers) {
+        question.answers.forEach((answer, idx) => {
+          questionData.push([
+            question.questionId,
+            question.order,
+            question.content,
+            questionTypeTranslations[question.questionType],
+            question.avgTimeTaken.toFixed(2),
+            answer.textAnswer,
+            "-", // No selection count for text
+            answer.answeredBy,
+          ]);
+        });
+      } else if (question.options) {
+        question.options.forEach((option) => {
+          questionData.push([
+            question.questionId,
+            question.order,
+            question.content,
+            questionTypeTranslations[question.questionType],
+            question.avgTimeTaken.toFixed(2),
+            option.content,
+            option.selectionCount,
+            option.answeredBy.map((u) => u.username).join(", "),
+          ]);
+        });
+      }
+    });
+
+    const wsQuestions = XLSX.utils.aoa_to_sheet(questionData);
+    XLSX.utils.book_append_sheet(wb, wsQuestions, "Questions");
+
+    // Submitted Users Sheet
+    const userHeaders = ["User ID", "Username", "Total Time Taken (s)"];
+    const userData = data.submittedUsers.map((user) => [
+      user.id,
+      user.username,
+      user.totalTimeTaken,
+    ]);
+    const wsUsers = XLSX.utils.aoa_to_sheet([userHeaders, ...userData]);
+    XLSX.utils.book_append_sheet(wb, wsUsers, "Submitted Users");
+
+    // Download the file
+    XLSX.writeFile(wb, `${data.title}_stats.xlsx`);
   };
 
   const renderChart = (chartType: ChartType, chartData: any[]) => {
@@ -290,7 +376,7 @@ const StatsPage = () => {
 
   const PollDetails = ({ data }: { data: PollData }) => {
     return (
-      <Card title="Санал асуулгын мэдээлэл" className="mb-6">
+      <Card title="Санал асуулгын мэдэээлэл" className="mb-6">
         <Descriptions
           column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 3 }}
           bordered
@@ -393,9 +479,14 @@ const StatsPage = () => {
                   width={200}
                   height={200}
                 />
-                <h1 className="text-2xl font-bold text-gray-800 mb-6">
-                  {data.title}
-                </h1>
+                <div className="flex flex-col gap-2">
+                  <h1 className="text-2xl font-bold text-gray-800">
+                    {data.title}
+                  </h1>
+                  <Button type="primary" onClick={exportToExcel}>
+                    Export to Excel
+                  </Button>
+                </div>
               </div>
               <PollDetails data={data} />
             </div>
