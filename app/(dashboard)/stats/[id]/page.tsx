@@ -79,6 +79,7 @@ interface PollQuestion {
   poster?: string | null;
   isPointBased: boolean;
   hasCorrectAnswer: boolean;
+  minAnswerCount?: number | null;
 }
 
 interface UserProp {
@@ -160,13 +161,11 @@ const StatsPage = () => {
     data.questions.forEach((question) => {
       if (question.isPointBased && question.options) {
         if (question.questionType === "MULTI_CHOICE") {
-          // Sum all option points for MULTI_CHOICE
           netPoints += question.options.reduce(
             (sum, option) => sum + option.points,
             0
           );
         } else {
-          // Take max points for SINGLE_CHOICE or YES_NO
           const maxPoints = Math.max(
             ...question.options.map((option) => option.points),
             0
@@ -790,6 +789,16 @@ const StatsPage = () => {
                     <h2 className="text-xl font-semibold text-gray-700 mb-4">
                       Асуулт: {question.content}
                     </h2>
+                    <div className="mb-4">
+                      <p className="text-gray-600">
+                        <span className="font-medium">Асуултын төрөл: </span>
+                        {questionTypeTranslations[question.questionType]}
+                      </p>
+                      <p className="text-gray-600">
+                        <span className="font-medium">Дундаж хариулах хугацаа: </span>
+                        {question.avgTimeTaken.toFixed(2)} секунд
+                      </p>
+                    </div>
                     <h3 className="text-lg font-medium text-gray-600 mb-2">
                       Оролцогчдын хариулт
                     </h3>
@@ -797,10 +806,7 @@ const StatsPage = () => {
                       <ul className="list-disc pl-5 space-y-2">
                         {question.answers.map((answer, aIndex) => (
                           <li key={aIndex} className="text-gray-800">
-                            <span className="font-medium">
-                              {answer.answeredBy}
-                            </span>
-                            : {answer.textAnswer}
+                            <span className="font-medium">{answer.answeredBy}</span>: {answer.textAnswer}
                           </li>
                         ))}
                       </ul>
@@ -840,7 +846,23 @@ const StatsPage = () => {
                       </Tag>
                     )}
                   </div>
-
+                  <div className="mb-4">
+                    <p className="text-gray-600">
+                      <span className="font-medium">Асуултын төрөл: </span>
+                      {questionTypeTranslations[question.questionType]}
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-medium">Дундаж хариулах хугацаа: </span>
+                      {question.avgTimeTaken.toFixed(2)} секунд
+                    </p>
+                    {question.questionType === "MULTI_CHOICE" &&
+                      question.minAnswerCount !== null && (
+                        <p className="text-gray-600">
+                          <span className="font-medium">Хамгийн бага хариултын тоо: </span>
+                          {question.minAnswerCount}
+                        </p>
+                      )}
+                  </div>
                   {question.poster && (
                     <Image
                       src={question.poster}
@@ -867,7 +889,6 @@ const StatsPage = () => {
                       <option value="line">Line Chart</option>
                     </select>
                   </div>
-
                   <div className="h-80 mb-6">
                     <ResponsiveContainer width="100%" height="100%">
                       {renderChart(chartTypes[qIndex], chartData) ?? (
@@ -875,7 +896,6 @@ const StatsPage = () => {
                       )}
                     </ResponsiveContainer>
                   </div>
-
                   <div className="mt-4">
                     <h3 className="text-lg font-medium text-gray-600 mb-2">
                       Оролцогчдын хариулт
