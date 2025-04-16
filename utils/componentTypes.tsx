@@ -137,6 +137,8 @@ export interface OptionProps {
   content: string;
   order: number;
   poster?: string | null;
+  points: number;
+  isCorrect: boolean;
 }
 
 export interface QuestionProps {
@@ -156,6 +158,8 @@ export interface QuestionProps {
   id?: number;
   required: boolean;
   poster?: string | null;
+  isPointBased: boolean;
+  hasCorrectAnswer: boolean;
 }
 
 type ChosenTypeProps =

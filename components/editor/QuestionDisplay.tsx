@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import RateSection from "../RatingSection";
 import { questionTypes } from "@/utils/utils";
@@ -6,6 +7,7 @@ import { QuestionDisplayProps } from "@/utils/componentTypes";
 import CloseCircleIcon from "@/public/icons/close_circle";
 import AddIcon from "@/public/icons/add";
 import { Card, Switch, Image } from "antd";
+import { CheckCircleOutlined } from "@ant-design/icons";
 
 const QuestionDisplay = ({
   chosenType,
@@ -59,6 +61,16 @@ const QuestionDisplay = ({
                       className="text-[14px] leading-[17px] font-semibold"
                     >
                       {index + 1}. {question.content || "Question"}
+                      {question.isPointBased && (
+                        <span className="ml-2 text-[12px] italic">
+                          (Point-based)
+                        </span>
+                      )}
+                      {question.hasCorrectAnswer && (
+                        <span className="ml-2 text-[12px] italic">
+                          (Has Correct Answer)
+                        </span>
+                      )}
                     </p>
                     {question.poster && (
                       <Image
@@ -84,6 +96,17 @@ const QuestionDisplay = ({
                                   {String.fromCharCode(65 + optIndex)}.
                                 </span>
                                 {item.content || "Answer"}
+                                {question.isPointBased && (
+                                  <span className="ml-2 text-[12px]">
+                                    ({item.points} pts)
+                                  </span>
+                                )}
+                                {item.isCorrect && (
+                                  <CheckCircleOutlined
+                                    className="ml-2"
+                                    style={{ color: "#52c41a" }}
+                                  />
+                                )}
                               </div>
                               {question.options &&
                                 question.options.length > 2 && (
@@ -181,6 +204,16 @@ const QuestionDisplay = ({
                   className="text-[14px] leading-[17px] font-semibold cursor-pointer"
                 >
                   {currentPage + 1}. {currentQuestion?.content}
+                  {currentQuestion?.isPointBased && (
+                    <span className="ml-2 text-[12px] italic">
+                      (Point-based)
+                    </span>
+                  )}
+                  {currentQuestion?.hasCorrectAnswer && (
+                    <span className="ml-2 text-[12px] italic">
+                      (Has Correct Answer)
+                    </span>
+                  )}
                 </p>
                 {currentQuestion?.poster && (
                   <Image
@@ -203,6 +236,17 @@ const QuestionDisplay = ({
                               {String.fromCharCode(65 + index)}.
                             </span>
                             {item.content || "Answer"}
+                            {currentQuestion?.isPointBased && (
+                              <span className="ml-2 text-[12px]">
+                                ({item.points} pts)
+                              </span>
+                            )}
+                            {item.isCorrect && (
+                              <CheckCircleOutlined
+                                className="ml-2"
+                                style={{ color: "#52c41a" }}
+                              />
+                            )}
                           </div>
                           {currentQuestion?.options &&
                             currentQuestion?.options.length > 2 && (

@@ -101,6 +101,8 @@ export default function SurveyDetailPage() {
       options: [],
       required: false,
       poster: null,
+      isPointBased: false,
+      hasCorrectAnswer: false,
     },
   ]);
 
@@ -115,7 +117,7 @@ export default function SurveyDetailPage() {
   useEffect(() => {
     if (data) {
       setThemeId(data.themeId);
-  
+
       setSettingsPage((prev) => ({
         ...prev,
         startDate: data.startDate,
@@ -128,7 +130,7 @@ export default function SurveyDetailPage() {
         isPollsterNumber: data.isPollsterNumber,
         pollsters: data.pollsters,
       }));
-  
+
       setStartPage((prev) => ({
         ...prev,
         title: data.title,
@@ -136,13 +138,13 @@ export default function SurveyDetailPage() {
         btnLabel: data.btnLabel,
         poster: data.poster || null,
       }));
-  
+
       setEndPage((prev) => ({
         ...prev,
         endTitle: data.endTitle,
         thankYouMessage: data.thankYouMessage,
       }));
-  
+
       const transformedQuestions = data.questions
         .map((question: any, index: any) => ({
           content: question.content,
@@ -153,12 +155,16 @@ export default function SurveyDetailPage() {
           order: question.order,
           required: question.required || false,
           poster: question.poster || null,
+          isPointBased: question.isPointBased || false,
+          hasCorrectAnswer: question.hasCorrectAnswer || false,
           options:
             question.options
               ?.map((option: any) => ({
                 content: option.content,
                 order: option.order,
-                poster: option.poster || null, // Add poster field
+                poster: option.poster || null,
+                points: option.points || 0,
+                isCorrect: option.isCorrect || false,
               }))
               .sort((a: any, b: any) => a.order - b.order) || [],
         }))
@@ -190,6 +196,66 @@ export default function SurveyDetailPage() {
   };
 
   const handleCreatePoll = async () => {
+    for (const question of newQuestions) {
+      if (question.isPointBased && question.options) {
+        const totalPoints = question.options.reduce(
+          (sum, opt) => sum + (opt.points || 0),
+          0
+        );
+        if (totalPoints !== 100) {
+          showAlert(
+            `Question ${question.order + 1}: Points must sum to 100`,
+            "warning",
+            "",
+            true
+          );
+          return;
+        }
+      }
+      if (
+        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO"].includes(
+          question.questionType ?? ""
+        ) &&
+        question.hasCorrectAnswer &&
+        question.options
+      ) {
+        const correctCount = question.options.filter(
+          (opt) => opt.isCorrect
+        ).length;
+        if (correctCount === 0) {
+          showAlert(
+            `Question ${question.order + 1}: At least one correct answer must be set`,
+            "warning",
+            "",
+            true
+          );
+          return;
+        }
+        if (
+          ["SINGLE_CHOICE", "YES_NO"].includes(question.questionType ?? "") &&
+          correctCount > 1
+        ) {
+          showAlert(
+            `Question ${question.order + 1}: Only one correct answer is allowed for ${question.questionType}`,
+            "warning",
+            "",
+            true
+          );
+          return;
+        }
+      }
+      // Ensure hasCorrectAnswer and isPointBased are mutually exclusive
+      if (question.hasCorrectAnswer && question.isPointBased) {
+        showAlert(
+          `Question ${question.order + 1}: A question cannot have both correct answers and points`,
+          "warning",
+          "",
+          true
+        );
+        return;
+      }
+    }
+
     if (id === "new") {
       try {
         const result = await createPoll(pollData);
@@ -232,20 +298,22 @@ export default function SurveyDetailPage() {
       newQuestions.length === 1 && newQuestions[0].content === ""
         ? 0
         : newQuestions.length;
-  
+
     const shouldAddAnswers =
       questionType === "SINGLE_CHOICE" || questionType === "MULTI_CHOICE";
-  
+
     const newQuestion: QuestionProps = {
       content: "",
       questionType,
       required: false,
       order: lastIndex + 1,
       poster: null,
+      isPointBased: false,
+      hasCorrectAnswer: false,
       options: shouldAddAnswers
         ? [
-            { content: "", order: 1, poster: null },
-            { content: "", order: 2, poster: null },
+            { content: "", order: 1, poster: null, points: 0, isCorrect: false },
+            { content: "", order: 2, poster: null, points: 0, isCorrect: false },
           ]
         : [],
       ...(questionType === "RATING" && {
@@ -255,21 +323,23 @@ export default function SurveyDetailPage() {
           content: (i + 1).toString(),
           order: i + 1,
           poster: null,
+          points: 0,
+          isCorrect: false,
         })),
       }),
       ...(questionType === "YES_NO" && {
         options: [
-          { content: "Тийм", order: 1, poster: null },
-          { content: "Үгүй", order: 2, poster: null },
+          { content: "Тийм", order: 1, poster: null, points: 0, isCorrect: false },
+          { content: "Үгүй", order: 2, poster: null, points: 0, isCorrect: false },
         ],
       }),
     };
-  
+
     setNewQuestions((prev) => {
       const emptyTitleIndex = prev.findIndex(
         (question) => question.content === ""
       );
-  
+
       if (
         emptyTitleIndex !== -1 &&
         prev[emptyTitleIndex].questionType === null
@@ -280,7 +350,7 @@ export default function SurveyDetailPage() {
       }
       return [...prev, newQuestion];
     });
-  
+
     setCurrentPage(lastIndex);
     setCurrentQuestion(newQuestion);
     setChosenType(questionType);
@@ -294,10 +364,11 @@ export default function SurveyDetailPage() {
         : newQuestions.length - 1;
     setCurrentQuestion(newQuestions[currentPage]);
   }, [currentPage, chosenType]);
+
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">
       <div className="flex flex-col md:flex-row h-auto md:h-full md:max-h-[calc(100vh-56px)]">
-        <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] min-h-full py-3 rounded ">
+        <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] min-h-full py-3 rounded">
           <div className="px-5">
             <div className="rounded-full w-full flex items-center h-[34px] bg-[#D9D9D9]">
               {["Тохиргоо", "Нүүр", "Асуултууд", "Төгсгөл"].map(
@@ -315,7 +386,7 @@ export default function SurveyDetailPage() {
                   >
                     {text}
                   </p>
-                ),
+                )
               )}
             </div>
           </div>
@@ -432,7 +503,7 @@ export default function SurveyDetailPage() {
         <div className="flex flex-col gap-4">
           <div>
             <p>Хүсэлтийн URL</p>
-            <div className="flex fle-row gap-2">
+            <div className="flex flex-row gap-2">
               <Link href={reqUrl}>{reqUrl}</Link>
               <Button
                 icon={<CopyOutlined />}

@@ -1,15 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, InputNumber, Radio, Switch, Upload } from "antd";
+import { Button, InputNumber, Checkbox, Radio, Switch, Upload } from "antd";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
 import { QuestionTextEditorProps } from "@/utils/componentTypes";
 import AddIcon from "@/public/icons/add";
 import RateStarIcon from "@/public/icons/rate_star";
-import { UploadOutlined } from "@ant-design/icons";
-import { useAlert } from "@/context/AlertProvider";
 import { FileImageOutlined } from "@ant-design/icons";
+import { useAlert } from "@/context/AlertProvider";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -45,7 +44,6 @@ const QuestionTextEditor = ({
       setFileList([]);
     }
 
-    // Initialize file lists for options
     setOptionFileLists(
       currentQuestion?.options?.map((option) =>
         option.poster
@@ -74,6 +72,8 @@ const QuestionTextEditor = ({
           options: [],
           required: false,
           poster: null,
+          isPointBased: false,
+          hasCorrectAnswer: false,
         },
       ]);
       setCurrentQuestion({
@@ -85,6 +85,8 @@ const QuestionTextEditor = ({
         options: [],
         required: false,
         poster: null,
+        isPointBased: false,
+        hasCorrectAnswer: false,
       });
       setChosenType(null);
       setCurrentPage(0);
@@ -189,6 +191,50 @@ const QuestionTextEditor = ({
     }
   };
 
+  const handleCorrectAnswerChange = (values: number[]) => {
+    const updatedOptions =
+      currentQuestion?.options?.map((opt, i) => ({
+        ...opt,
+        isCorrect: values.includes(i),
+      })) || [];
+    setCurrentQuestion((prev) => ({
+      ...prev!,
+      options: updatedOptions,
+    }));
+    setNewQuestions((prev) =>
+      prev.map((question, questionIndex) =>
+        questionIndex === currentPage && question.options
+          ? {
+              ...question,
+              options: updatedOptions,
+            }
+          : question
+      )
+    );
+  };
+
+  const handleSingleCorrectAnswerChange = (answerIndex: number) => {
+    const updatedOptions =
+      currentQuestion?.options?.map((opt, i) => ({
+        ...opt,
+        isCorrect: i === answerIndex,
+      })) || [];
+    setCurrentQuestion((prev) => ({
+      ...prev!,
+      options: updatedOptions,
+    }));
+    setNewQuestions((prev) =>
+      prev.map((question, questionIndex) =>
+        questionIndex === currentPage && question.options
+          ? {
+              ...question,
+              options: updatedOptions,
+            }
+          : question
+      )
+    );
+  };
+
   return (
     <div
       id="question_edit"
@@ -224,6 +270,8 @@ const QuestionTextEditor = ({
                     minAnswerCount: 1,
                     required: false,
                     poster: null,
+                    isPointBased: false,
+                    hasCorrectAnswer: false,
                   });
                 }
               }}
@@ -231,25 +279,121 @@ const QuestionTextEditor = ({
               className={questionInputClass}
               placeholder="Асуултаа энд бичнэ үү?"
             />
-            <div className="flex items-center gap-2 mt-2">
-              <Switch
-                checked={currentQuestion?.required || false}
-                onChange={(checked) => {
-                  const updatedQuestions = newQuestions.map((item, index) =>
-                    index === currentPage
-                      ? { ...item, required: checked }
-                      : item
-                  );
-                  setNewQuestions(updatedQuestions);
-                  if (currentQuestion) {
-                    setCurrentQuestion({
-                      ...currentQuestion,
-                      required: checked,
-                    });
-                  }
-                }}
-              />
-              <p className="text-[13px] text-[#1E1E1E]">Заавал бөглөх</p>
+            <div className="flex flex-wrap gap-x-3">
+              <div className="flex items-center gap-2 mt-2">
+                <Switch
+                  checked={currentQuestion?.required || false}
+                  onChange={(checked) => {
+                    const updatedQuestions = newQuestions.map((item, index) =>
+                      index === currentPage
+                        ? { ...item, required: checked }
+                        : item
+                    );
+                    setNewQuestions(updatedQuestions);
+                    if (currentQuestion) {
+                      setCurrentQuestion({
+                        ...currentQuestion,
+                        required: checked,
+                      });
+                    }
+                  }}
+                />
+                <p className="text-[13px] text-[#1E1E1E]">Заавал бөглөх</p>
+              </div>
+              {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                currentQuestion?.questionType ?? ""
+              ) && (
+                <div className="flex items-center gap-2 mt-2">
+                  <Switch
+                    checked={currentQuestion?.isPointBased || false}
+                    disabled={currentQuestion?.hasCorrectAnswer || false}
+                    onChange={(checked) => {
+                      const updatedQuestions = newQuestions.map(
+                        (item, index) =>
+                          index === currentPage
+                            ? {
+                                ...item,
+                                isPointBased: checked,
+                                hasCorrectAnswer: checked
+                                  ? false
+                                  : item.hasCorrectAnswer,
+                                options: item.options?.map((opt) => ({
+                                  ...opt,
+                                  points: checked ? 0 : 0,
+                                  isCorrect: checked ? false : opt.isCorrect,
+                                })),
+                              }
+                            : item
+                      );
+                      setNewQuestions(updatedQuestions);
+                      if (currentQuestion) {
+                        setCurrentQuestion({
+                          ...currentQuestion,
+                          isPointBased: checked,
+                          hasCorrectAnswer: checked
+                            ? false
+                            : currentQuestion.hasCorrectAnswer,
+                          options: currentQuestion.options?.map((opt) => ({
+                            ...opt,
+                            points: checked ? 0 : 0,
+                            isCorrect: checked ? false : opt.isCorrect,
+                          })),
+                        });
+                      }
+                    }}
+                  />
+                  <p className="text-[13px] text-[#1E1E1E]">Оноотой асуулт</p>
+                </div>
+              )}
+              {["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO"].includes(
+                currentQuestion?.questionType ?? ""
+              ) && (
+                <div className="flex items-center gap-2 mt-2">
+                  <Switch
+                    checked={currentQuestion?.hasCorrectAnswer || false}
+                    disabled={
+                      ["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                        currentQuestion?.questionType ?? ""
+                      ) && currentQuestion?.isPointBased
+                    }
+                    onChange={(checked) => {
+                      const updatedQuestions = newQuestions.map(
+                        (item, index) =>
+                          index === currentPage
+                            ? {
+                                ...item,
+                                hasCorrectAnswer: checked,
+                                isPointBased: checked
+                                  ? false
+                                  : item.isPointBased,
+                                options: item.options?.map((opt) => ({
+                                  ...opt,
+                                  points: checked ? 0 : opt.points,
+                                  isCorrect: checked ? opt.isCorrect : false,
+                                })),
+                              }
+                            : item
+                      );
+                      setNewQuestions(updatedQuestions);
+                      if (currentQuestion) {
+                        setCurrentQuestion({
+                          ...currentQuestion,
+                          hasCorrectAnswer: checked,
+                          isPointBased: checked
+                            ? false
+                            : currentQuestion.isPointBased,
+                          options: currentQuestion.options?.map((opt) => ({
+                            ...opt,
+                            points: checked ? 0 : opt.points,
+                            isCorrect: checked ? opt.isCorrect : false,
+                          })),
+                        });
+                      }
+                    }}
+                  />
+                  <p className="text-[13px] text-[#1E1E1E]">Зөв хариулттай</p>
+                </div>
+              )}
             </div>
           </div>
           <Upload
@@ -270,7 +414,6 @@ const QuestionTextEditor = ({
             accept="image/*"
             listType="picture"
             maxCount={1}
-            // className="!max-w-20"
           >
             <Button icon={<FileImageOutlined />}></Button>
           </Upload>
@@ -291,6 +434,8 @@ const QuestionTextEditor = ({
                       content: (index + 1).toString(),
                       order: index + 1,
                       poster: null,
+                      points: 0,
+                      isCorrect: false,
                     })
                   );
 
@@ -402,6 +547,48 @@ const QuestionTextEditor = ({
                   Хариулт
                 </p>
 
+                {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                  currentQuestion?.questionType ?? ""
+                ) &&
+                  currentQuestion?.hasCorrectAnswer && (
+                    <div className="mt-2">
+                      <p className="text-[13px] text-[#1E1E1E] font-semibold">
+                        Зөв хариулт
+                      </p>
+                      {currentQuestion?.questionType === "MULTI_CHOICE" ? (
+                        <Checkbox.Group
+                          value={currentQuestion?.options
+                            ?.map((opt, i) => (opt.isCorrect ? i : -1))
+                            .filter((i) => i !== -1)}
+                          onChange={(checkedValues) =>
+                            handleCorrectAnswerChange(checkedValues as number[])
+                          }
+                        >
+                          {currentQuestion?.options?.map((_, index) => (
+                            <Checkbox key={index} value={index}>
+                              {String.fromCharCode(65 + index)}
+                            </Checkbox>
+                          ))}
+                        </Checkbox.Group>
+                      ) : (
+                        <Radio.Group
+                          value={currentQuestion?.options?.findIndex(
+                            (opt) => opt.isCorrect
+                          )}
+                          onChange={(e) =>
+                            handleSingleCorrectAnswerChange(e.target.value)
+                          }
+                        >
+                          {currentQuestion?.options?.map((_, index) => (
+                            <Radio key={index} value={index}>
+                              {String.fromCharCode(65 + index)}
+                            </Radio>
+                          ))}
+                        </Radio.Group>
+                      )}
+                    </div>
+                  )}
+
                 <div className="flex flex-col gap-y-3 mt-[14px]">
                   {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
                     currentQuestion?.questionType ?? ""
@@ -409,63 +596,115 @@ const QuestionTextEditor = ({
                     currentQuestion?.options?.map((item, answerIndex) => {
                       return (
                         <div key={answerIndex} className="w-full">
-                          {focusedIndex === answerIndex ? (
-                            <CustomInput
-                              className="w-full !h-9 bg-[#E6E6E6] !rounded-[10px] text-[#757575] font-medium !italic !text-[13px] px-2 flex items-center"
-                              value={item.content}
-                              onChange={(e: any) => {
-                                setCurrentQuestion((prev: any) => ({
-                                  ...currentQuestion,
-                                  options: prev?.options.map(
-                                    (
-                                      option: {
-                                        content: string;
-                                        order: number;
-                                        poster?: string | null;
-                                      },
-                                      i: number
-                                    ) =>
+                          <div className="flex flex-row gap-1">
+                            {focusedIndex === answerIndex ? (
+                              <CustomInput
+                                className="w-full !h-9 bg-[#E6E6E6] !rounded-[10px] text-[#757575] font-medium !italic !text-[13px] px-2 flex items-center"
+                                value={item.content}
+                                onChange={(e: any) => {
+                                  setCurrentQuestion((prev: any) => ({
+                                    ...currentQuestion,
+                                    options: prev?.options.map(
+                                      (
+                                        option: {
+                                          content: string;
+                                          order: number;
+                                          poster?: string | null;
+                                          points: number;
+                                          isCorrect: boolean;
+                                        },
+                                        i: number
+                                      ) =>
+                                        i === answerIndex
+                                          ? {
+                                              ...option,
+                                              content: e.target.value,
+                                            }
+                                          : option
+                                    ),
+                                  }));
+                                  setNewQuestions((prev) =>
+                                    prev.map((question, questionIndex) =>
+                                      questionIndex === currentPage &&
+                                      question.options
+                                        ? {
+                                            ...question,
+                                            options: question.options.map(
+                                              (option, i) =>
+                                                i === answerIndex
+                                                  ? {
+                                                      ...option,
+                                                      content: e.target.value,
+                                                    }
+                                                  : option
+                                            ),
+                                          }
+                                        : question
+                                    )
+                                  );
+                                }}
+                                onFocus={() => setFocusedIndex(answerIndex)}
+                                onBlur={() => setFocusedIndex(null)}
+                                placeholder="Хариулт"
+                              />
+                            ) : (
+                              <div
+                                className="w-full h-9 bg-[#E6E6E6] rounded-[10px] text-[#757575] font-medium italic text-[13px] px-2 flex items-center"
+                                onClick={() => setFocusedIndex(answerIndex)}
+                              >
+                                <span className="text-[#1E1E1E]">
+                                  {String.fromCharCode(65 + answerIndex)}.
+                                </span>
+                                {item.content || "Хариулт"}
+                              </div>
+                            )}
+                            {currentQuestion.isPointBased && (
+                              <InputNumber
+                                min={0}
+                                max={100}
+                                value={item.points || 0}
+                                onChange={(value: number | null) => {
+                                  const newPoints = value || 0;
+                                  const updatedOptions =
+                                    currentQuestion?.options?.map((opt, i) =>
                                       i === answerIndex
-                                        ? { ...option, content: e.target.value }
-                                        : option
-                                  ),
-                                }));
-                                setNewQuestions((prev) =>
-                                  prev.map((question, questionIndex) =>
-                                    questionIndex === currentPage &&
-                                    question.options
-                                      ? {
-                                          ...question,
-                                          options: question.options.map(
-                                            (option, i) =>
-                                              i === answerIndex
-                                                ? {
-                                                    ...option,
-                                                    content: e.target.value,
-                                                  }
-                                                : option
-                                          ),
-                                        }
-                                      : question
-                                  )
-                                );
-                              }}
-                              onFocus={() => setFocusedIndex(answerIndex)}
-                              onBlur={() => setFocusedIndex(null)}
-                              placeholder="Хариулт"
-                            />
-                          ) : (
-                            <div
-                              className="w-full h-9 bg-[#E6E6E6] rounded-[10px] text-[#757575] font-medium italic text-[13px] px-2 flex items-center"
-                              onClick={() => setFocusedIndex(answerIndex)}
-                            >
-                              <span className="text-[#1E1E1E]">
-                                {String.fromCharCode(65 + answerIndex)}.
-                              </span>
-                              {item.content || "Хариулт"}
-                            </div>
-                          )}
-                          {/* Option Image Upload */}
+                                        ? { ...opt, points: newPoints }
+                                        : opt
+                                    ) || [];
+                                  const totalPoints = updatedOptions.reduce(
+                                    (sum, opt) => sum + (opt.points || 0),
+                                    0
+                                  );
+                                  if (totalPoints > 100) {
+                                    showAlert(
+                                      "Total points cannot exceed 100",
+                                      "warning",
+                                      "",
+                                      true
+                                    );
+                                    return;
+                                  }
+                                  setCurrentQuestion((prev) => ({
+                                    ...prev!,
+                                    options: updatedOptions,
+                                  }));
+                                  setNewQuestions((prev) =>
+                                    prev.map((question, questionIndex) =>
+                                      questionIndex === currentPage &&
+                                      question.options
+                                        ? {
+                                            ...question,
+                                            options: updatedOptions,
+                                          }
+                                        : question
+                                    )
+                                  );
+                                }}
+                                className={`${questionInputClass} w-20 mt-2`}
+                                placeholder="Points"
+                              />
+                            )}
+                          </div>
                           <Upload
                             fileList={optionFileLists[answerIndex] || []}
                             onChange={(info) =>
@@ -490,8 +729,7 @@ const QuestionTextEditor = ({
                             <Button
                               icon={<FileImageOutlined />}
                               style={{ marginTop: "8px" }}
-                            >
-                            </Button>
+                            ></Button>
                           </Upload>
                         </div>
                       );
@@ -508,7 +746,13 @@ const QuestionTextEditor = ({
                         ...currentQuestion,
                         options: [
                           ...(prev.options || []),
-                          { content: "", order: newOrder, poster: null },
+                          {
+                            content: "",
+                            order: newOrder,
+                            poster: null,
+                            points: 0,
+                            isCorrect: false,
+                          },
                         ],
                       }));
                       setNewQuestions((prev) =>
@@ -522,6 +766,8 @@ const QuestionTextEditor = ({
                                     content: "",
                                     order: newOrder,
                                     poster: null,
+                                    points: 0,
+                                    isCorrect: false,
                                   },
                                 ],
                               }
@@ -539,6 +785,26 @@ const QuestionTextEditor = ({
                   </div>
                 )}
               </div>
+            </div>
+          )}
+        {currentQuestion?.questionType === "YES_NO" &&
+          currentQuestion?.hasCorrectAnswer && (
+            <div className="rounded-[10px] bg-[#F5F5F5] w-full mt-5 p-[10px] h-auto flex flex-col gap-2">
+              <p className="text-[13px] text-[#1E1E1E] font-semibold">
+                Зөв хариулт
+              </p>
+              <Radio.Group
+                value={currentQuestion?.options?.findIndex(
+                  (opt) => opt.isCorrect
+                )}
+                onChange={(e) => handleSingleCorrectAnswerChange(e.target.value)}
+              >
+                {currentQuestion?.options?.map((opt, index) => (
+                  <Radio key={index} value={index}>
+                    {opt.content}
+                  </Radio>
+                ))}
+              </Radio.Group>
             </div>
           )}
       </div>

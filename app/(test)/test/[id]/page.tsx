@@ -32,6 +32,8 @@ interface Option {
   content: string;
   order: number;
   poster?: string | null; // Add poster field for options
+  points?: number;
+  isCorrect?: boolean;
 }
 
 interface Question {
@@ -45,6 +47,8 @@ interface Question {
   rateNumber?: number;
   rateType?: string;
   poster?: string | null;
+  isPointBased?: boolean;
+  hasCorrectAnswer?: boolean;
 }
 
 export default function TestPage() {
@@ -314,12 +318,17 @@ export default function TestPage() {
             Энэ асуултад заавал хариулах шаардлагатай
           </div>
         )}
-
+        {question.questionType === "MULTI_CHOICE" && (
+          <div className="text-xs mb-2" style={{ color: custStyle.primaryColor }}>
+            Хамгийн багадаа {question.minAnswerCount} сонголт сонгоно уу
+          </div>
+        )}
+  
         {question.questionType === "MULTI_CHOICE" && (
           <Checkbox.Group
             value={
-              answers.find((answer) => answer.questionId === question.id)
-                ?.option || []
+              answers.find((answer) => answer.questionId === question.id)?.option ||
+              []
             }
             onChange={(checkedValues) =>
               handleChange(question.id, checkedValues, "")
@@ -327,10 +336,7 @@ export default function TestPage() {
             className="circle-checkbox flex flex-col gap-3 w-full max-h-full overflow-y-auto"
           >
             {question.options.map((item: Option, idx: number) => (
-              <div
-                key={idx}
-                className="flex flex-row gap-2 w-full items-center"
-              >
+              <div key={idx} className="flex flex-row gap-2 w-full items-center">
                 <div className="flex-1">
                   <Checkbox
                     value={item}
@@ -357,21 +363,19 @@ export default function TestPage() {
             ))}
           </Checkbox.Group>
         )}
-
+  
+        {/* Other question types remain unchanged */}
         {question.questionType === "SINGLE_CHOICE" && (
           <Radio.Group
             onChange={(e) => handleChange(question.id, [e.target.value], "")}
             value={
-              answers.find((answer) => answer.questionId === question.id)
-                ?.option?.[0] || undefined
+              answers.find((answer) => answer.questionId === question.id)?.option?.[0] ||
+              undefined
             }
             className="flex flex-col w-full max-h-full overflow-y-auto"
           >
             {question.options.map((item: Option, idx: number) => (
-              <div
-                key={idx}
-                className="flex flex-row w-full gap-2 items-center"
-              >
+              <div key={idx} className="flex flex-row w-full gap-2 items-center">
                 <div className="flex-1">
                   <Radio
                     style={{ color: custStyle.primaryColor }}
@@ -398,14 +402,14 @@ export default function TestPage() {
             ))}
           </Radio.Group>
         )}
-
+  
         {question.questionType === "RATING" && (
           <div className="w-full flex items-center justify-center">
             <Rate
               count={question.rateNumber}
               value={Number(
-                answers.find((answer) => answer.questionId === question.id)
-                  ?.option?.[0]?.content || 0
+                answers.find((answer) => answer.questionId === question.id)?.option?.[0]
+                  ?.content || 0
               )}
               onChange={(value) => {
                 const selectedOption = question.options.find(
@@ -421,9 +425,8 @@ export default function TestPage() {
                       color:
                         index <
                         Number(
-                          answers.find(
-                            (answer) => answer.questionId === question.id
-                          )?.option?.[0]?.content || 0
+                          answers.find((answer) => answer.questionId === question.id)
+                            ?.option?.[0]?.content || 0
                         )
                           ? custStyle.primaryColor
                           : "#E0E8F1",
@@ -436,9 +439,8 @@ export default function TestPage() {
                     fill={
                       index <
                       Number(
-                        answers.find(
-                          (answer) => answer.questionId === question.id
-                        )?.option?.[0]?.content || 0
+                        answers.find((answer) => answer.questionId === question.id)
+                          ?.option?.[0]?.content || 0
                       )
                         ? custStyle.primaryColor
                         : "#E0E8F1"
@@ -449,23 +451,20 @@ export default function TestPage() {
             />
           </div>
         )}
-
+  
         {question.questionType === "YES_NO" && (
           <Radio.Group
             optionType="button"
             buttonStyle="solid"
             onChange={(e) => handleChange(question.id, [e.target.value], "")}
             value={
-              answers.find((answer) => answer.questionId === question.id)
-                ?.option?.[0] || undefined
+              answers.find((answer) => answer.questionId === question.id)?.option?.[0] ||
+              undefined
             }
             className="flex flex-col w-full max-h-full overflow-y-auto"
           >
             {question.options.map((item: Option, idx: number) => (
-              <div
-                key={idx}
-                className="flex flex-row w-full items-center gap-2"
-              >
+              <div key={idx} className="flex flex-row w-full items-center gap-2">
                 <div className="flex-1">
                   <Radio
                     style={{ color: custStyle.primaryColor }}
@@ -492,13 +491,13 @@ export default function TestPage() {
             ))}
           </Radio.Group>
         )}
-
+  
         {question.questionType === "TEXT" && (
           <TextArea
             onChange={(e) => handleChange(question.id, [], e.target.value)}
             value={
-              answers.find((answer) => answer.questionId === question.id)
-                ?.textAnswer || ""
+              answers.find((answer) => answer.questionId === question.id)?.textAnswer ||
+              ""
             }
             style={{
               backgroundColor: custStyle.backgroundColor,
@@ -738,7 +737,7 @@ export default function TestPage() {
             </div>
           )}
           {step === "questions" && displayMode === "all" && (
-            <div className="flex flex-col items-center gap-5 w-200 max-h-full h-full bg-red-200">
+            <div className="flex flex-col items-center gap-5 w-200 max-h-full h-full">
               <div>{formatTime(timeLeft)}</div>
               <div className="flex flex-col gap-5 items-center w-full max-h-full h-full overflow-y-auto px-6">
                 {orderedQuestions.map((question, index) =>

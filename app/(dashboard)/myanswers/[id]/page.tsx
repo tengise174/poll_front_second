@@ -16,11 +16,14 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const { TextArea } = Input;
+const { Text } = Typography;
 
 interface OptionsProps {
   id: string;
   content: string;
   poster?: string | null;
+  points?: number;
+  isCorrect?: boolean;
 }
 
 interface QuestionProps {
@@ -33,6 +36,8 @@ interface QuestionProps {
   selectedOptions?: OptionsProps[];
   textAnswer?: string;
   poster?: string | null;
+  isPointBased?: boolean;
+  hasCorrectAnswer?: boolean;
 }
 
 interface PollProps {
@@ -105,6 +110,47 @@ const MyAnswersDetail = () => {
 
   if (!answerDetails) return <div>Алдаа гарсан</div>;
 
+  // Helper function to calculate total points for selected options
+  const calculateTotalPoints = (
+    selectedOptions: OptionsProps[] | undefined,
+    allOptions: OptionsProps[] | undefined
+  ): number => {
+    if (!selectedOptions || !allOptions) return 0;
+    return selectedOptions.reduce((sum, selected) => {
+      const option = allOptions.find((opt) => opt.id === selected.id);
+      return sum + (option?.points || 0);
+    }, 0);
+  };
+
+  // Helper function to check if user's answer is correct
+  const isUserAnswerCorrect = (
+    selectedOptions: OptionsProps[] | undefined,
+    allOptions: OptionsProps[] | undefined
+  ): boolean => {
+    if (!selectedOptions || !allOptions) return false;
+    const correctOptionIds = allOptions
+      .filter((opt) => opt.isCorrect)
+      .map((opt) => opt.id);
+    const selectedOptionIds = selectedOptions.map((opt) => opt.id);
+    return (
+      correctOptionIds.length === selectedOptionIds.length &&
+      correctOptionIds.every((id) => selectedOptionIds.includes(id))
+    );
+  };
+
+  // Helper function to get correct answers
+  const getCorrectAnswers = (
+    allOptions: OptionsProps[] | undefined
+  ): string => {
+    if (!allOptions) return "";
+    const correctOptions = allOptions
+      .filter((opt) => opt.isCorrect)
+      .map((opt) => opt.content);
+    return correctOptions.length > 0
+      ? correctOptions.join(", ")
+      : "Зөв хариулт байхгүй";
+  };
+
   return (
     <div className="w-200 flex flex-col items-center justify-center mx-auto">
       <div className="w-full font-bold">
@@ -165,27 +211,77 @@ const MyAnswersDetail = () => {
                   const isChecked = question.selectedOptions?.some(
                     (selected) => selected.id === option.id
                   );
+                  const isCorrectOption = option.isCorrect;
                   return (
-                    <Checkbox
-                      key={option.id}
-                      checked={isChecked}
-                      disabled
-                      style={{ marginBottom: 8 }}
-                      className="custom-checkbox"
-                    >
-                      <div className="flex flex-row items-center gap-2">
-                        <p className="fond-bold text-md">{option.content}</p>
-                        <Image
-                          src={option.poster || ""}
-                          height={100}
-                          style={{
-                            width: "auto",
-                          }}
-                        />
-                      </div>
-                    </Checkbox>
+                    <div key={option.id} className="flex flex-col">
+                      <Checkbox
+                        checked={isChecked}
+                        disabled
+                        style={{ marginBottom: 8 }}
+                        className="custom-checkbox"
+                      >
+                        <div className="flex flex-row items-center gap-2">
+                          <p
+                            className={`font-bold text-md ${
+                              isCorrectOption ? "text-green-600" : ""
+                            }`}
+                          >
+                            {option.content}
+                            {question.isPointBased && option.points !== undefined
+                              ? ` (${option.points} оноо)`
+                              : ""}
+                          </p>
+                          {option.poster && (
+                            <Image
+                              src={option.poster}
+                              height={100}
+                              style={{
+                                width: "auto",
+                              }}
+                            />
+                          )}
+                        </div>
+                      </Checkbox>
+                    </div>
                   );
                 })}
+                {question.hasCorrectAnswer && (
+                  <div className="mt-4">
+                    <Text strong>
+                      Зөв хариулт: {getCorrectAnswers(question.allOptions)}
+                    </Text>
+                    <br />
+                    <Text
+                      type={
+                        isUserAnswerCorrect(
+                          question.selectedOptions,
+                          question.allOptions
+                        )
+                          ? "success"
+                          : "danger"
+                      }
+                    >
+                      Таны хариулт:{" "}
+                      {isUserAnswerCorrect(
+                        question.selectedOptions,
+                        question.allOptions
+                      )
+                        ? "Зөв"
+                        : "Буруу"}
+                    </Text>
+                  </div>
+                )}
+                {question.isPointBased && (
+                  <div className="mt-2">
+                    <Text strong>
+                      Нийт оноо:{" "}
+                      {calculateTotalPoints(
+                        question.selectedOptions,
+                        question.allOptions
+                      )}
+                    </Text>
+                  </div>
+                )}
               </div>
             )}
           </Card>
