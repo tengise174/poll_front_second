@@ -213,6 +213,7 @@ const StatsPage = () => {
     const wb = XLSX.utils.book_new();
     const netPoints = calculateNetPoints();
 
+    // General Info Sheet
     const generalInfo = [
       ["Poll Title", data.title],
       ["Created At", new Date(data.createdAt).toLocaleString()],
@@ -239,8 +240,8 @@ const StatsPage = () => {
     const wsGeneral = XLSX.utils.aoa_to_sheet(generalInfo);
     XLSX.utils.book_append_sheet(wb, wsGeneral, "Poll Info");
 
+    // Questions Sheet
     const questionHeaders = [
-      "Question ID",
       "Order",
       "Content",
       "Type",
@@ -254,13 +255,13 @@ const StatsPage = () => {
       "Answered By",
     ];
 
-    const questionData: any[] = [questionHeaders];
+    const questionData: any[] = [];
+    const merges: { s: { r: number; c: number }; e: { r: number; c: number } }[] = [];
 
     data.questions.forEach((question) => {
       if (question.questionType === "TEXT" && question.answers) {
-        question.answers.forEach((answer, idx) => {
+        question.answers.forEach((answer) => {
           questionData.push([
-            question.questionId,
             question.order,
             question.content,
             questionTypeTranslations[question.questionType],
@@ -275,15 +276,15 @@ const StatsPage = () => {
           ]);
         });
       } else if (question.options) {
-        question.options.forEach((option) => {
+        const startRow = questionData.length + 1; // +1 for header
+        question.options.forEach((option, idx) => {
           questionData.push([
-            question.questionId,
-            question.order,
-            question.content,
-            questionTypeTranslations[question.questionType],
-            question.isPointBased ? "Yes" : "No",
-            question.hasCorrectAnswer ? "Yes" : "No",
-            question.avgTimeTaken.toFixed(2),
+            idx === 0 ? question.order : "", // Only show order for first option
+            idx === 0 ? question.content : "", // Only show content for first option
+            idx === 0 ? questionTypeTranslations[question.questionType] : "", // Only show type for first option
+            idx === 0 ? (question.isPointBased ? "Yes" : "No") : "", // Only show point-based for first
+            idx === 0 ? (question.hasCorrectAnswer ? "Yes" : "No") : "", // Only show correct answer for first
+            idx === 0 ? question.avgTimeTaken.toFixed(2) : "", // Only show time for first
             option.content,
             option.points,
             option.isCorrect ? "Yes" : "No",
@@ -291,14 +292,27 @@ const StatsPage = () => {
             option.answeredBy.map((u) => u.username).join(", "),
           ]);
         });
+        const endRow = questionData.length;
+        if (question.options.length > 1) {
+          // Merge cells for question details
+          merges.push(
+            { s: { r: startRow, c: 0 }, e: { r: endRow, c: 0 } }, // Order
+            { s: { r: startRow, c: 1 }, e: { r: endRow, c: 1 } }, // Content
+            { s: { r: startRow, c: 2 }, e: { r: endRow, c: 2 } }, // Type
+            { s: { r: startRow, c: 3 }, e: { r: endRow, c: 3 } }, // Is Point Based
+            { s: { r: startRow, c: 4 }, e: { r: endRow, c: 4 } }, // Has Correct Answer
+            { s: { r: startRow, c: 5 }, e: { r: endRow, c: 5 } } // Avg Time Taken
+          );
+        }
       }
     });
 
-    const wsQuestions = XLSX.utils.aoa_to_sheet(questionData);
+    const wsQuestions = XLSX.utils.aoa_to_sheet([questionHeaders, ...questionData]);
+    wsQuestions["!merges"] = merges;
     XLSX.utils.book_append_sheet(wb, wsQuestions, "Questions");
 
+    // Submitted Users Sheet
     const userHeaders = [
-      "User ID",
       "Username",
       "Total Time Taken (s)",
       "Total Points",
@@ -309,7 +323,6 @@ const StatsPage = () => {
       const { totalPoints, correctAnswers, percentage } =
         calculateUserStats(user);
       return [
-        user.id,
         user.username,
         user.totalTimeTaken,
         totalPoints,
@@ -319,6 +332,80 @@ const StatsPage = () => {
     });
     const wsUsers = XLSX.utils.aoa_to_sheet([userHeaders, ...userData]);
     XLSX.utils.book_append_sheet(wb, wsUsers, "Submitted Users");
+
+    // User Answers Sheet
+    const userAnswerHeaders = [
+      "Username",
+      "Question Order",
+      "Question Content",
+      "Question Type",
+      "Selected Options/Answer",
+      "Points Earned",
+      "Is Correct",
+      "Time Taken (s)",
+    ];
+
+    const userAnswerData: any[] = [];
+    const userAnswerMerges: { s: { r: number; c: number }; e: { r: number; c: number } }[] = [];
+
+    data.submittedUsers.forEach((user) => {
+      const startRow = userAnswerData.length + 1; // +1 for header
+      data.questions.forEach((question) => {
+        let selectedOptions: string[] = [];
+        let pointsEarned = 0;
+        let isCorrect = "-";
+        let timeTaken: number | null = null;
+
+        if (question.questionType === "TEXT" && question.answers) {
+          const userAnswer = question.answers.find(
+            (answer) => answer.answeredBy === user.username
+          );
+          if (userAnswer) {
+            selectedOptions = [userAnswer.textAnswer];
+            timeTaken = parseFloat(userAnswer.timeTaken) || null;
+          }
+        } else if (question.options) {
+          question.options.forEach((option) => {
+            const userResponse = option.answeredBy.find(
+              (ans) => ans.username === user.username
+            );
+            if (userResponse) {
+              selectedOptions.push(option.content);
+              pointsEarned += option.points;
+              timeTaken = timeTaken || userResponse.timeTaken;
+              if (question.hasCorrectAnswer && option.isCorrect) {
+                isCorrect = "Yes";
+              } else if (question.hasCorrectAnswer) {
+                isCorrect = isCorrect === "Yes" ? "Yes" : "No";
+              }
+            }
+          });
+        }
+
+        userAnswerData.push([
+          userAnswerData.length === startRow - 1 ? user.username : "", // Only show username for first question
+          question.order,
+          question.content,
+          questionTypeTranslations[question.questionType],
+          selectedOptions.length > 0 ? selectedOptions.join(", ") : "No Answer",
+          pointsEarned,
+          isCorrect,
+          timeTaken !== null ? timeTaken.toFixed(2) : "-",
+        ]);
+      });
+      const endRow = userAnswerData.length;
+      if (data.questions.length > 0) {
+        // Merge username cells for this user
+        userAnswerMerges.push({
+          s: { r: startRow, c: 0 },
+          e: { r: endRow, c: 0 },
+        });
+      }
+    });
+
+    const wsUserAnswers = XLSX.utils.aoa_to_sheet([userAnswerHeaders, ...userAnswerData]);
+    wsUserAnswers["!merges"] = userAnswerMerges;
+    XLSX.utils.book_append_sheet(wb, wsUserAnswers, "User Answers");
 
     XLSX.writeFile(wb, `${data.title}_stats.xlsx`);
   };
