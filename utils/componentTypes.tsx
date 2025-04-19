@@ -88,7 +88,7 @@ export interface SurveyProps {
 export interface QuestionTypeProps {
   icon: any;
   title: string;
-  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN";
+  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID";
 }
 interface SettingsPageProps {
   isAccessLevel: boolean;
@@ -140,6 +140,8 @@ export interface OptionProps {
   points: number;
   isCorrect: boolean;
   nextQuestionOrder?: number | null;
+  rowIndex: number | null;
+  columnIndex: number | null;
 }
 
 export interface QuestionProps {
@@ -152,6 +154,7 @@ export interface QuestionProps {
     | "YES_NO"
     | "TEXT"
     | "DROPDOWN"
+    | "MULTIPLE_CHOICE_GRID"
     | null;
   minAnswerCount?: number;
   order: number;
@@ -162,6 +165,8 @@ export interface QuestionProps {
   poster?: string | null;
   isPointBased: boolean;
   hasCorrectAnswer: boolean;
+  gridRows: string[];
+  gridColumns: string[];
 }
 
 type ChosenTypeProps =
@@ -171,6 +176,7 @@ type ChosenTypeProps =
   | "YES_NO"
   | "TEXT"
   | "DROPDOWN"
+  | "MULTIPLE_CHOICE_GRID"
   | null;
 
 export interface QuestionTextEditorProps {

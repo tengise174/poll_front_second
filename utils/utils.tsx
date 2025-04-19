@@ -62,6 +62,11 @@ export const questionTypes: QuestionTypeProps[] = [
     title: "Dropdown",
     questionType: "DROPDOWN",
   },
+  {
+    questionType: "MULTIPLE_CHOICE_GRID",
+    title: "Олон сонголттой тор",
+    icon: null, // Replace with appropriate icon
+  },
 ];
 
 export const formatNumber = (num: number): string => {

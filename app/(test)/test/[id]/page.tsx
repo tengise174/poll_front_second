@@ -14,6 +14,7 @@ import {
   Button,
   Image,
   Select,
+  Table,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import CustomButton from "@/components/CustomButton";
@@ -36,6 +37,8 @@ interface Option {
   points?: number;
   isCorrect?: boolean;
   nextQuestionOrder?: number | null;
+  rowIndex?: number | null;
+  columnIndex?: number | null;
 }
 
 interface Question {
@@ -51,6 +54,8 @@ interface Question {
   poster?: string | null;
   isPointBased?: boolean;
   hasCorrectAnswer?: boolean;
+  gridRows?: string[];
+  gridColumns?: string[];
 }
 
 export default function TestPage() {
@@ -219,6 +224,12 @@ export default function TestPage() {
       return answer !== undefined && answer.textAnswer?.trim().length > 0;
     }
 
+    if (type === "MULTIPLE_CHOICE_GRID") {
+      if (!answer || !answer.option) return false;
+      const rowCount = orderedQuestions.find((q) => q.id === id)?.gridRows?.length || 0;
+      return answer.option.length >= rowCount;
+    }
+
     return true;
   };
 
@@ -352,7 +363,72 @@ export default function TestPage() {
             Хамгийн багадаа {question.minAnswerCount} сонголт сонгоно уу
           </div>
         )}
-  
+
+        {question.questionType === "MULTIPLE_CHOICE_GRID" && (
+          <div className="w-full">
+            <Table
+              dataSource={question.gridRows?.map((row, rowIndex) => ({
+                key: rowIndex,
+                row,
+              }))}
+              columns={[
+                {
+                  title: "",
+                  dataIndex: "row",
+                  key: "row",
+                  render: (text) => (
+                    <span style={{ color: custStyle.primaryColor }}>{text}</span>
+                  ),
+                },
+                ...(question.gridColumns?.map((column, colIndex) => ({
+                  title: column,
+                  dataIndex: `col${colIndex}`,
+                  key: `col${colIndex}`,
+                  render: (_: any, record: { key: number; row: string }) => {
+                    const rowIndex = question.gridRows?.indexOf(record.row) || 0;
+                    const option = question.options.find(
+                      (opt) =>
+                        opt.rowIndex === rowIndex && opt.columnIndex === colIndex
+                    );
+                    const selectedOption = answers
+                      .find((answer) => answer.questionId === question.id)
+                      ?.option.find(
+                        (opt) => opt.rowIndex === rowIndex
+                      );
+                    return (
+                      <Radio
+                        checked={
+                          selectedOption?.id === option?.id
+                        }
+                        onChange={() => {
+                          const newOption = question.options.find(
+                            (opt) =>
+                              opt.rowIndex === rowIndex &&
+                              opt.columnIndex === colIndex
+                          );
+                          if (newOption) {
+                            const updatedOptions = answers
+                              .find((answer) => answer.questionId === question.id)
+                              ?.option.filter(
+                                (opt) => opt.rowIndex !== rowIndex
+                              ) || [];
+                            handleChange(question.id, [...updatedOptions, newOption], "");
+                          }
+                        }}
+                        style={{ color: custStyle.primaryColor }}
+                      />
+                    );
+                  },
+                })) || []),
+              ]}
+              pagination={false}
+              bordered
+              size="small"
+              style={{ color: custStyle.primaryColor }}
+            />
+          </div>
+        )}
+
         {question.questionType === "MULTI_CHOICE" && (
           <Checkbox.Group
             value={
@@ -392,7 +468,7 @@ export default function TestPage() {
             ))}
           </Checkbox.Group>
         )}
-  
+
         {question.questionType === "SINGLE_CHOICE" && (
           <Radio.Group
             onChange={(e) => handleChange(question.id, [e.target.value], "")}
@@ -430,7 +506,7 @@ export default function TestPage() {
             ))}
           </Radio.Group>
         )}
-  
+
         {question.questionType === "DROPDOWN" && (
           <Select
             style={{ width: '100%', color: custStyle.primaryColor }}
@@ -486,7 +562,7 @@ export default function TestPage() {
             className="w-full"
           />
         )}
-  
+
         {question.questionType === "RATING" && (
           <div className="w-full flex items-center justify-center">
             <Rate
@@ -535,7 +611,7 @@ export default function TestPage() {
             />
           </div>
         )}
-  
+
         {question.questionType === "YES_NO" && (
           <Radio.Group
             optionType="button"
@@ -575,7 +651,7 @@ export default function TestPage() {
             ))}
           </Radio.Group>
         )}
-  
+
         {question.questionType === "TEXT" && (
           <TextArea
             onChange={(e) => handleChange(question.id, [], e.target.value)}
@@ -657,6 +733,12 @@ export default function TestPage() {
             colorBgContainer: custStyle.backgroundColor,
             colorBorder: "#D9D9D9",
           },
+          Table: {
+            headerBg: custStyle.backgroundColor,
+            headerColor: custStyle.primaryColor,
+            rowHoverBg: "#f5f5f5",
+            borderColor: "#D9D9D9",
+          },
         },
       }}
     >
@@ -729,7 +811,7 @@ export default function TestPage() {
                 title={data?.btnLabel || "Эхлэх"}
                 onClick={() => {
                   setStep("questions");
-                  setHistory([]); 
+                  setHistory([]);
                 }}
               />
             </div>
@@ -796,7 +878,7 @@ export default function TestPage() {
                       ? "Дуусгах"
                       : "Цааш"
                   }
-                  className="h-9 w-[220px] rounded-[99px] text-[13px]  font-semibold cursor-pointer"
+                  className="h-9 w-[220px] rounded-[99px] text-[13px] font-semibold cursor-pointer"
                   style={{
                     color: custStyle.backgroundColor,
                     backgroundColor: isButtonDisabled(
@@ -824,7 +906,7 @@ export default function TestPage() {
                     if (questionNo === orderedQuestions.length - 1) {
                       handleSubmit();
                     } else {
-                      setHistory((prev) => [...prev, questionNo]); 
+                      setHistory((prev) => [...prev, questionNo]);
                       const nextIndex = getNextQuestionIndex();
                       if (nextIndex >= orderedQuestions.length) {
                         handleSubmit();

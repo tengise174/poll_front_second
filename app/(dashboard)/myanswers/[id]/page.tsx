@@ -2,7 +2,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Card, Checkbox, Skeleton, Typography, Input, Rate, Image } from "antd";
+import {
+  Card,
+  Checkbox,
+  Skeleton,
+  Typography,
+  Input,
+  Rate,
+  Image,
+  Table,
+} from "antd";
 import { getAnsweredPollDetail } from "@/api/action";
 import { dualColors } from "@/utils/utils";
 
@@ -15,6 +24,8 @@ interface OptionsProps {
   poster?: string | null;
   points?: number;
   isCorrect?: boolean;
+  rowIndex?: number | null;
+  columnIndex?: number | null;
 }
 
 interface QuestionProps {
@@ -26,15 +37,18 @@ interface QuestionProps {
     | "YES_NO"
     | "TEXT"
     | "SINGLE_CHOICE"
-    | "DROPDOWN";
-  rateNumber: number;
-  rateType: "STAR" | "NUMBER";
+    | "DROPDOWN"
+    | "MULTIPLE_CHOICE_GRID";
+  rateNumber?: number | null;
+  rateType?: "STAR" | "NUMBER" | null;
   allOptions?: OptionsProps[];
   selectedOptions?: OptionsProps[];
-  textAnswer?: string;
+  textAnswer?: string | null;
   poster?: string | null;
   isPointBased?: boolean;
   hasCorrectAnswer?: boolean;
+  gridColumns?: string[];
+  gridRows?: string[];
 }
 
 interface PollProps {
@@ -42,8 +56,8 @@ interface PollProps {
   title: string;
   greetingMessage: string;
   themeId: number;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string | null;
+  endDate?: string | null;
   poster?: string | null;
 }
 
@@ -139,10 +153,69 @@ const MyAnswersDetail = () => {
     if (!allOptions) return "";
     const correctOptions = allOptions
       .filter((opt) => opt.isCorrect)
-      .map((opt) => opt.content);
+      .map((opt) => opt.content || `(${opt.rowIndex}, ${opt.columnIndex})`);
     return correctOptions.length > 0
       ? correctOptions.join(", ")
       : "Зөв хариулт байхгүй";
+  };
+
+  const renderMultipleChoiceGrid = (question: QuestionProps) => {
+    const { gridRows, gridColumns, allOptions, selectedOptions } = question;
+
+    if (!gridRows || !gridColumns || !allOptions) return null;
+
+    // Create table columns
+    const columns = [
+      {
+        title: "",
+        dataIndex: "rowLabel",
+        key: "rowLabel",
+        fixed: "left" as const,
+        width: 150,
+      },
+      ...gridColumns.map((col, index) => ({
+        title: col,
+        dataIndex: `col${index}`,
+        key: `col${index}`,
+        width: 100,
+        align: "center" as const,
+      })),
+    ];
+
+    // Create table data
+    const dataSource = gridRows.map((row, rowIndex) => {
+      const rowData: any = { rowLabel: row, key: rowIndex };
+      gridColumns.forEach((_, colIndex) => {
+        const option = allOptions.find(
+          (opt) => opt.rowIndex === rowIndex && opt.columnIndex === colIndex
+        );
+        const isSelected = selectedOptions?.some(
+          (sel) => sel.id === option?.id
+        );
+        const isCorrect = option?.isCorrect;
+        rowData[`col${colIndex}`] = option ? (
+          <Checkbox
+            checked={isSelected}
+            disabled
+            className={`custom-checkbox ${isCorrect ? "text-green-600" : ""}`}
+          >
+            {isSelected ? "✓" : ""}
+          </Checkbox>
+        ) : null;
+      });
+      return rowData;
+    });
+
+    return (
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+        bordered
+        size="small"
+        style={{ marginBottom: 16 }}
+      />
+    );
   };
 
   return (
@@ -188,7 +261,7 @@ const MyAnswersDetail = () => {
                     ? Number(question.selectedOptions[0].content)
                     : 0
                 }
-                count={question.rateNumber}
+                count={question.rateNumber || 5}
                 disabled
                 character={
                   question.rateType === "NUMBER"
@@ -198,11 +271,52 @@ const MyAnswersDetail = () => {
               />
             ) : question.questionType === "TEXT" ? (
               <TextArea
-                value={question.textAnswer}
+                value={question.textAnswer || ""}
                 readOnly
                 rows={4}
                 style={{ marginTop: 8 }}
               />
+            ) : question.questionType === "MULTIPLE_CHOICE_GRID" ? (
+              <div className="flex flex-col">
+                {renderMultipleChoiceGrid(question)}
+                {question.hasCorrectAnswer && (
+                  <div className="mt-4">
+                    <Text strong>
+                      Зөв хариулт: {getCorrectAnswers(question.allOptions)}
+                    </Text>
+                    <br />
+                    <Text
+                      type={
+                        isUserAnswerCorrect(
+                          question.selectedOptions,
+                          question.allOptions
+                        )
+                          ? "success"
+                          : "danger"
+                      }
+                    >
+                      Таны хариулт:{" "}
+                      {isUserAnswerCorrect(
+                        question.selectedOptions,
+                        question.allOptions
+                      )
+                        ? "Зөв"
+                        : "Буруу"}
+                    </Text>
+                  </div>
+                )}
+                {question.isPointBased && (
+                  <div className="mt-2">
+                    <Text strong>
+                      Нийт оноо:{" "}
+                      {calculateTotalPoints(
+                        question.selectedOptions,
+                        question.allOptions
+                      )}
+                    </Text>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="flex flex-col">
                 {question.allOptions?.map((option) => {

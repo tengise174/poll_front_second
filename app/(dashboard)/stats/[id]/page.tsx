@@ -43,6 +43,7 @@ const questionTypeTranslations: Record<string, string> = {
   TEXT: "Текст",
   SINGLE_CHOICE: "Ганц сонголттой",
   DROPDOWN: "Dropdown",
+  MULTIPLE_CHOICE_GRID: "Хүснэгтийн олон сонголттой",
 };
 
 interface AnsweredByProp {
@@ -60,6 +61,8 @@ interface PollOption {
   order: number;
   points: number;
   isCorrect: boolean;
+  rowIndex?: number | null;
+  columnIndex?: number | null;
 }
 
 interface PollAnswer {
@@ -72,7 +75,7 @@ interface PollAnswer {
 interface PollQuestion {
   questionId: string;
   content: string;
-  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE" | "DROPDOWN";
+  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID";
   avgTimeTaken: number;
   order: number;
   options?: PollOption[];
@@ -81,6 +84,8 @@ interface PollQuestion {
   isPointBased: boolean;
   hasCorrectAnswer: boolean;
   minAnswerCount?: number | null;
+  gridRows?: string[];
+  gridColumns?: string[];
 }
 
 interface UserProp {
@@ -268,22 +273,22 @@ const StatsPage = () => {
             question.hasCorrectAnswer ? "Yes" : "No",
             question.avgTimeTaken.toFixed(2),
             answer.textAnswer,
-            "-", 
-            "-", 
-            "-", 
+            "-",
+            "-",
+            "-",
             answer.answeredBy,
           ]);
         });
       } else if (question.options) {
-        const startRow = questionData.length + 1; 
+        const startRow = questionData.length + 1;
         question.options.forEach((option, idx) => {
           questionData.push([
-            idx === 0 ? question.order : "", 
-            idx === 0 ? question.content : "", 
-            idx === 0 ? questionTypeTranslations[question.questionType] : "", 
-            idx === 0 ? (question.isPointBased ? "Yes" : "No") : "", 
-            idx === 0 ? (question.hasCorrectAnswer ? "Yes" : "No") : "", 
-            idx === 0 ? question.avgTimeTaken.toFixed(2) : "", 
+            idx === 0 ? question.order : "",
+            idx === 0 ? question.content : "",
+            idx === 0 ? questionTypeTranslations[question.questionType] : "",
+            idx === 0 ? (question.isPointBased ? "Yes" : "No") : "",
+            idx === 0 ? (question.hasCorrectAnswer ? "Yes" : "No") : "",
+            idx === 0 ? question.avgTimeTaken.toFixed(2) : "",
             option.content,
             option.points,
             option.isCorrect ? "Yes" : "No",
@@ -295,11 +300,11 @@ const StatsPage = () => {
         if (question.options.length > 1) {
           merges.push(
             { s: { r: startRow, c: 0 }, e: { r: endRow, c: 0 } },
-            { s: { r: startRow, c: 1 }, e: { r: endRow, c: 1 } }, 
-            { s: { r: startRow, c: 2 }, e: { r: endRow, c: 2 } }, 
-            { s: { r: startRow, c: 3 }, e: { r: endRow, c: 3 } }, 
-            { s: { r: startRow, c: 4 }, e: { r: endRow, c: 4 } }, 
-            { s: { r: startRow, c: 5 }, e: { r: endRow, c: 5 } } 
+            { s: { r: startRow, c: 1 }, e: { r: endRow, c: 1 } },
+            { s: { r: startRow, c: 2 }, e: { r: endRow, c: 2 } },
+            { s: { r: startRow, c: 3 }, e: { r: endRow, c: 3 } },
+            { s: { r: startRow, c: 4 }, e: { r: endRow, c: 4 } },
+            { s: { r: startRow, c: 5 }, e: { r: endRow, c: 5 } }
           );
         }
       }
@@ -345,7 +350,7 @@ const StatsPage = () => {
     const userAnswerMerges: { s: { r: number; c: number }; e: { r: number; c: number } }[] = [];
 
     data.submittedUsers.forEach((user) => {
-      const startRow = userAnswerData.length + 1; 
+      const startRow = userAnswerData.length + 1;
       data.questions.forEach((question) => {
         let selectedOptions: string[] = [];
         let pointsEarned = 0;
@@ -379,7 +384,7 @@ const StatsPage = () => {
         }
 
         userAnswerData.push([
-          userAnswerData.length === startRow - 1 ? user.username : "", 
+          userAnswerData.length === startRow - 1 ? user.username : "",
           question.order,
           question.content,
           questionTypeTranslations[question.questionType],
@@ -527,6 +532,64 @@ const StatsPage = () => {
       render: (text: number | null) => (text ? text.toFixed(2) : "-"),
     },
   ];
+
+  const prepareGridTableData = (question: PollQuestion) => {
+    if (question.questionType !== "MULTIPLE_CHOICE_GRID" || !question.gridRows || !question.gridColumns || !question.options) {
+      return [];
+    }
+
+    const optionMap: { [row: number]: { [col: number]: PollOption } } = {};
+    question.options.forEach((option) => {
+      if (option.rowIndex !== null && option.columnIndex !== null) {
+        if (option.rowIndex !== undefined && !optionMap[option.rowIndex]) {
+          optionMap[option.rowIndex] = {};
+        }
+        if (option.rowIndex !== undefined && option.columnIndex !== undefined) {
+          optionMap[option.rowIndex][option.columnIndex] = option;
+        }
+      }
+    });
+
+    return question.gridRows.map((rowLabel, rowIndex) => {
+      const rowData: { [key: string]: any } = {
+        key: `row-${rowIndex}`,
+        rowLabel,
+      };
+      question.gridColumns?.forEach((colLabel, colIndex) => {
+        const option = optionMap[rowIndex]?.[colIndex];
+        rowData[`col-${colIndex}`] = option
+          ? {
+              selectionCount: option.selectionCount,
+              answeredBy: option.answeredBy.map((user) => user.username).join(", ") || "No users",
+            }
+          : { selectionCount: 0, answeredBy: "No users" };
+      });
+      return rowData;
+    });
+  };
+
+  const getGridTableColumns = (gridColumns: string[]) => {
+    return [
+      {
+        title: "Row",
+        dataIndex: "rowLabel",
+        key: "rowLabel",
+        fixed: "left" as const,
+        width: 150,
+      },
+      ...gridColumns.map((colLabel, colIndex) => ({
+        title: colLabel,
+        dataIndex: `col-${colIndex}`,
+        key: `col-${colIndex}`,
+        render: (value: { selectionCount: number; answeredBy: string }) => (
+          <div>
+            <p><strong>Count:</strong> {value.selectionCount}</p>
+            <p><strong>Users:</strong> {value.answeredBy}</p>
+          </div>
+        ),
+      })),
+    ];
+  };
 
   if (isFetching) {
     return <Skeleton />;
@@ -899,6 +962,63 @@ const StatsPage = () => {
                 );
               }
 
+              if (question.questionType === "MULTIPLE_CHOICE_GRID") {
+                const gridTableData = prepareGridTableData(question);
+                const gridTableColumns = getGridTableColumns(question.gridColumns || []);
+
+                return (
+                  <div
+                    key={qIndex}
+                    className="p-6 bg-second-gray rounded-lg shadow-md"
+                  >
+                    <div className="text-xl font-semibold text-gray-700 mb-4">
+                      <p>Асуулт: {question.content}</p>
+                      {question.isPointBased && (
+                        <Tag color="blue" className="ml-2">
+                          Оноотой
+                        </Tag>
+                      )}
+                      {question.hasCorrectAnswer && (
+                        <Tag color="green" className="ml-2">
+                          Зөв хариулттай
+                        </Tag>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <p className="text-gray-600">
+                        <span className="font-medium">Асуултын төрөл: </span>
+                        {questionTypeTranslations[question.questionType]}
+                      </p>
+                      <p className="text-gray-600">
+                        <span className="font-medium">Дундаж хариулах хугацаа: </span>
+                        {question.avgTimeTaken.toFixed(2)} секунд
+                      </p>
+                    </div>
+                    {question.poster && (
+                      <Image
+                        src={question.poster}
+                        height={100}
+                        style={{ width: "auto" }}
+                      />
+                    )}
+                    <div className="mt-4">
+                      <h3 className="text-lg font-medium text-gray-600 mb-2">
+                        Оролцогчдын хариулт
+                      </h3>
+                      <Table
+                        columns={gridTableColumns}
+                        dataSource={gridTableData}
+                        rowKey="key"
+                        pagination={false}
+                        bordered
+                        size="middle"
+                        scroll={{ x: "max-content" }}
+                      />
+                    </div>
+                  </div>
+                );
+              }
+
               const sortedOptions = [...(question.options || [])].sort(
                 (a, b) => a.order - b.order
               );
@@ -949,9 +1069,7 @@ const StatsPage = () => {
                     <Image
                       src={question.poster}
                       height={100}
-                      style={{
-                        width: "auto",
-                      }}
+                      style={{ width: "auto" }}
                     />
                   )}
                   <div className="mb-4">

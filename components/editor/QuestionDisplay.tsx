@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Switch, Image, Select } from "antd";
+import { Card, Switch, Image, Select, Table, Radio } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import RateSection from "../RatingSection";
 import { QuestionDisplayProps } from "@/utils/componentTypes";
@@ -26,6 +26,47 @@ const QuestionDisplay = ({
     setCurrentQuestion(question);
     setChosenType(question.questionType);
   };
+
+  // Define table columns for MULTIPLE_CHOICE_GRID
+  const gridColumns = (question: any) => [
+    {
+      title: "",
+      dataIndex: "row",
+      key: "row",
+      render: (text: string) => (
+        <span className="text-[14px] font-medium">{text}</span>
+      ),
+    },
+    ...(question.gridColumns?.map((col: string, index: number) => ({
+      title: col,
+      dataIndex: `col_${index}`,
+      key: `col_${index}`,
+      align: "center" as const,
+      render: (_: any, record: any) => {
+        const option = question.options?.find(
+          (opt: any) => opt.rowIndex === record.rowIndex && opt.columnIndex === index
+        );
+        return (
+          <div className="flex justify-center items-center">
+            <Radio disabled />
+            {option?.isCorrect && (
+              <CheckCircleOutlined
+                style={{ color: "#52c41a", marginLeft: 8 }}
+              />
+            )}
+          </div>
+        );
+      },
+    })) || []),
+  ];
+
+  // Define table data for MULTIPLE_CHOICE_GRID
+  const gridData = (question: any) =>
+    question.gridRows?.map((row: string, index: number) => ({
+      key: index,
+      row,
+      rowIndex: index,
+    })) || [];
 
   return (
     <div className="w-full flex flex-col h-full">
@@ -74,7 +115,8 @@ const QuestionDisplay = ({
                       <Image
                         src={question.poster}
                         height={100}
-                        style={{ width: "auto" }}
+                        style={{ width: "auto", marginTop: "10px" }}
+                        preview={false}
                       />
                     )}
                     <div className="flex flex-col gap-y-[18px] mt-[18px]">
@@ -121,14 +163,25 @@ const QuestionDisplay = ({
                                       setNewQuestions((prev) =>
                                         prev.map((q, qIndex) =>
                                           qIndex === index
-                                            ? { ...q, options: updatedOptions }
+                                            ? {
+                                                ...q,
+                                                options: updatedOptions.map(
+                                                  (opt, i) => ({
+                                                    ...opt,
+                                                    order: i + 1,
+                                                  })
+                                                ),
+                                              }
                                             : q
                                         )
                                       );
                                       if (currentPage === index) {
                                         setCurrentQuestion({
                                           ...question,
-                                          options: updatedOptions,
+                                          options: updatedOptions.map((opt, i) => ({
+                                            ...opt,
+                                            order: i + 1,
+                                          })),
                                         });
                                       }
                                     }}
@@ -145,6 +198,7 @@ const QuestionDisplay = ({
                                   width: "auto",
                                   borderRadius: "8px",
                                 }}
+                                preview={false}
                               />
                             )}
                           </div>
@@ -153,6 +207,7 @@ const QuestionDisplay = ({
                         <Select
                           placeholder="Сонголт хийнэ үү"
                           style={{ width: "100%", height: 44 }}
+                          disabled
                         >
                           {question.options?.map((item, optIndex) => (
                             <Select.Option key={optIndex} value={optIndex}>
@@ -165,16 +220,6 @@ const QuestionDisplay = ({
                               )}
                               {item.nextQuestionOrder != null &&
                                 ` (Next: Q${item.nextQuestionOrder})`}
-                              {item.poster && (
-                                <Image
-                                  src={item.poster}
-                                  height={60}
-                                  style={{
-                                    width: "auto",
-                                    borderRadius: "8px",
-                                  }}
-                                />
-                              )}
                             </Select.Option>
                           ))}
                         </Select>
@@ -209,6 +254,7 @@ const QuestionDisplay = ({
                                   width: "auto",
                                   borderRadius: "8px",
                                 }}
+                                preview={false}
                               />
                             )}
                           </div>
@@ -222,6 +268,15 @@ const QuestionDisplay = ({
                         <RateSection
                           rateType={question.rateType ?? "NUMBER"}
                           rateNumber={question.rateNumber ?? 5}
+                        />
+                      )}
+                      {question.questionType === "MULTIPLE_CHOICE_GRID" && (
+                        <Table
+                          columns={gridColumns(question)}
+                          dataSource={gridData(question)}
+                          pagination={false}
+                          bordered
+                          style={{ marginTop: "10px" }}
                         />
                       )}
                     </div>
@@ -267,7 +322,8 @@ const QuestionDisplay = ({
                   <Image
                     src={currentQuestion.poster}
                     height={100}
-                    style={{ width: "auto" }}
+                    style={{ width: "auto", marginTop: "10px" }}
+                    preview={false}
                   />
                 )}
                 <div className="flex flex-col gap-y-[18px] mt-[18px]">
@@ -309,14 +365,22 @@ const QuestionDisplay = ({
                                     ) || [];
                                   setCurrentQuestion((prev) => ({
                                     ...prev!,
-                                    options: updatedOptions,
+                                    options: updatedOptions.map((opt, i) => ({
+                                      ...opt,
+                                      order: i + 1,
+                                    })),
                                   }));
                                   setNewQuestions((prev) =>
                                     prev.map((question, questionIndex) =>
                                       questionIndex === currentPage
                                         ? {
                                             ...question,
-                                            options: updatedOptions,
+                                            options: updatedOptions.map(
+                                              (opt, i) => ({
+                                                ...opt,
+                                                order: i + 1,
+                                              })
+                                            ),
                                           }
                                         : question
                                     )
@@ -335,6 +399,7 @@ const QuestionDisplay = ({
                               width: "auto",
                               borderRadius: "8px",
                             }}
+                            preview={false}
                           />
                         )}
                       </div>
@@ -388,6 +453,7 @@ const QuestionDisplay = ({
                               width: "auto",
                               borderRadius: "8px",
                             }}
+                            preview={false}
                           />
                         )}
                       </div>
@@ -401,6 +467,15 @@ const QuestionDisplay = ({
                     <RateSection
                       rateType={currentQuestion.rateType ?? "NUMBER"}
                       rateNumber={currentQuestion.rateNumber ?? 5}
+                    />
+                  )}
+                  {currentQuestion?.questionType === "MULTIPLE_CHOICE_GRID" && (
+                    <Table
+                      columns={gridColumns(currentQuestion)}
+                      dataSource={gridData(currentQuestion)}
+                      pagination={false}
+                      bordered
+                      style={{ marginTop: "10px" }}
                     />
                   )}
                 </div>

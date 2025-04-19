@@ -30,7 +30,7 @@ export default function SurveyDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [chosenType, setChosenType] = useState<
-    "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | null
+    "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | null
   >(null);
 
   const handleCopyUrl = () => {
@@ -103,6 +103,8 @@ export default function SurveyDetailPage() {
       poster: null,
       isPointBased: false,
       hasCorrectAnswer: false,
+      gridRows: [],
+      gridColumns: [],
     },
   ]);
 
@@ -157,6 +159,8 @@ export default function SurveyDetailPage() {
           poster: question.poster || null,
           isPointBased: question.isPointBased || false,
           hasCorrectAnswer: question.hasCorrectAnswer || false,
+          gridRows: question.gridRows || [],
+          gridColumns: question.gridColumns || [],
           options:
             question.options
               ?.map((option: any) => ({
@@ -166,6 +170,8 @@ export default function SurveyDetailPage() {
                 points: option.points || 0,
                 isCorrect: option.isCorrect || false,
                 nextQuestionOrder: option.nextQuestionOrder || null,
+                rowIndex: option.rowIndex || null,
+                columnIndex: option.columnIndex || null,
               }))
               .sort((a: any, b: any) => a.order - b.order) || [],
         }))
@@ -188,7 +194,16 @@ export default function SurveyDetailPage() {
     endDate: settingsPage.endDate,
     duration: settingsPage.duration,
     pollsterNumber: settingsPage.pollsterNumber,
-    questions: newQuestions,
+    questions: newQuestions.map((q) => ({
+      ...q,
+      gridRows: q.gridRows || [],
+      gridColumns: q.gridColumns || [],
+      options: (q.options ?? []).map((opt) => ({
+        ...opt,
+        rowIndex: opt.rowIndex || 0,
+        columnIndex: opt.columnIndex || 0,
+      })),
+    })),
     isAccessLevel: settingsPage.isAccessLevel,
     isTimeSelected: settingsPage.isTimeSelected,
     isDuration: settingsPage.isDuration,
@@ -214,39 +229,59 @@ export default function SurveyDetailPage() {
         }
       }
       if (
-        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
+        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN", "MULTIPLE_CHOICE_GRID"].includes(
           question.questionType ?? ""
         ) &&
         question.hasCorrectAnswer &&
         question.options
       ) {
-        const correctCount = question.options.filter(
-          (opt) => opt.isCorrect
-        ).length;
-        if (correctCount === 0) {
-          showAlert(
-            `Question ${
-              question.order + 1
-            }: At least one correct answer must be set`,
-            "warning",
-            "",
-            true
-          );
-          return;
-        }
-        if (
-          ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(question.questionType ?? "") &&
-          correctCount > 1
-        ) {
-          showAlert(
-            `Question ${
-              question.order + 1
-            }: Only one correct answer is allowed for ${question.questionType}`,
-            "warning",
-            "",
-            true
-          );
-          return;
+        if (question.questionType === "MULTIPLE_CHOICE_GRID") {
+          // Validate one correct answer per row
+          const rowCount = question.gridRows?.length || 0;
+          const correctPerRow = Array(rowCount).fill(false);
+          question.options.forEach((opt) => {
+            if (opt.isCorrect && opt.rowIndex != null) {
+              correctPerRow[opt.rowIndex] = true;
+            }
+          });
+          if (correctPerRow.some((hasCorrect) => !hasCorrect)) {
+            showAlert(
+              `Question ${question.order + 1}: Each row must have exactly one correct answer`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
+        } else {
+          const correctCount = question.options.filter(
+            (opt) => opt.isCorrect
+          ).length;
+          if (correctCount === 0) {
+            showAlert(
+              `Question ${
+                question.order + 1
+              }: At least one correct answer must be set`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
+          if (
+            ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(question.questionType ?? "") &&
+            correctCount > 1
+          ) {
+            showAlert(
+              `Question ${
+                question.order + 1
+              }: Only one correct answer is allowed for ${question.questionType}`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
         }
       }
       if (question.hasCorrectAnswer && question.isPointBased) {
@@ -261,7 +296,7 @@ export default function SurveyDetailPage() {
         return;
       }
       if (
-        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
+        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN", "MULTIPLE_CHOICE_GRID"].includes(
           question.questionType ?? ""
         ) &&
         question.options
@@ -298,6 +333,27 @@ export default function SurveyDetailPage() {
               return;
             }
           }
+        }
+      }
+      if (question.questionType === "MULTIPLE_CHOICE_GRID") {
+        if (!question.gridRows?.length || !question.gridColumns?.length) {
+          showAlert(
+            `Question ${question.order + 1}: Grid must have at least one row and one column`,
+            "warning",
+            "",
+            true
+          );
+          return;
+        }
+        const expectedOptions = (question.gridRows.length * question.gridColumns.length);
+        if ((question.options ?? []).length !== expectedOptions) {
+          showAlert(
+            `Question ${question.order + 1}: Grid must have options for all cells`,
+            "warning",
+            "",
+            true
+          );
+          return;
         }
       }
     }
@@ -345,6 +401,7 @@ export default function SurveyDetailPage() {
       | "YES_NO"
       | "TEXT"
       | "DROPDOWN"
+      | "MULTIPLE_CHOICE_GRID"
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
@@ -354,7 +411,8 @@ export default function SurveyDetailPage() {
     const shouldAddAnswers =
       questionType === "SINGLE_CHOICE" ||
       questionType === "MULTI_CHOICE" ||
-      questionType === "DROPDOWN";
+      questionType === "DROPDOWN" ||
+      questionType === "MULTIPLE_CHOICE_GRID";
 
     const newQuestion: QuestionProps = {
       content: "",
@@ -364,26 +422,9 @@ export default function SurveyDetailPage() {
       poster: null,
       isPointBased: false,
       hasCorrectAnswer: false,
-      options: shouldAddAnswers
-        ? [
-            {
-              content: "",
-              order: 1,
-              poster: null,
-              points: 0,
-              isCorrect: false,
-              nextQuestionOrder: null,
-            },
-            {
-              content: "",
-              order: 2,
-              poster: null,
-              points: 0,
-              isCorrect: false,
-              nextQuestionOrder: null,
-            },
-          ]
-        : [],
+      options: [],
+      gridRows: [],
+      gridColumns: [],
       ...(questionType === "RATING" && {
         rateNumber: 5,
         rateType: "STAR",
@@ -394,6 +435,8 @@ export default function SurveyDetailPage() {
           points: 0,
           isCorrect: false,
           nextQuestionOrder: null,
+          rowIndex: null,
+          columnIndex: null,
         })),
       }),
       ...(questionType === "YES_NO" && {
@@ -405,6 +448,8 @@ export default function SurveyDetailPage() {
             points: 0,
             isCorrect: false,
             nextQuestionOrder: null,
+            rowIndex: null,
+            columnIndex: null,
           },
           {
             content: "Үгүй",
@@ -413,9 +458,82 @@ export default function SurveyDetailPage() {
             points: 0,
             isCorrect: false,
             nextQuestionOrder: null,
+            rowIndex: null,
+            columnIndex: null,
           },
         ],
       }),
+      ...(questionType === "MULTIPLE_CHOICE_GRID" && {
+        gridRows: ["Row 1", "Row 2"],
+        gridColumns: ["Column 1", "Column 2"],
+        options: [
+          {
+            content: "",
+            order: 1,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 0,
+            columnIndex: 0,
+          },
+          {
+            content: "",
+            order: 2,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 0,
+            columnIndex: 1,
+          },
+          {
+            content: "",
+            order: 3,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 1,
+            columnIndex: 0,
+          },
+          {
+            content: "",
+            order: 4,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 1,
+            columnIndex: 1,
+          },
+        ],
+      }),
+      ...(shouldAddAnswers &&
+        questionType !== "MULTIPLE_CHOICE_GRID" && {
+          options: [
+            {
+              content: "",
+              order: 1,
+              poster: null,
+              points: 0,
+              isCorrect: false,
+              nextQuestionOrder: null,
+              rowIndex: null,
+              columnIndex: null,
+            },
+            {
+              content: "",
+              order: 2,
+              poster: null,
+              points: 0,
+              isCorrect: false,
+              nextQuestionOrder: null,
+              rowIndex: null,
+              columnIndex: null,
+            },
+          ],
+        }),
     };
 
     setNewQuestions((prev) => {
@@ -447,6 +565,9 @@ export default function SurveyDetailPage() {
         : newQuestions.length - 1;
     setCurrentQuestion(newQuestions[currentPage]);
   }, [currentPage, chosenType]);
+
+
+  console.log(newQuestions);
 
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">
