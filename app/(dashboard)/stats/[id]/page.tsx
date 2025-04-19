@@ -1,5 +1,6 @@
 "use client";
-import { getStatById } from "@/api/action";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Card,
@@ -12,8 +13,6 @@ import {
   Image,
   Button,
 } from "antd";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -29,6 +28,7 @@ import {
   Line,
 } from "recharts";
 import * as XLSX from "xlsx";
+import { getStatById } from "@/api/action";
 
 const { Panel } = Collapse;
 
@@ -213,7 +213,6 @@ const StatsPage = () => {
     const wb = XLSX.utils.book_new();
     const netPoints = calculateNetPoints();
 
-    // General Info Sheet
     const generalInfo = [
       ["Poll Title", data.title],
       ["Created At", new Date(data.createdAt).toLocaleString()],
@@ -240,7 +239,6 @@ const StatsPage = () => {
     const wsGeneral = XLSX.utils.aoa_to_sheet(generalInfo);
     XLSX.utils.book_append_sheet(wb, wsGeneral, "Poll Info");
 
-    // Questions Sheet
     const questionHeaders = [
       "Order",
       "Content",
@@ -269,22 +267,22 @@ const StatsPage = () => {
             question.hasCorrectAnswer ? "Yes" : "No",
             question.avgTimeTaken.toFixed(2),
             answer.textAnswer,
-            "-", // No points for text
-            "-", // No correct answer for text
-            "-", // No selection count for text
+            "-", 
+            "-", 
+            "-", 
             answer.answeredBy,
           ]);
         });
       } else if (question.options) {
-        const startRow = questionData.length + 1; // +1 for header
+        const startRow = questionData.length + 1; 
         question.options.forEach((option, idx) => {
           questionData.push([
-            idx === 0 ? question.order : "", // Only show order for first option
-            idx === 0 ? question.content : "", // Only show content for first option
-            idx === 0 ? questionTypeTranslations[question.questionType] : "", // Only show type for first option
-            idx === 0 ? (question.isPointBased ? "Yes" : "No") : "", // Only show point-based for first
-            idx === 0 ? (question.hasCorrectAnswer ? "Yes" : "No") : "", // Only show correct answer for first
-            idx === 0 ? question.avgTimeTaken.toFixed(2) : "", // Only show time for first
+            idx === 0 ? question.order : "", 
+            idx === 0 ? question.content : "", 
+            idx === 0 ? questionTypeTranslations[question.questionType] : "", 
+            idx === 0 ? (question.isPointBased ? "Yes" : "No") : "", 
+            idx === 0 ? (question.hasCorrectAnswer ? "Yes" : "No") : "", 
+            idx === 0 ? question.avgTimeTaken.toFixed(2) : "", 
             option.content,
             option.points,
             option.isCorrect ? "Yes" : "No",
@@ -294,14 +292,13 @@ const StatsPage = () => {
         });
         const endRow = questionData.length;
         if (question.options.length > 1) {
-          // Merge cells for question details
           merges.push(
-            { s: { r: startRow, c: 0 }, e: { r: endRow, c: 0 } }, // Order
-            { s: { r: startRow, c: 1 }, e: { r: endRow, c: 1 } }, // Content
-            { s: { r: startRow, c: 2 }, e: { r: endRow, c: 2 } }, // Type
-            { s: { r: startRow, c: 3 }, e: { r: endRow, c: 3 } }, // Is Point Based
-            { s: { r: startRow, c: 4 }, e: { r: endRow, c: 4 } }, // Has Correct Answer
-            { s: { r: startRow, c: 5 }, e: { r: endRow, c: 5 } } // Avg Time Taken
+            { s: { r: startRow, c: 0 }, e: { r: endRow, c: 0 } },
+            { s: { r: startRow, c: 1 }, e: { r: endRow, c: 1 } }, 
+            { s: { r: startRow, c: 2 }, e: { r: endRow, c: 2 } }, 
+            { s: { r: startRow, c: 3 }, e: { r: endRow, c: 3 } }, 
+            { s: { r: startRow, c: 4 }, e: { r: endRow, c: 4 } }, 
+            { s: { r: startRow, c: 5 }, e: { r: endRow, c: 5 } } 
           );
         }
       }
@@ -311,7 +308,6 @@ const StatsPage = () => {
     wsQuestions["!merges"] = merges;
     XLSX.utils.book_append_sheet(wb, wsQuestions, "Questions");
 
-    // Submitted Users Sheet
     const userHeaders = [
       "Username",
       "Total Time Taken (s)",
@@ -333,7 +329,6 @@ const StatsPage = () => {
     const wsUsers = XLSX.utils.aoa_to_sheet([userHeaders, ...userData]);
     XLSX.utils.book_append_sheet(wb, wsUsers, "Submitted Users");
 
-    // User Answers Sheet
     const userAnswerHeaders = [
       "Username",
       "Question Order",
@@ -349,7 +344,7 @@ const StatsPage = () => {
     const userAnswerMerges: { s: { r: number; c: number }; e: { r: number; c: number } }[] = [];
 
     data.submittedUsers.forEach((user) => {
-      const startRow = userAnswerData.length + 1; // +1 for header
+      const startRow = userAnswerData.length + 1; 
       data.questions.forEach((question) => {
         let selectedOptions: string[] = [];
         let pointsEarned = 0;
@@ -383,7 +378,7 @@ const StatsPage = () => {
         }
 
         userAnswerData.push([
-          userAnswerData.length === startRow - 1 ? user.username : "", // Only show username for first question
+          userAnswerData.length === startRow - 1 ? user.username : "", 
           question.order,
           question.content,
           questionTypeTranslations[question.questionType],
@@ -395,7 +390,6 @@ const StatsPage = () => {
       });
       const endRow = userAnswerData.length;
       if (data.questions.length > 0) {
-        // Merge username cells for this user
         userAnswerMerges.push({
           s: { r: startRow, c: 0 },
           e: { r: endRow, c: 0 },

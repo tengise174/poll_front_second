@@ -1,7 +1,6 @@
 import React from "react";
-import { StartDisplayProps } from "@/utils/componentTypes";
-import BoxIcon from "@/public/icons/box_icon";
 import { Image } from "antd";
+import { StartDisplayProps } from "@/utils/componentTypes";
 
 const StartDisplay = ({
   startPage,

@@ -1,13 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Form, Row, FormInstance } from "antd";
 import { getProfile, signup } from "@/api/action";
 import CustomButton from "@/components/CustomButton";
 import FormItem from "@/components/FormItem";
 import { useAlert } from "@/context/AlertProvider";
-import { Form, Row, FormInstance } from "antd";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 
 const Register = () => {
   const [form] = Form.useForm();

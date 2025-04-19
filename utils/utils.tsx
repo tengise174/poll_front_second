@@ -1,11 +1,4 @@
-import SingleChoiceIcon from "@/public/icons/single_choice";
 import { QuestionTypeProps } from "./componentTypes";
-import MultipleChoiceIcon from "@/public/icons/multiple_choice";
-import RatingChoiceIcon from "@/public/icons/rating_choice";
-import YesNoChoiceIcon from "@/public/icons/yesno_choice";
-import TextChoiceIcon from "@/public/icons/text_choice";
-import { useEffect } from "react";
-// import { refreshToken } from "@/api/action";
 
 export const manualStatusTag = ({ status }: { status: string }) => {
   switch (status) {
@@ -38,67 +31,29 @@ export const manualStatusTag = ({ status }: { status: string }) => {
   }
 };
 
-// export const NineMinuteTimer = () => {
-//   if (typeof window === "undefined") return;
-//   const intervalTime = 9 * 60 * 1000; // 9 minutes in milliseconds
-//   const runFunction = async () => {
-//     const res = await refreshToken();
-//     localStorage.setItem("token", res.token);
-
-//     // Update the last execution time in localStorage.
-//     localStorage.setItem("lastExecution", Date.now().toString());
-//   };
-
-//   // Get the last time the function was executed (if any).
-//   const lastExecutionStr = localStorage.getItem("lastExecution");
-//   let initialDelay = intervalTime;
-//   const now = Date.now();
-
-//   if (lastExecutionStr) {
-//     const lastExecution = parseInt(lastExecutionStr, 10);
-//     const elapsed = now - lastExecution;
-
-//     if (elapsed < intervalTime) {
-//       // Not enough time has passed; delay the next execution.
-//       initialDelay = intervalTime - elapsed;
-//     } else {
-//       // Enough time has passed; run immediately.
-//       runFunction();
-//     }
-//   }
-
-//   // Set a timeout for the remaining delay, then start the interval.
-//   setTimeout(() => {
-//     runFunction();
-//     setInterval(runFunction, intervalTime);
-//   }, initialDelay);
-// };
-
-// allow only number regex => !/^\d?$/.test(value)
-
 export const questionTypes: QuestionTypeProps[] = [
   {
-    icon: <div>📝</div>, // Replace with actual icon component
+    icon: <div>📝</div>, 
     title: "Олон сонголттой",
     questionType: "MULTI_CHOICE",
   },
   {
-    icon: <div>🔘</div>, // Replace with actual icon component
+    icon: <div>🔘</div>, 
     title: "Нэг сонголттой",
     questionType: "SINGLE_CHOICE",
   },
   {
-    icon: <div>⭐</div>, // Replace with actual icon component
+    icon: <div>⭐</div>, 
     title: "Үнэлгээ",
     questionType: "RATING",
   },
   {
-    icon: <div>✅</div>, // Replace with actual icon component
+    icon: <div>✅</div>, 
     title: "Тийм/Үгүй",
     questionType: "YES_NO",
   },
   {
-    icon: <div>📜</div>, // Replace with actual icon component
+    icon: <div>📜</div>, 
     title: "Текст",
     questionType: "TEXT",
   },

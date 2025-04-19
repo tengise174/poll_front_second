@@ -1,5 +1,6 @@
 "use client";
-import { PollCardType } from "@/utils/componentTypes";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button, Card, Popover, Tag, Tooltip, Image } from "antd";
 import Meta from "antd/es/card/Meta";
 import {
@@ -7,8 +8,7 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { PollCardType } from "@/utils/componentTypes";
 
 const PollCard = ({
   id,

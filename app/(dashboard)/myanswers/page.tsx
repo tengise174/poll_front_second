@@ -1,10 +1,10 @@
 "use client";
-import { getAnsweredPolls } from "@/api/action";
-import PollCard from "@/components/PollCard";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "antd";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { getAnsweredPolls } from "@/api/action";
+import PollCard from "@/components/PollCard";
 
 const MyAnswersPage = () => {
   const router = useRouter();

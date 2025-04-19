@@ -1,9 +1,8 @@
 "use client";
-import { getAnsweredPollDetail } from "@/api/action";
-import { dualColors } from "@/utils/utils";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Button,
   Card,
   Checkbox,
   Skeleton,
@@ -12,8 +11,8 @@ import {
   Rate,
   Image,
 } from "antd";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { getAnsweredPollDetail } from "@/api/action";
+import { dualColors } from "@/utils/utils";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -110,7 +109,6 @@ const MyAnswersDetail = () => {
 
   if (!answerDetails) return <div>Алдаа гарсан</div>;
 
-  // Helper function to calculate total points for selected options
   const calculateTotalPoints = (
     selectedOptions: OptionsProps[] | undefined,
     allOptions: OptionsProps[] | undefined
@@ -122,7 +120,6 @@ const MyAnswersDetail = () => {
     }, 0);
   };
 
-  // Helper function to check if user's answer is correct
   const isUserAnswerCorrect = (
     selectedOptions: OptionsProps[] | undefined,
     allOptions: OptionsProps[] | undefined
@@ -138,7 +135,6 @@ const MyAnswersDetail = () => {
     );
   };
 
-  // Helper function to get correct answers
   const getCorrectAnswers = (
     allOptions: OptionsProps[] | undefined
   ): string => {
@@ -189,7 +185,11 @@ const MyAnswersDetail = () => {
             )}
             {question.questionType === "RATING" ? (
               <Rate
-                defaultValue={Number(question.selectedOptions?.[0].content)}
+                defaultValue={
+                  question.selectedOptions?.[0]?.content
+                    ? Number(question.selectedOptions[0].content)
+                    : 0
+                }
                 count={question.rateNumber}
                 disabled
                 character={
@@ -227,7 +227,8 @@ const MyAnswersDetail = () => {
                             }`}
                           >
                             {option.content}
-                            {question.isPointBased && option.points !== undefined
+                            {question.isPointBased &&
+                            option.points !== undefined
                               ? ` (${option.points} оноо)`
                               : ""}
                           </p>

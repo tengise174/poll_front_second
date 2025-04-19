@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, Divider, Form, Input, Modal, Skeleton } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   changePassword,
   deleteProfile,
@@ -8,10 +12,6 @@ import {
 } from "@/api/action";
 import CustomButton from "@/components/CustomButton";
 import { useAlert } from "@/context/AlertProvider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Card, Divider, Form, Input, Modal, Skeleton } from "antd";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -128,7 +128,7 @@ const ProfilePage = () => {
         localStorage.removeItem("profile");
         queryClient.invalidateQueries({ queryKey: ["profile"] });
         setTimeout(() => {
-          router.push("/login"); // Redirect to login page
+          router.push("/login"); 
         }, 1500);
       }
     } catch (error: any) {

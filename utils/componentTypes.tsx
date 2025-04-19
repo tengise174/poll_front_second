@@ -139,6 +139,7 @@ export interface OptionProps {
   poster?: string | null;
   points: number;
   isCorrect: boolean;
+  nextQuestionOrder?: number | null;
 }
 
 export interface QuestionProps {

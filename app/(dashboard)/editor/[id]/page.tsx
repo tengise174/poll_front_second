@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { Button, Modal, QRCode } from "antd";
+import { createPoll, getPollById, updatePoll } from "@/api/action";
+import { CopyOutlined } from "@ant-design/icons";
 import StartShapeEditor from "@/components/editor/StartShapeEditor";
 import QuestionTextEditor from "@/components/editor/QuestionTextEditor";
 import StartDisplay from "@/components/editor/StartDisplay";
@@ -12,26 +17,21 @@ import SettingsEditor from "@/components/editor/SettingsEditor";
 import SettingsDisplay from "@/components/editor/SettingsDisplay";
 import { dualColors, questionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
-import { createPoll, getPollById, updatePoll } from "@/api/action";
-import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "@/context/AlertProvider";
-import { Button, Modal, QRCode } from "antd";
-import Link from "next/link";
-import { CopyOutlined } from "@ant-design/icons";
 import { QuestionProps } from "@/utils/componentTypes";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
   const { showAlert } = useAlert();
-  const [activeSection, setActiveSection] = useState(0);
+  const [reqUrl, setReqUrl] = useState<string>("");
   const [themeId, setThemeId] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [activeSection, setActiveSection] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [chosenType, setChosenType] = useState<
     "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | null
   >(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [reqUrl, setReqUrl] = useState<string>("");
 
   const handleCopyUrl = () => {
     navigator.clipboard
@@ -165,6 +165,7 @@ export default function SurveyDetailPage() {
                 poster: option.poster || null,
                 points: option.points || 0,
                 isCorrect: option.isCorrect || false,
+                nextQuestionOrder: option.nextQuestionOrder || null,
               }))
               .sort((a: any, b: any) => a.order - b.order) || [],
         }))
@@ -224,7 +225,9 @@ export default function SurveyDetailPage() {
         ).length;
         if (correctCount === 0) {
           showAlert(
-            `Question ${question.order + 1}: At least one correct answer must be set`,
+            `Question ${
+              question.order + 1
+            }: At least one correct answer must be set`,
             "warning",
             "",
             true
@@ -236,7 +239,9 @@ export default function SurveyDetailPage() {
           correctCount > 1
         ) {
           showAlert(
-            `Question ${question.order + 1}: Only one correct answer is allowed for ${question.questionType}`,
+            `Question ${
+              question.order + 1
+            }: Only one correct answer is allowed for ${question.questionType}`,
             "warning",
             "",
             true
@@ -244,15 +249,56 @@ export default function SurveyDetailPage() {
           return;
         }
       }
-      // Ensure hasCorrectAnswer and isPointBased are mutually exclusive
       if (question.hasCorrectAnswer && question.isPointBased) {
         showAlert(
-          `Question ${question.order + 1}: A question cannot have both correct answers and points`,
+          `Question ${
+            question.order + 1
+          }: A question cannot have both correct answers and points`,
           "warning",
           "",
           true
         );
         return;
+      }
+      if (
+        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO"].includes(
+          question.questionType ?? ""
+        ) &&
+        question.options
+      ) {
+        for (const [optIndex, option] of question.options.entries()) {
+          if (
+            option.nextQuestionOrder !== null &&
+            option.nextQuestionOrder !== undefined
+          ) {
+            const nextOrder = option.nextQuestionOrder;
+            const isValidOrder = newQuestions.some(
+              (q) => q.order === nextOrder
+            );
+            if (!isValidOrder) {
+              showAlert(
+                `Question ${question.order + 1}, Option ${
+                  optIndex + 1
+                }: Invalid next question order`,
+                "warning",
+                "",
+                true
+              );
+              return;
+            }
+            if (nextOrder <= question.order) {
+              showAlert(
+                `Question ${question.order + 1}, Option ${
+                  optIndex + 1
+                }: Next question order must be greater than current question order`,
+                "warning",
+                "",
+                true
+              );
+              return;
+            }
+          }
+        }
       }
     }
 
@@ -292,7 +338,12 @@ export default function SurveyDetailPage() {
   };
 
   const handleQuestionTypeSelect = (
-    questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT"
+    questionType:
+      | "MULTI_CHOICE"
+      | "SINGLE_CHOICE"
+      | "RATING"
+      | "YES_NO"
+      | "TEXT"
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
@@ -312,8 +363,22 @@ export default function SurveyDetailPage() {
       hasCorrectAnswer: false,
       options: shouldAddAnswers
         ? [
-            { content: "", order: 1, poster: null, points: 0, isCorrect: false },
-            { content: "", order: 2, poster: null, points: 0, isCorrect: false },
+            {
+              content: "",
+              order: 1,
+              poster: null,
+              points: 0,
+              isCorrect: false,
+              nextQuestionOrder: null,
+            },
+            {
+              content: "",
+              order: 2,
+              poster: null,
+              points: 0,
+              isCorrect: false,
+              nextQuestionOrder: null,
+            },
           ]
         : [],
       ...(questionType === "RATING" && {
@@ -325,12 +390,27 @@ export default function SurveyDetailPage() {
           poster: null,
           points: 0,
           isCorrect: false,
+          nextQuestionOrder: null,
         })),
       }),
       ...(questionType === "YES_NO" && {
         options: [
-          { content: "Тийм", order: 1, poster: null, points: 0, isCorrect: false },
-          { content: "Үгүй", order: 2, poster: null, points: 0, isCorrect: false },
+          {
+            content: "Тийм",
+            order: 1,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+          },
+          {
+            content: "Үгүй",
+            order: 2,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+          },
         ],
       }),
     };

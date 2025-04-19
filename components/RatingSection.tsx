@@ -2,8 +2,7 @@ import RateStarIcon from "@/public/icons/rate_star";
 
 
 export const RateSection = ({ rateType, rateNumber }: { rateType: 'STAR' | 'NUMBER', rateNumber: number }) => {
-  // Ensure rateNumber is positive and reasonable
-  const validatedCount = Math.max(1, Math.min(rateNumber, 10)); // Cap at 10 for practicality
+  const validatedCount = Math.max(1, Math.min(rateNumber, 10)); 
   
   if (rateType === 'STAR') {
     return (

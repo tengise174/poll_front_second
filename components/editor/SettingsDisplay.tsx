@@ -1,4 +1,3 @@
-import { employeeData } from "@/app/(dashboard)/editor/utils/content";
 import AddPollsterTable from "./AddPollsterTable";
 import { SettingsDisplayProps } from "@/utils/componentTypes";
 

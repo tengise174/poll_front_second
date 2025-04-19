@@ -1,18 +1,16 @@
 "use client";
+import { useEffect, useState } from "react";
+import { Card, Modal, Skeleton } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Meta from "antd/es/card/Meta";
 import {
   deletePollById,
-  getAllPoll,
   getAllPollBasic,
   getPollById,
 } from "@/api/action";
 import CustomButton from "@/components/CustomButton";
 import PollCard from "@/components/PollCard";
 import { useAlert } from "@/context/AlertProvider";
-import { PollCardType } from "@/utils/componentTypes";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, Modal, Skeleton } from "antd";
-import Meta from "antd/es/card/Meta";
-import { useEffect, useState } from "react";
 
 const MyPollsPage = () => {
   const { showAlert } = useAlert();

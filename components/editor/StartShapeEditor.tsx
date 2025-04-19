@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { Button, Upload, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import CustomInput from "../CustomInput";
 import { StartShapeEditorProps } from "@/utils/componentTypes";
 import { dualColors } from "@/utils/utils";
-import { UploadOutlined } from "@ant-design/icons";
 
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -109,7 +109,7 @@ const StartShapeEditor = ({
           fileList={fileList}
           onChange={handleFileChange}
           beforeUpload={(file) => {
-            const isLt1M = file.size / 1024 / 1024 < 1; // Limit to 1MB
+            const isLt1M = file.size / 1024 / 1024 < 1; 
             const isImage = file.type.startsWith("image/");
             if (!isImage) {
               message.error("Зөвхөн зураг оруулна уу!");
@@ -119,7 +119,7 @@ const StartShapeEditor = ({
               message.error("Зураг 1MB-аас хэтэрч болохгүй!");
               return Upload.LIST_IGNORE;
             }
-            return true; // Allow upload
+            return true; 
           }}
           accept="image/*"
           listType="picture"

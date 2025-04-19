@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, InputNumber, Checkbox, Radio, Switch, Upload } from "antd";
+import { FileImageOutlined } from "@ant-design/icons";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
-import { QuestionTextEditorProps } from "@/utils/componentTypes";
 import AddIcon from "@/public/icons/add";
 import RateStarIcon from "@/public/icons/rate_star";
-import { FileImageOutlined } from "@ant-design/icons";
 import { useAlert } from "@/context/AlertProvider";
+import { QuestionTextEditorProps } from "@/utils/componentTypes";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -24,8 +24,8 @@ const QuestionTextEditor = ({
   setCurrentQuestion,
 }: QuestionTextEditorProps) => {
   const { showAlert } = useAlert();
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [fileList, setFileList] = useState<any[]>([]);
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [optionFileLists, setOptionFileLists] = useState<any[][]>(
     currentQuestion?.options?.map(() => []) || []
   );
@@ -436,6 +436,7 @@ const QuestionTextEditor = ({
                       poster: null,
                       points: 0,
                       isCorrect: false,
+                      nextQuestionOrder: null,
                     })
                   );
 
@@ -596,7 +597,7 @@ const QuestionTextEditor = ({
                     currentQuestion?.options?.map((item, answerIndex) => {
                       return (
                         <div key={answerIndex} className="w-full">
-                          <div className="flex flex-row gap-1">
+                          <div className="flex flex-row gap-1 items-center">
                             {focusedIndex === answerIndex ? (
                               <CustomInput
                                 className="w-full !h-9 bg-[#E6E6E6] !rounded-[10px] text-[#757575] font-medium !italic !text-[13px] px-2 flex items-center"
@@ -612,6 +613,7 @@ const QuestionTextEditor = ({
                                           poster?: string | null;
                                           points: number;
                                           isCorrect: boolean;
+                                          nextQuestionOrder: number | null;
                                         },
                                         i: number
                                       ) =>
@@ -705,32 +707,64 @@ const QuestionTextEditor = ({
                               />
                             )}
                           </div>
-                          <Upload
-                            fileList={optionFileLists[answerIndex] || []}
-                            onChange={(info) =>
-                              handleOptionUploadChange(info, answerIndex)
-                            }
-                            beforeUpload={(file) => {
-                              const isLt2M = file.size / 1024 / 1024 < 2;
-                              if (!isLt2M) {
-                                showAlert(
-                                  "Image must be smaller than 2MB!",
-                                  "warning",
-                                  "",
-                                  true
+                          <div className="flex flex-row gap-2 mt-2">
+                            <InputNumber
+                              min={currentQuestion.order + 1}
+                              max={newQuestions.length}
+                              value={item.nextQuestionOrder || undefined}
+                              onChange={(value: number | null) => {
+                                const updatedOptions =
+                                  currentQuestion?.options?.map((opt, i) =>
+                                    i === answerIndex
+                                      ? { ...opt, nextQuestionOrder: value }
+                                      : opt
+                                  ) || [];
+                                setCurrentQuestion((prev) => ({
+                                  ...prev!,
+                                  options: updatedOptions,
+                                }));
+                                setNewQuestions((prev) =>
+                                  prev.map((question, questionIndex) =>
+                                    questionIndex === currentPage &&
+                                    question.options
+                                      ? {
+                                          ...question,
+                                          options: updatedOptions,
+                                        }
+                                      : question
+                                  )
                                 );
+                              }}
+                              className={`${questionInputClass} w-24`}
+                              placeholder="Next Q"
+                            />
+                            <Upload
+                              fileList={optionFileLists[answerIndex] || []}
+                              onChange={(info) =>
+                                handleOptionUploadChange(info, answerIndex)
                               }
-                              return isLt2M || Upload.LIST_IGNORE;
-                            }}
-                            accept="image/*"
-                            listType="picture"
-                            maxCount={1}
-                          >
-                            <Button
-                              icon={<FileImageOutlined />}
-                              style={{ marginTop: "8px" }}
-                            ></Button>
-                          </Upload>
+                              beforeUpload={(file) => {
+                                const isLt2M = file.size / 1024 / 1024 < 2;
+                                if (!isLt2M) {
+                                  showAlert(
+                                    "Image must be smaller than 2MB!",
+                                    "warning",
+                                    "",
+                                    true
+                                  );
+                                }
+                                return isLt2M || Upload.LIST_IGNORE;
+                              }}
+                              accept="image/*"
+                              listType="picture"
+                              maxCount={1}
+                            >
+                              <Button
+                                icon={<FileImageOutlined />}
+                                style={{ marginTop: "8px" }}
+                              ></Button>
+                            </Upload>
+                          </div>
                         </div>
                       );
                     })}
@@ -752,6 +786,7 @@ const QuestionTextEditor = ({
                             poster: null,
                             points: 0,
                             isCorrect: false,
+                            nextQuestionOrder: null,
                           },
                         ],
                       }));
@@ -768,6 +803,7 @@ const QuestionTextEditor = ({
                                     poster: null,
                                     points: 0,
                                     isCorrect: false,
+                                    nextQuestionOrder: null,
                                   },
                                 ],
                               }
@@ -788,23 +824,70 @@ const QuestionTextEditor = ({
             </div>
           )}
         {currentQuestion?.questionType === "YES_NO" &&
-          currentQuestion?.hasCorrectAnswer && (
+          currentQuestion?.options && (
             <div className="rounded-[10px] bg-[#F5F5F5] w-full mt-5 p-[10px] h-auto flex flex-col gap-2">
               <p className="text-[13px] text-[#1E1E1E] font-semibold">
-                Зөв хариулт
+                Хариулт
               </p>
-              <Radio.Group
-                value={currentQuestion?.options?.findIndex(
-                  (opt) => opt.isCorrect
-                )}
-                onChange={(e) => handleSingleCorrectAnswerChange(e.target.value)}
-              >
-                {currentQuestion?.options?.map((opt, index) => (
-                  <Radio key={index} value={index}>
-                    {opt.content}
-                  </Radio>
+              {currentQuestion.hasCorrectAnswer && (
+                <div className="mt-2">
+                  <p className="text-[13px] text-[#1E1E1E] font-semibold">
+                    Зөв хариулт
+                  </p>
+                  <Radio.Group
+                    value={currentQuestion.options.findIndex(
+                      (opt) => opt.isCorrect
+                    )}
+                    onChange={(e) =>
+                      handleSingleCorrectAnswerChange(e.target.value)
+                    }
+                  >
+                    {currentQuestion.options.map((opt, index) => (
+                      <Radio key={index} value={index}>
+                        {opt.content}
+                      </Radio>
+                    ))}
+                  </Radio.Group>
+                </div>
+              )}
+              <div className="flex flex-col gap-y-3 mt-[14px]">
+                {currentQuestion.options.map((item, answerIndex) => (
+                  <div key={answerIndex} className="w-full">
+                    <div className="w-full h-9 bg-[#E6E6E6] rounded-[10px] text-[#757575] font-medium italic text-[13px] px-2 flex items-center">
+                      {item.content}
+                    </div>
+                    <InputNumber
+                      min={currentQuestion.order + 1}
+                      max={newQuestions.length}
+                      value={item.nextQuestionOrder || undefined}
+                      onChange={(value: number | null) => {
+                        const updatedOptions =
+                          currentQuestion.options?.map((opt, i) =>
+                            i === answerIndex
+                              ? { ...opt, nextQuestionOrder: value }
+                              : opt
+                          ) || [];
+                        setCurrentQuestion((prev) => ({
+                          ...prev!,
+                          options: updatedOptions,
+                        }));
+                        setNewQuestions((prev) =>
+                          prev.map((question, questionIndex) =>
+                            questionIndex === currentPage && question.options
+                              ? {
+                                  ...question,
+                                  options: updatedOptions,
+                                }
+                              : question
+                          )
+                        );
+                      }}
+                      className={`${questionInputClass} w-24 mt-2`}
+                      placeholder="Next Q"
+                    />
+                  </div>
                 ))}
-              </Radio.Group>
+              </div>
             </div>
           )}
       </div>

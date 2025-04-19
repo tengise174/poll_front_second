@@ -1,20 +1,20 @@
 "use client";
 
-import { getProfile, signin, signup } from "@/api/action";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Form, Row } from "antd";
+import { getProfile, signin } from "@/api/action";
 import CustomButton from "@/components/CustomButton";
 import FormItem from "@/components/FormItem";
 import { useAlert } from "@/context/AlertProvider";
-import { Form, Row, FormInstance, Alert } from "antd";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 
 const Login = () => {
+  const router = useRouter();
   const [form] = Form.useForm();
   const { showAlert } = useAlert();
-  const [isFormValid, setIsFormValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const handleLogIn = async () => {
     setLoading(true);

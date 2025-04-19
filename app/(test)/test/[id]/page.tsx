@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import {
   Checkbox,
   ConfigProvider,
@@ -18,8 +20,6 @@ import { dualColors } from "@/utils/utils";
 import RateStarIcon from "@/public/icons/rate_star";
 import BoxIcon from "@/public/icons/box_icon";
 import ArrowRightIcon from "@/public/icons/arrow_right";
-import { useQuery } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
 import {
   createAnswer,
   getPollForTest,
@@ -31,9 +31,10 @@ interface Option {
   id: string;
   content: string;
   order: number;
-  poster?: string | null; // Add poster field for options
+  poster?: string | null;
   points?: number;
   isCorrect?: boolean;
+  nextQuestionOrder?: number | null;
 }
 
 interface Question {
@@ -56,13 +57,13 @@ export default function TestPage() {
   const { showAlert } = useAlert();
   const router = useRouter();
   const [data, setData] = useState<any>(null);
-  const [requiredError, setRequiredError] = useState<string[]>([]);
-  const [step, setStep] = useState<"start" | "questions" | "end">("start");
-  const [questionNo, setQuestionNo] = useState<number>(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderedQuestions, setOrderedQuestions] = useState<Question[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [questionNo, setQuestionNo] = useState<number>(0);
+  const [requiredError, setRequiredError] = useState<string[]>([]);
+  const [step, setStep] = useState<"start" | "questions" | "end">("start");
+  const [orderedQuestions, setOrderedQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<
     { questionId: string; option: any[]; textAnswer: string }[]
   >([]);
@@ -77,6 +78,8 @@ export default function TestPage() {
     Date.now()
   );
   const [displayMode, setDisplayMode] = useState<"single" | "all">("single");
+  const [hasNextQuestionOrder, setHasNextQuestionOrder] = useState<boolean>(false);
+  const [history, setHistory] = useState<number[]>([]);
 
   const {
     data: fetchedData,
@@ -98,16 +101,23 @@ export default function TestPage() {
 
   useEffect(() => {
     if (data) {
-      setOrderedQuestions(
-        data?.questions
-          .sort((a: any, b: any) => a.order - b.order)
-          .map((question: any) => ({
-            ...question,
-            options: question.options.sort(
-              (a: any, b: any) => a.order - b.order
-            ),
-          }))
+      const sortedQuestions = data?.questions
+        .sort((a: any, b: any) => a.order - b.order)
+        .map((question: any) => ({
+          ...question,
+          options: question.options.sort(
+            (a: any, b: any) => a.order - b.order
+          ),
+        }));
+      setOrderedQuestions(sortedQuestions);
+
+      const hasNonNullNextQuestionOrder = sortedQuestions.some((question: Question) =>
+        question.options.some((option: Option) => option.nextQuestionOrder !== null)
       );
+      setHasNextQuestionOrder(hasNonNullNextQuestionOrder);
+      if (hasNonNullNextQuestionOrder) {
+        setDisplayMode("single");
+      }
     }
 
     if (data && data?.duration) {
@@ -279,6 +289,24 @@ export default function TestPage() {
     }
   };
 
+  const getNextQuestionIndex = () => {
+    const currentAnswer = answers.find(
+      (answer) => answer.questionId === orderedQuestions[questionNo].id
+    );
+    if (
+      currentAnswer &&
+      currentAnswer.option.length > 0 &&
+      currentAnswer.option[0].nextQuestionOrder !== null
+    ) {
+      const nextOrder = currentAnswer.option[0].nextQuestionOrder;
+      const nextIndex = orderedQuestions.findIndex(
+        (q) => q.order === nextOrder
+      );
+      return nextIndex !== -1 ? nextIndex : questionNo + 1;
+    }
+    return questionNo + 1;
+  };
+
   const renderQuestion = (question: Question, index?: number) => {
     const isError = requiredError.includes(question.id);
     return (
@@ -364,7 +392,6 @@ export default function TestPage() {
           </Checkbox.Group>
         )}
   
-        {/* Other question types remain unchanged */}
         {question.questionType === "SINGLE_CHOICE" && (
           <Radio.Group
             onChange={(e) => handleChange(question.id, [e.target.value], "")}
@@ -611,22 +638,24 @@ export default function TestPage() {
                     {data?.duration} мин
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <p
-                    style={{ color: custStyle.primaryColor }}
-                    className="text-[13px] font-medium"
-                  >
-                    {displayMode === "single" ? "Нэг асуулт" : "Бүх асуултууд"}
-                  </p>
-                  <Switch
-                    checked={displayMode === "all"}
-                    onChange={(checked) =>
-                      setDisplayMode(checked ? "all" : "single")
-                    }
-                    checkedChildren="Бүгд"
-                    unCheckedChildren="Нэг"
-                  />
-                </div>
+                {!hasNextQuestionOrder && (
+                  <div className="flex items-center gap-4">
+                    <p
+                      style={{ color: custStyle.primaryColor }}
+                      className="text-[13px] font-medium"
+                    >
+                      {displayMode === "single" ? "Нэг асуулт" : "Бүх асуултууд"}
+                    </p>
+                    <Switch
+                      checked={displayMode === "all"}
+                      onChange={(checked) =>
+                        setDisplayMode(checked ? "all" : "single")
+                      }
+                      checkedChildren="Бүгд"
+                      unCheckedChildren="Нэг"
+                    />
+                  </div>
+                )}
               </div>
               <CustomButton
                 titleClassname="text-base font-medium"
@@ -638,6 +667,7 @@ export default function TestPage() {
                 title={data?.btnLabel || "Эхлэх"}
                 onClick={() => {
                   setStep("questions");
+                  setHistory([]); 
                 }}
               />
             </div>
@@ -671,26 +701,30 @@ export default function TestPage() {
                   title="Буцах"
                   className="text-[#B3B3B3] text-[13px] font-semibold h-9 w-[79px]"
                   onClick={() => {
-                    if (questionNo > 0) {
-                      const timeSpent = Math.round(
-                        (Date.now() - questionStartTime) / 1000
-                      );
-                      setTimeTakenPerQuestion((prev) => ({
-                        ...prev,
-                        [orderedQuestions[questionNo].id]: timeSpent,
-                      }));
-                      setQuestionNo(questionNo - 1);
+                    const timeSpent = Math.round(
+                      (Date.now() - questionStartTime) / 1000
+                    );
+                    setTimeTakenPerQuestion((prev) => ({
+                      ...prev,
+                      [orderedQuestions[questionNo].id]: timeSpent,
+                    }));
+                    setRequiredError((prev) =>
+                      prev.filter(
+                        (id) => id !== orderedQuestions[questionNo].id
+                      )
+                    );
+
+                    if (history.length > 0) {
+                      const previousQuestionNo = history[history.length - 1];
+                      setHistory((prev) => prev.slice(0, -1));
+                      setQuestionNo(previousQuestionNo);
                       setQuestionStartTime(Date.now());
-                      setRequiredError((prev) =>
-                        prev.filter(
-                          (id) => id !== orderedQuestions[questionNo].id
-                        )
-                      );
                     } else {
                       setStep("start");
                       setQuestionNo(0);
                       setAnswers([]);
                       setRequiredError([]);
+                      setHistory([]);
                     }
                   }}
                 />
@@ -700,7 +734,7 @@ export default function TestPage() {
                       ? "Дуусгах"
                       : "Цааш"
                   }
-                  className="h-9 w-[220px] rounded-[99px] text-[13px] font-semibold cursor-pointer"
+                  className="h-9 w-[220px] rounded-[99px] text-[13px]  font-semibold cursor-pointer"
                   style={{
                     color: custStyle.backgroundColor,
                     backgroundColor: isButtonDisabled(
@@ -728,8 +762,14 @@ export default function TestPage() {
                     if (questionNo === orderedQuestions.length - 1) {
                       handleSubmit();
                     } else {
-                      setQuestionNo(questionNo + 1);
-                      setQuestionStartTime(Date.now());
+                      setHistory((prev) => [...prev, questionNo]); 
+                      const nextIndex = getNextQuestionIndex();
+                      if (nextIndex >= orderedQuestions.length) {
+                        handleSubmit();
+                      } else {
+                        setQuestionNo(nextIndex);
+                        setQuestionStartTime(Date.now());
+                      }
                     }
                   }}
                 />
@@ -797,6 +837,7 @@ export default function TestPage() {
                 onClick={() => {
                   setAnswers([]);
                   setQuestionNo(0);
+                  setHistory([]);
                   router.push("/mypolls");
                 }}
                 className="text-[13px] font-semibold h-9 w-[220px] rounded-[99px] hover:cursor-pointer"

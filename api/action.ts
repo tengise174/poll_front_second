@@ -4,9 +4,8 @@ import { message } from "antd";
 import axios from "axios";
 
 const baseURL = "http://localhost:5000";
-import { useRouter } from "next/navigation"; // For client-side navigation (if applicable)
+import { useRouter } from "next/navigation";
 
-// Create Axios instance
 const instance = axios.create({
   baseURL: baseURL,
   headers: {
@@ -15,7 +14,6 @@ const instance = axios.create({
   timeout: 1000000,
 });
 
-// Request Interceptor: Add token to headers
 instance.interceptors.request.use(
   async (config) => {
     const tokenString = localStorage.getItem("token");
@@ -51,7 +49,6 @@ instance.interceptors.response.use(
   }
 );
 
-// Sign-in request
 export const signin = async (body: any) => {
   try {
     const response = await instance.post("/auth/signin", body);
@@ -61,7 +58,6 @@ export const signin = async (body: any) => {
   }
 };
 
-// Sign-up request
 export const signup = async (body: any) => {
   try {
     const response = await instance.post("/auth/signup", body);

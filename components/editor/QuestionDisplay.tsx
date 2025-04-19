@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import RateSection from "../RatingSection";
-import { questionTypes } from "@/utils/utils";
-import { QuestionDisplayProps } from "@/utils/componentTypes";
-import CloseCircleIcon from "@/public/icons/close_circle";
-import AddIcon from "@/public/icons/add";
 import { Card, Switch, Image } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
+import RateSection from "../RatingSection";
+import { QuestionDisplayProps } from "@/utils/componentTypes";
+import CloseCircleIcon from "@/public/icons/close_circle";
 
 const QuestionDisplay = ({
   chosenType,
@@ -76,9 +74,7 @@ const QuestionDisplay = ({
                       <Image
                         src={question.poster}
                         height={100}
-                        style={{
-                          width: "auto",
-                        }}
+                        style={{ width: "auto" }}
                       />
                     )}
                     <div className="flex flex-col gap-y-[18px] mt-[18px]">
@@ -107,38 +103,36 @@ const QuestionDisplay = ({
                                     style={{ color: "#52c41a" }}
                                   />
                                 )}
+                                {item.nextQuestionOrder != null && (
+                                  <span className="ml-2 text-[12px]">
+                                    (Next: Q{item.nextQuestionOrder})
+                                  </span>
+                                )}
                               </div>
                               {question.options &&
                                 question.options.length > 2 && (
                                   <CloseCircleIcon
                                     onClick={(e) => {
                                       e.stopPropagation();
+                                      const updatedOptions =
+                                        question.options?.filter(
+                                          (_, i) => i !== optIndex
+                                        ) || [];
                                       setNewQuestions((prev) =>
                                         prev.map((q, qIndex) =>
-                                          qIndex === index && q.options
-                                            ? {
-                                                ...q,
-                                                options: q.options.filter(
-                                                  (_, i) => i !== optIndex
-                                                ),
-                                              }
+                                          qIndex === index
+                                            ? { ...q, options: updatedOptions }
                                             : q
                                         )
                                       );
                                       if (currentPage === index) {
-                                        if (question.options) {
-                                          setCurrentQuestion({
-                                            ...question,
-                                            options: question.options.filter(
-                                              (_, i) => i !== optIndex
-                                            ),
-                                          });
-                                        }
+                                        setCurrentQuestion({
+                                          ...question,
+                                          options: updatedOptions,
+                                        });
                                       }
                                     }}
-                                    style={{
-                                      color: dualColors[themeId][1],
-                                    }}
+                                    style={{ color: dualColors[themeId][1] }}
                                     className="ml-[10px] cursor-pointer"
                                   />
                                 )}
@@ -155,16 +149,40 @@ const QuestionDisplay = ({
                             )}
                           </div>
                         ))}
-                      {question.questionType === "YES_NO" && (
-                        <div className="flex flex-col gap-y-[18px]">
-                          <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
-                            Тийм
+                      {question.questionType === "YES_NO" &&
+                        question.options?.map((item, optIndex) => (
+                          <div
+                            className="flex flex-row gap-2 w-full"
+                            key={optIndex}
+                          >
+                            <div className="flex flex-1 items-center">
+                              <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
+                                {item.content}
+                                {item.isCorrect && (
+                                  <CheckCircleOutlined
+                                    className="ml-2"
+                                    style={{ color: "#52c41a" }}
+                                  />
+                                )}
+                                {item.nextQuestionOrder != null && (
+                                  <span className="ml-2 text-[12px]">
+                                    (Next: Q{item.nextQuestionOrder})
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {item.poster && (
+                              <Image
+                                src={item.poster}
+                                height={60}
+                                style={{
+                                  width: "auto",
+                                  borderRadius: "8px",
+                                }}
+                              />
+                            )}
                           </div>
-                          <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
-                            Үгүй
-                          </div>
-                        </div>
-                      )}
+                        ))}
                       {question.questionType === "TEXT" && (
                         <div className="w-full h-[100px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5 flex items-center">
                           Хариултаа бичнэ үү
@@ -203,7 +221,7 @@ const QuestionDisplay = ({
                   style={{ color: dualColors[themeId][1] }}
                   className="text-[14px] leading-[17px] font-semibold cursor-pointer"
                 >
-                  {currentPage + 1}. {currentQuestion?.content}
+                  {currentPage + 1}. {currentQuestion?.content || "Question"}
                   {currentQuestion?.isPointBased && (
                     <span className="ml-2 text-[12px] italic">
                       (Point-based)
@@ -217,11 +235,9 @@ const QuestionDisplay = ({
                 </p>
                 {currentQuestion?.poster && (
                   <Image
-                    src={currentQuestion?.poster}
+                    src={currentQuestion.poster}
                     height={100}
-                    style={{
-                      width: "auto",
-                    }}
+                    style={{ width: "auto" }}
                   />
                 )}
                 <div className="flex flex-col gap-y-[18px] mt-[18px]">
@@ -247,34 +263,36 @@ const QuestionDisplay = ({
                                 style={{ color: "#52c41a" }}
                               />
                             )}
+                            {item.nextQuestionOrder != null && (
+                              <span className="ml-2 text-[12px]">
+                                (Next: Q{item.nextQuestionOrder})
+                              </span>
+                            )}
                           </div>
                           {currentQuestion?.options &&
-                            currentQuestion?.options.length > 2 && (
+                            currentQuestion.options.length > 2 && (
                               <CloseCircleIcon
                                 onClick={() => {
-                                  setCurrentQuestion((prev: any) => ({
-                                    ...prev,
-                                    options: prev.options.filter(
-                                      (_: any, i: number) => i !== index
-                                    ),
+                                  const updatedOptions =
+                                    currentQuestion.options?.filter(
+                                      (_, i) => i !== index
+                                    ) || [];
+                                  setCurrentQuestion((prev) => ({
+                                    ...prev!,
+                                    options: updatedOptions,
                                   }));
                                   setNewQuestions((prev) =>
                                     prev.map((question, questionIndex) =>
-                                      questionIndex === currentPage &&
-                                      question.options
+                                      questionIndex === currentPage
                                         ? {
                                             ...question,
-                                            options: question.options.filter(
-                                              (_, i) => i !== index
-                                            ),
+                                            options: updatedOptions,
                                           }
                                         : question
                                     )
                                   );
                                 }}
-                                style={{
-                                  color: dualColors[themeId][1],
-                                }}
+                                style={{ color: dualColors[themeId][1] }}
                                 className="ml-[10px] cursor-pointer"
                               />
                             )}
@@ -291,16 +309,37 @@ const QuestionDisplay = ({
                         )}
                       </div>
                     ))}
-                  {currentQuestion?.questionType === "YES_NO" && (
-                    <div className="flex flex-col gap-y-[18px]">
-                      <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
-                        Тийм
+                  {currentQuestion?.questionType === "YES_NO" &&
+                    currentQuestion?.options?.map((item, index) => (
+                      <div className="flex flex-row gap-2 w-full" key={index}>
+                        <div className="flex items-center flex-1">
+                          <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
+                            {item.content}
+                            {item.isCorrect && (
+                              <CheckCircleOutlined
+                                className="ml-2"
+                                style={{ color: "#52c41a" }}
+                              />
+                            )}
+                            {item.nextQuestionOrder != null && (
+                              <span className="ml-2 text-[12px]">
+                                (Next: Q{item.nextQuestionOrder})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {item.poster && (
+                          <Image
+                            src={item.poster}
+                            height={80}
+                            style={{
+                              width: "auto",
+                              borderRadius: "8px",
+                            }}
+                          />
+                        )}
                       </div>
-                      <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
-                        Үгүй
-                      </div>
-                    </div>
-                  )}
+                    ))}
                   {currentQuestion?.questionType === "TEXT" && (
                     <div className="w-full h-[200px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5">
                       Хариултаа бичнэ үү

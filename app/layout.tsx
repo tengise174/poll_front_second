@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { ConfigProvider } from "antd";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@ant-design/v5-patch-for-react-19";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AlertProvider } from "@/context/AlertProvider";
-import { ConfigProvider } from "antd";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
