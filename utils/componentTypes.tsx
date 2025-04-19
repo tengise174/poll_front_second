@@ -88,7 +88,7 @@ export interface SurveyProps {
 export interface QuestionTypeProps {
   icon: any;
   title: string;
-  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT";
+  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN";
 }
 interface SettingsPageProps {
   isAccessLevel: boolean;
@@ -151,6 +151,7 @@ export interface QuestionProps {
     | "RATING"
     | "YES_NO"
     | "TEXT"
+    | "DROPDOWN"
     | null;
   minAnswerCount?: number;
   order: number;
@@ -169,6 +170,7 @@ type ChosenTypeProps =
   | "RATING"
   | "YES_NO"
   | "TEXT"
+  | "DROPDOWN"
   | null;
 
 export interface QuestionTextEditorProps {

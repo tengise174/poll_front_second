@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Switch, Image } from "antd";
+import { Card, Switch, Image, Select } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import RateSection from "../RatingSection";
 import { QuestionDisplayProps } from "@/utils/componentTypes";
@@ -149,6 +149,36 @@ const QuestionDisplay = ({
                             )}
                           </div>
                         ))}
+                      {question.questionType === "DROPDOWN" && (
+                        <Select
+                          placeholder="Сонголт хийнэ үү"
+                          style={{ width: "100%", height: 44 }}
+                        >
+                          {question.options?.map((item, optIndex) => (
+                            <Select.Option key={optIndex} value={optIndex}>
+                              {item.content || "Answer"}
+                              {question.isPointBased && ` (${item.points} pts)`}
+                              {item.isCorrect && (
+                                <CheckCircleOutlined
+                                  style={{ color: "#52c41a", marginLeft: 8 }}
+                                />
+                              )}
+                              {item.nextQuestionOrder != null &&
+                                ` (Next: Q${item.nextQuestionOrder})`}
+                              {item.poster && (
+                                <Image
+                                  src={item.poster}
+                                  height={60}
+                                  style={{
+                                    width: "auto",
+                                    borderRadius: "8px",
+                                  }}
+                                />
+                              )}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
                       {question.questionType === "YES_NO" &&
                         question.options?.map((item, optIndex) => (
                           <div
@@ -309,6 +339,28 @@ const QuestionDisplay = ({
                         )}
                       </div>
                     ))}
+                  {currentQuestion?.questionType === "DROPDOWN" && (
+                    <Select
+                      placeholder="Сонголт хийнэ үү"
+                      style={{ width: "100%", height: 44 }}
+                      disabled
+                    >
+                      {currentQuestion?.options?.map((item, index) => (
+                        <Select.Option key={index} value={index}>
+                          {item.content || "Answer"}
+                          {currentQuestion.isPointBased &&
+                            ` (${item.points} pts)`}
+                          {item.isCorrect && (
+                            <CheckCircleOutlined
+                              style={{ color: "#52c41a", marginLeft: 8 }}
+                            />
+                          )}
+                          {item.nextQuestionOrder != null &&
+                            ` (Next: Q${item.nextQuestionOrder})`}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
                   {currentQuestion?.questionType === "YES_NO" &&
                     currentQuestion?.options?.map((item, index) => (
                       <div className="flex flex-row gap-2 w-full" key={index}>

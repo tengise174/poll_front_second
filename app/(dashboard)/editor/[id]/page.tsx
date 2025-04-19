@@ -30,7 +30,7 @@ export default function SurveyDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [chosenType, setChosenType] = useState<
-    "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | null
+    "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | null
   >(null);
 
   const handleCopyUrl = () => {
@@ -214,7 +214,7 @@ export default function SurveyDetailPage() {
         }
       }
       if (
-        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO"].includes(
+        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
           question.questionType ?? ""
         ) &&
         question.hasCorrectAnswer &&
@@ -235,7 +235,7 @@ export default function SurveyDetailPage() {
           return;
         }
         if (
-          ["SINGLE_CHOICE", "YES_NO"].includes(question.questionType ?? "") &&
+          ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(question.questionType ?? "") &&
           correctCount > 1
         ) {
           showAlert(
@@ -261,7 +261,7 @@ export default function SurveyDetailPage() {
         return;
       }
       if (
-        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO"].includes(
+        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
           question.questionType ?? ""
         ) &&
         question.options
@@ -344,6 +344,7 @@ export default function SurveyDetailPage() {
       | "RATING"
       | "YES_NO"
       | "TEXT"
+      | "DROPDOWN"
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
@@ -351,7 +352,9 @@ export default function SurveyDetailPage() {
         : newQuestions.length;
 
     const shouldAddAnswers =
-      questionType === "SINGLE_CHOICE" || questionType === "MULTI_CHOICE";
+      questionType === "SINGLE_CHOICE" ||
+      questionType === "MULTI_CHOICE" ||
+      questionType === "DROPDOWN";
 
     const newQuestion: QuestionProps = {
       content: "",

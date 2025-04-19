@@ -2,15 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Card,
-  Checkbox,
-  Skeleton,
-  Typography,
-  Input,
-  Rate,
-  Image,
-} from "antd";
+import { Card, Checkbox, Skeleton, Typography, Input, Rate, Image } from "antd";
 import { getAnsweredPollDetail } from "@/api/action";
 import { dualColors } from "@/utils/utils";
 
@@ -28,7 +20,13 @@ interface OptionsProps {
 interface QuestionProps {
   questionId: string;
   content: string;
-  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE";
+  questionType:
+    | "MULTI_CHOICE"
+    | "RATING"
+    | "YES_NO"
+    | "TEXT"
+    | "SINGLE_CHOICE"
+    | "DROPDOWN";
   rateNumber: number;
   rateType: "STAR" | "NUMBER";
   allOptions?: OptionsProps[];

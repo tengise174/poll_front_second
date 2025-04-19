@@ -300,7 +300,7 @@ const QuestionTextEditor = ({
                 />
                 <p className="text-[13px] text-[#1E1E1E]">Заавал бөглөх</p>
               </div>
-              {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+              {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
                 currentQuestion?.questionType ?? ""
               ) && (
                 <div className="flex items-center gap-2 mt-2">
@@ -345,14 +345,14 @@ const QuestionTextEditor = ({
                   <p className="text-[13px] text-[#1E1E1E]">Оноотой асуулт</p>
                 </div>
               )}
-              {["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO"].includes(
+              {["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
                 currentQuestion?.questionType ?? ""
               ) && (
                 <div className="flex items-center gap-2 mt-2">
                   <Switch
                     checked={currentQuestion?.hasCorrectAnswer || false}
                     disabled={
-                      ["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                      ["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
                         currentQuestion?.questionType ?? ""
                       ) && currentQuestion?.isPointBased
                     }
@@ -548,7 +548,7 @@ const QuestionTextEditor = ({
                   Хариулт
                 </p>
 
-                {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
                   currentQuestion?.questionType ?? ""
                 ) &&
                   currentQuestion?.hasCorrectAnswer && (
@@ -591,7 +591,7 @@ const QuestionTextEditor = ({
                   )}
 
                 <div className="flex flex-col gap-y-3 mt-[14px]">
-                  {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                  {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
                     currentQuestion?.questionType ?? ""
                   ) &&
                     currentQuestion?.options?.map((item, answerIndex) => {
@@ -769,7 +769,7 @@ const QuestionTextEditor = ({
                       );
                     })}
                 </div>
-                {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
                   currentQuestion?.questionType ?? ""
                 ) && (
                   <div

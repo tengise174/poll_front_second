@@ -42,6 +42,7 @@ const questionTypeTranslations: Record<string, string> = {
   YES_NO: "Тийм/Үгүй",
   TEXT: "Текст",
   SINGLE_CHOICE: "Ганц сонголттой",
+  DROPDOWN: "Dropdown",
 };
 
 interface AnsweredByProp {
@@ -71,7 +72,7 @@ interface PollAnswer {
 interface PollQuestion {
   questionId: string;
   content: string;
-  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE";
+  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE" | "DROPDOWN";
   avgTimeTaken: number;
   order: number;
   options?: PollOption[];

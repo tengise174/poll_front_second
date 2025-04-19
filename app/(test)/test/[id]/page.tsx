@@ -13,6 +13,7 @@ import {
   Card,
   Button,
   Image,
+  Select,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import CustomButton from "@/components/CustomButton";
@@ -210,7 +211,7 @@ export default function TestPage() {
       return answer.option.length >= minAnswerCount;
     }
 
-    if (type === "SINGLE_CHOICE" || type === "RATING" || type === "YES_NO") {
+    if (type === "SINGLE_CHOICE" || type === "RATING" || type === "YES_NO" || type === "DROPDOWN") {
       return answer !== undefined && answer.option?.length > 0;
     }
 
@@ -430,6 +431,62 @@ export default function TestPage() {
           </Radio.Group>
         )}
   
+        {question.questionType === "DROPDOWN" && (
+          <Select
+            style={{ width: '100%', color: custStyle.primaryColor }}
+            value={
+              answers.find((answer) => answer.questionId === question.id)?.option?.[0]?.id ||
+              undefined
+            }
+            onChange={(value) => {
+              const selectedOption = question.options.find((opt) => opt.id === value);
+              handleChange(question.id, selectedOption ? [selectedOption] : [], "");
+              
+              if (selectedOption?.nextQuestionOrder !== null && displayMode === "single") {
+                const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
+                setTimeTakenPerQuestion((prev) => ({
+                  ...prev,
+                  [question.id]: timeSpent,
+                }));
+                setRequiredError((prev) => prev.filter((id) => id !== question.id));
+                setHistory((prev) => [...prev, questionNo]);
+                const nextIndex = orderedQuestions.findIndex(
+                  (q) => selectedOption && q.order === selectedOption.nextQuestionOrder
+                );
+                if (nextIndex !== -1 && nextIndex < orderedQuestions.length) {
+                  setQuestionNo(nextIndex);
+                  setQuestionStartTime(Date.now());
+                } else if (nextIndex >= orderedQuestions.length) {
+                  handleSubmit();
+                }
+              }
+            }}
+            placeholder="Сонголт хийнэ үү"
+            options={question.options.map((item: Option) => ({
+              value: item.id,
+              label: (
+                <div>
+                  <p>{item.content}</p>
+                  {item.poster && (
+                    <Image
+                      src={item.poster}
+                      height={80}
+                      style={{
+                        width: "auto",
+                        borderRadius: "8px",
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  )}
+                </div>
+              ),
+            }))}
+            className="w-full"
+          />
+        )}
+  
         {question.questionType === "RATING" && (
           <div className="w-full flex items-center justify-center">
             <Rate
@@ -594,6 +651,11 @@ export default function TestPage() {
           Card: {
             headerBg: custStyle.backgroundColor,
             borderRadiusLG: 10,
+          },
+          Select: {
+            colorText: custStyle.primaryColor,
+            colorBgContainer: custStyle.backgroundColor,
+            colorBorder: "#D9D9D9",
           },
         },
       }}

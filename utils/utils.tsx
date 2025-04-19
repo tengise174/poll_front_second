@@ -57,6 +57,11 @@ export const questionTypes: QuestionTypeProps[] = [
     title: "Текст",
     questionType: "TEXT",
   },
+  {
+    icon: <div>📜</div>, 
+    title: "Dropdown",
+    questionType: "DROPDOWN",
+  },
 ];
 
 export const formatNumber = (num: number): string => {
