@@ -44,7 +44,8 @@ const QuestionDisplay = ({
       align: "center" as const,
       render: (_: any, record: any) => {
         const option = question.options?.find(
-          (opt: any) => opt.rowIndex === record.rowIndex && opt.columnIndex === index
+          (opt: any) =>
+            opt.rowIndex === record.rowIndex && opt.columnIndex === index
         );
         return (
           <div className="flex justify-center items-center">
@@ -178,10 +179,12 @@ const QuestionDisplay = ({
                                       if (currentPage === index) {
                                         setCurrentQuestion({
                                           ...question,
-                                          options: updatedOptions.map((opt, i) => ({
-                                            ...opt,
-                                            order: i + 1,
-                                          })),
+                                          options: updatedOptions.map(
+                                            (opt, i) => ({
+                                              ...opt,
+                                              order: i + 1,
+                                            })
+                                          ),
                                         });
                                       }
                                     }}
@@ -207,7 +210,6 @@ const QuestionDisplay = ({
                         <Select
                           placeholder="Сонголт хийнэ үү"
                           style={{ width: "100%", height: 44 }}
-                          disabled
                         >
                           {question.options?.map((item, optIndex) => (
                             <Select.Option key={optIndex} value={optIndex}>

@@ -3,31 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Checkbox,
-  ConfigProvider,
-  Radio,
-  Rate,
-  Skeleton,
-  Switch,
-  Card,
-  Button,
-  Image,
-  Select,
-  Table,
-} from "antd";
-import TextArea from "antd/es/input/TextArea";
-import CustomButton from "@/components/CustomButton";
-import { dualColors } from "@/utils/utils";
-import RateStarIcon from "@/public/icons/rate_star";
-import BoxIcon from "@/public/icons/box_icon";
-import ArrowRightIcon from "@/public/icons/arrow_right";
-import {
-  createAnswer,
-  getPollForTest,
-  recordFailedAttendance,
-} from "@/api/action";
+import { ConfigProvider, Skeleton } from "antd";
+import { createAnswer, getPollForTest, recordFailedAttendance } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
+import { dualColors } from "@/utils/utils";
+import PollHeader from "@/components/test/PollHeader";
+import PollQuestion from "@/components/test/PollQuestion";
+import PollTimer from "@/components/test/PollTimer";
+import PollNavigation from "@/components/test/PollNavigation";
+import PollEndScreen from "@/components/test/PollEndScreen";
+import CustomButton from "@/components/CustomButton";
+import BoxIcon from "@/public/icons/box_icon";
 
 interface Option {
   id: string;
@@ -319,356 +305,53 @@ export default function TestPage() {
     return questionNo + 1;
   };
 
-  const renderQuestion = (question: Question, index?: number) => {
-    const isError = requiredError.includes(question.id);
-    return (
-      <Card
-        key={question.id}
-        title={
-          <div className="flex items-center gap-2">
-            <span>
-              {index !== undefined
-                ? `${index + 1}. ${question.content}`
-                : question.content}
-            </span>
-            {question.required && <span className="text-red-500">*</span>}
-          </div>
-        }
-        className="w-full shadow-xl hover:scale-102 transition-all duration-300 ease-in-out"
-        style={{ marginBottom: 16, backgroundColor: custStyle.backgroundColor }}
-        headStyle={{ color: custStyle.primaryColor }}
-        styles={{ body: { color: custStyle.primaryColor } }}
-      >
-        {question.poster && (
-          <Image
-            src={question.poster}
-            height={100}
-            style={{
-              width: "auto",
-              borderRadius: "8px",
-              marginBottom: "16px",
-            }}
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
-        )}
-        {isError && (
-          <div className="text-red-500 text-xs mb-2">
-            Энэ асуултад заавал хариулах шаардлагатай
-          </div>
-        )}
-        {question.questionType === "MULTI_CHOICE" && (
-          <div className="text-xs mb-2" style={{ color: custStyle.primaryColor }}>
-            Хамгийн багадаа {question.minAnswerCount} сонголт сонгоно уу
-          </div>
-        )}
-
-        {question.questionType === "MULTIPLE_CHOICE_GRID" && (
-          <div className="w-full">
-            <Table
-              dataSource={question.gridRows?.map((row, rowIndex) => ({
-                key: rowIndex,
-                row,
-              }))}
-              columns={[
-                {
-                  title: "",
-                  dataIndex: "row",
-                  key: "row",
-                  render: (text) => (
-                    <span style={{ color: custStyle.primaryColor }}>{text}</span>
-                  ),
-                },
-                ...(question.gridColumns?.map((column, colIndex) => ({
-                  title: column,
-                  dataIndex: `col${colIndex}`,
-                  key: `col${colIndex}`,
-                  render: (_: any, record: { key: number; row: string }) => {
-                    const rowIndex = question.gridRows?.indexOf(record.row) || 0;
-                    const option = question.options.find(
-                      (opt) =>
-                        opt.rowIndex === rowIndex && opt.columnIndex === colIndex
-                    );
-                    const selectedOption = answers
-                      .find((answer) => answer.questionId === question.id)
-                      ?.option.find(
-                        (opt) => opt.rowIndex === rowIndex
-                      );
-                    return (
-                      <Radio
-                        checked={
-                          selectedOption?.id === option?.id
-                        }
-                        onChange={() => {
-                          const newOption = question.options.find(
-                            (opt) =>
-                              opt.rowIndex === rowIndex &&
-                              opt.columnIndex === colIndex
-                          );
-                          if (newOption) {
-                            const updatedOptions = answers
-                              .find((answer) => answer.questionId === question.id)
-                              ?.option.filter(
-                                (opt) => opt.rowIndex !== rowIndex
-                              ) || [];
-                            handleChange(question.id, [...updatedOptions, newOption], "");
-                          }
-                        }}
-                        style={{ color: custStyle.primaryColor }}
-                      />
-                    );
-                  },
-                })) || []),
-              ]}
-              pagination={false}
-              bordered
-              size="small"
-              style={{ color: custStyle.primaryColor }}
-            />
-          </div>
-        )}
-
-        {question.questionType === "MULTI_CHOICE" && (
-          <Checkbox.Group
-            value={
-              answers.find((answer) => answer.questionId === question.id)?.option ||
-              []
-            }
-            onChange={(checkedValues) =>
-              handleChange(question.id, checkedValues, "")
-            }
-            className="circle-checkbox flex flex-col gap-3 w-full max-h-full overflow-y-auto"
-          >
-            {question.options.map((item: Option, idx: number) => (
-              <div key={idx} className="flex flex-row gap-2 w-full items-center">
-                <div className="flex-1">
-                  <Checkbox
-                    value={item}
-                    style={{ color: custStyle.primaryColor }}
-                    className="custom-radio w-full border font-open border-[#D9D9D9] rounded-[10px] p-3 text-[13px] font-medium items-center gap-3"
-                  >
-                    {item.content}
-                  </Checkbox>
-                </div>
-                {item.poster && (
-                  <Image
-                    src={item.poster}
-                    height={80}
-                    style={{
-                      width: "auto",
-                      borderRadius: "8px",
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-          </Checkbox.Group>
-        )}
-
-        {question.questionType === "SINGLE_CHOICE" && (
-          <Radio.Group
-            onChange={(e) => handleChange(question.id, [e.target.value], "")}
-            value={
-              answers.find((answer) => answer.questionId === question.id)?.option?.[0] ||
-              undefined
-            }
-            className="flex flex-col w-full max-h-full overflow-y-auto"
-          >
-            {question.options.map((item: Option, idx: number) => (
-              <div key={idx} className="flex flex-row w-full gap-2 items-center">
-                <div className="flex-1">
-                  <Radio
-                    style={{ color: custStyle.primaryColor }}
-                    className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
-                    value={item}
-                  >
-                    {item.content}
-                  </Radio>
-                </div>
-                {item.poster && (
-                  <Image
-                    src={item.poster}
-                    height={80}
-                    style={{
-                      width: "auto",
-                      borderRadius: "8px",
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-          </Radio.Group>
-        )}
-
-        {question.questionType === "DROPDOWN" && (
-          <Select
-            style={{ width: '100%', color: custStyle.primaryColor }}
-            value={
-              answers.find((answer) => answer.questionId === question.id)?.option?.[0]?.id ||
-              undefined
-            }
-            onChange={(value) => {
-              const selectedOption = question.options.find((opt) => opt.id === value);
-              handleChange(question.id, selectedOption ? [selectedOption] : [], "");
-              
-              if (selectedOption?.nextQuestionOrder !== null && displayMode === "single") {
-                const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
-                setTimeTakenPerQuestion((prev) => ({
-                  ...prev,
-                  [question.id]: timeSpent,
-                }));
-                setRequiredError((prev) => prev.filter((id) => id !== question.id));
-                setHistory((prev) => [...prev, questionNo]);
-                const nextIndex = orderedQuestions.findIndex(
-                  (q) => selectedOption && q.order === selectedOption.nextQuestionOrder
-                );
-                if (nextIndex !== -1 && nextIndex < orderedQuestions.length) {
-                  setQuestionNo(nextIndex);
-                  setQuestionStartTime(Date.now());
-                } else if (nextIndex >= orderedQuestions.length) {
-                  handleSubmit();
-                }
-              }
-            }}
-            placeholder="Сонголт хийнэ үү"
-            options={question.options.map((item: Option) => ({
-              value: item.id,
-              label: (
-                <div>
-                  <p>{item.content}</p>
-                  {item.poster && (
-                    <Image
-                      src={item.poster}
-                      height={80}
-                      style={{
-                        width: "auto",
-                        borderRadius: "8px",
-                      }}
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                    />
-                  )}
-                </div>
-              ),
-            }))}
-            className="w-full"
-          />
-        )}
-
-        {question.questionType === "RATING" && (
-          <div className="w-full flex items-center justify-center">
-            <Rate
-              count={question.rateNumber}
-              value={Number(
-                answers.find((answer) => answer.questionId === question.id)?.option?.[0]
-                  ?.content || 0
-              )}
-              onChange={(value) => {
-                const selectedOption = question.options.find(
-                  (opt: any) => opt.content === String(value)
-                );
-                handleChange(question.id, [selectedOption], "");
-              }}
-              character={({ index = 0 }) =>
-                question.rateType === "NUMBER" ? (
-                  <span
-                    className="text-base font-semibold font-open"
-                    style={{
-                      color:
-                        index <
-                        Number(
-                          answers.find((answer) => answer.questionId === question.id)
-                            ?.option?.[0]?.content || 0
-                        )
-                          ? custStyle.primaryColor
-                          : "#E0E8F1",
-                    }}
-                  >
-                    {question.options[index].content}
-                  </span>
-                ) : (
-                  <RateStarIcon
-                    fill={
-                      index <
-                      Number(
-                        answers.find((answer) => answer.questionId === question.id)
-                          ?.option?.[0]?.content || 0
-                      )
-                        ? custStyle.primaryColor
-                        : "#E0E8F1"
-                    }
-                  />
-                )
-              }
-            />
-          </div>
-        )}
-
-        {question.questionType === "YES_NO" && (
-          <Radio.Group
-            optionType="button"
-            buttonStyle="solid"
-            onChange={(e) => handleChange(question.id, [e.target.value], "")}
-            value={
-              answers.find((answer) => answer.questionId === question.id)?.option?.[0] ||
-              undefined
-            }
-            className="flex flex-col w-full max-h-full overflow-y-auto"
-          >
-            {question.options.map((item: Option, idx: number) => (
-              <div key={idx} className="flex flex-row w-full items-center gap-2">
-                <div className="flex-1">
-                  <Radio
-                    style={{ color: custStyle.primaryColor }}
-                    className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
-                    value={item}
-                  >
-                    {item.content}
-                  </Radio>
-                </div>
-                {item.poster && (
-                  <Image
-                    src={item.poster}
-                    height={80}
-                    style={{
-                      width: "auto",
-                      borderRadius: "8px",
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-          </Radio.Group>
-        )}
-
-        {question.questionType === "TEXT" && (
-          <TextArea
-            onChange={(e) => handleChange(question.id, [], e.target.value)}
-            value={
-              answers.find((answer) => answer.questionId === question.id)?.textAnswer ||
-              ""
-            }
-            style={{
-              backgroundColor: custStyle.backgroundColor,
-              color: custStyle.primaryColor,
-            }}
-            placeholder="Enter text"
-            className=""
-          />
-        )}
-      </Card>
+  const handleBack = () => {
+    const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
+    setTimeTakenPerQuestion((prev) => ({
+      ...prev,
+      [orderedQuestions[questionNo].id]: timeSpent,
+    }));
+    setRequiredError((prev) =>
+      prev.filter((id) => id !== orderedQuestions[questionNo].id)
     );
+
+    if (history.length > 0) {
+      const previousQuestionNo = history[history.length - 1];
+      setHistory((prev) => prev.slice(0, -1));
+      setQuestionNo(previousQuestionNo);
+      setQuestionStartTime(Date.now());
+    } else {
+      setStep("start");
+      setQuestionNo(0);
+      setAnswers([]);
+      setRequiredError([]);
+      setHistory([]);
+    }
+  };
+
+  const handleNext = () => {
+    const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
+    setTimeTakenPerQuestion((prev) => ({
+      ...prev,
+      [orderedQuestions[questionNo].id]: timeSpent,
+    }));
+
+    setRequiredError((prev) =>
+      prev.filter((id) => id !== orderedQuestions[questionNo].id)
+    );
+
+    if (questionNo === orderedQuestions.length - 1) {
+      handleSubmit();
+    } else {
+      setHistory((prev) => [...prev, questionNo]);
+      const nextIndex = getNextQuestionIndex();
+      if (nextIndex >= orderedQuestions.length) {
+        handleSubmit();
+      } else {
+        setQuestionNo(nextIndex);
+        setQuestionStartTime(Date.now());
+      }
+    }
   };
 
   if (isFetching)
@@ -743,13 +426,11 @@ export default function TestPage() {
       }}
     >
       <div
-        style={
-          {
-            backgroundColor: custStyle.backgroundColor,
-            "--primary-color": custStyle.primaryColor,
-            "--bg-color": custStyle.backgroundColor,
-          } as React.CSSProperties
-        }
+        style={{
+          backgroundColor: custStyle.backgroundColor,
+          "--primary-color": custStyle.primaryColor,
+          "--bg-color": custStyle.backgroundColor,
+        }}
         className="flex flex-col font-open h-screen pt-10"
       >
         <div className="h-[49px] flex flex-row items-center justify-center">
@@ -757,68 +438,24 @@ export default function TestPage() {
         </div>
         <div className="flex flex-1 flex-col items-center overflow-hidden">
           {step === "start" && (
-            <div className="flex flex-col gap-20 items-center max-w-[630px]">
-              <div className="flex flex-col gap-5">
-                <h1
-                  style={{ color: custStyle.primaryColor }}
-                  className="text-center text-5xl font-semibold"
-                >
-                  {data?.title}
-                </h1>
-                <p
-                  style={{ color: custStyle.primaryColor }}
-                  className="text-center text-base font-medium"
-                >
-                  {data?.greetingMessage}
-                </p>
-                <div className="flex flex-col items-center gap-[10px]">
-                  <p
-                    style={{ color: custStyle.primaryColor }}
-                    className="text-[13px] font-medium"
-                  >
-                    Судалгааны хугацаа
-                  </p>
-                  <div className="rounded-[99px] px-5 py-[5px] bg-[#434343] text-white text-sm font-medium">
-                    {data?.duration} мин
-                  </div>
-                </div>
-                {!hasNextQuestionOrder && (
-                  <div className="flex items-center gap-4">
-                    <p
-                      style={{ color: custStyle.primaryColor }}
-                      className="text-[13px] font-medium"
-                    >
-                      {displayMode === "single" ? "Нэг асуулт" : "Бүх асуултууд"}
-                    </p>
-                    <Switch
-                      checked={displayMode === "all"}
-                      onChange={(checked) =>
-                        setDisplayMode(checked ? "all" : "single")
-                      }
-                      checkedChildren="Бүгд"
-                      unCheckedChildren="Нэг"
-                    />
-                  </div>
-                )}
-              </div>
-              <CustomButton
-                titleClassname="text-base font-medium"
-                className="h-[42px] w-[200px] rounded-[999px] hover:cursor-pointer"
-                style={{
-                  backgroundColor: custStyle.primaryColor,
-                  color: custStyle.backgroundColor,
-                }}
-                title={data?.btnLabel || "Эхлэх"}
-                onClick={() => {
-                  setStep("questions");
-                  setHistory([]);
-                }}
-              />
-            </div>
+            <PollHeader
+              title={data?.title}
+              greetingMessage={data?.greetingMessage}
+              duration={data?.duration}
+              displayMode={displayMode}
+              hasNextQuestionOrder={hasNextQuestionOrder}
+              setDisplayMode={setDisplayMode}
+              custStyle={custStyle}
+              btnLabel={data?.btnLabel}
+              onStart={() => {
+                setStep("questions");
+                setHistory([]);
+              }}
+            />
           )}
           {step === "questions" && displayMode === "single" && (
             <div className="flex flex-col gap-5 items-center max-h-full w-200">
-              <div>{formatTime(timeLeft)}</div>
+              <PollTimer timeLeft={timeLeft} formatTime={formatTime} />
               <div
                 style={{ color: custStyle.primaryColor }}
                 className="font-semibold text-sm flex flex-row gap-1"
@@ -829,164 +466,72 @@ export default function TestPage() {
                   <span className="text-red-500 ml-1">*</span>
                 )}
               </div>
-
-              {requiredError.includes(orderedQuestions[questionNo].id) && (
-                <div className="text-red-500 text-xs">
-                  Энэ асуултад заавал хариулах шаардлагатай
-                </div>
-              )}
-
-              <div className="w-full h-[90%]">
-                {renderQuestion(orderedQuestions[questionNo])}
-              </div>
-
-              <div className="w-full flex flex-row gap-24 justify-between items-center">
-                <CustomButton
-                  title="Буцах"
-                  className="text-[#B3B3B3] text-[13px] font-semibold h-9 w-[79px]"
-                  onClick={() => {
-                    const timeSpent = Math.round(
-                      (Date.now() - questionStartTime) / 1000
-                    );
-                    setTimeTakenPerQuestion((prev) => ({
-                      ...prev,
-                      [orderedQuestions[questionNo].id]: timeSpent,
-                    }));
-                    setRequiredError((prev) =>
-                      prev.filter(
-                        (id) => id !== orderedQuestions[questionNo].id
-                      )
-                    );
-
-                    if (history.length > 0) {
-                      const previousQuestionNo = history[history.length - 1];
-                      setHistory((prev) => prev.slice(0, -1));
-                      setQuestionNo(previousQuestionNo);
-                      setQuestionStartTime(Date.now());
-                    } else {
-                      setStep("start");
-                      setQuestionNo(0);
-                      setAnswers([]);
-                      setRequiredError([]);
-                      setHistory([]);
-                    }
-                  }}
-                />
-                <CustomButton
-                  title={
-                    questionNo === orderedQuestions.length - 1
-                      ? "Дуусгах"
-                      : "Цааш"
+              <PollQuestion
+                question={orderedQuestions[questionNo]}
+                index={questionNo}
+                answers={answers}
+                requiredError={requiredError}
+                custStyle={custStyle}
+                handleChange={handleChange}
+                handleDropdownChange={(nextIndex) => {
+                  setHistory((prev) => [...prev, questionNo]);
+                  if (nextIndex >= orderedQuestions.length) {
+                    handleSubmit();
+                  } else {
+                    setQuestionNo(nextIndex);
+                    setQuestionStartTime(Date.now());
                   }
-                  className="h-9 w-[220px] rounded-[99px] text-[13px] font-semibold cursor-pointer"
-                  style={{
-                    color: custStyle.backgroundColor,
-                    backgroundColor: isButtonDisabled(
-                      orderedQuestions[questionNo]
-                    )
-                      ? "#D9D9D9"
-                      : custStyle.primaryColor,
-                  }}
-                  disabled={isButtonDisabled(orderedQuestions[questionNo])}
-                  onClick={() => {
-                    const timeSpent = Math.round(
-                      (Date.now() - questionStartTime) / 1000
-                    );
-                    setTimeTakenPerQuestion((prev) => ({
-                      ...prev,
-                      [orderedQuestions[questionNo].id]: timeSpent,
-                    }));
-
-                    setRequiredError((prev) =>
-                      prev.filter(
-                        (id) => id !== orderedQuestions[questionNo].id
-                      )
-                    );
-
-                    if (questionNo === orderedQuestions.length - 1) {
-                      handleSubmit();
-                    } else {
-                      setHistory((prev) => [...prev, questionNo]);
-                      const nextIndex = getNextQuestionIndex();
-                      if (nextIndex >= orderedQuestions.length) {
-                        handleSubmit();
-                      } else {
-                        setQuestionNo(nextIndex);
-                        setQuestionStartTime(Date.now());
-                      }
-                    }
-                  }}
-                />
-              </div>
+                }}
+              />
+              <PollNavigation
+                questionNo={questionNo}
+                totalQuestions={orderedQuestions.length}
+                isButtonDisabled={isButtonDisabled(orderedQuestions[questionNo])}
+                custStyle={custStyle}
+                onBack={handleBack}
+                onNext={handleNext}
+              />
             </div>
           )}
           {step === "questions" && displayMode === "all" && (
             <div className="flex flex-col items-center gap-5 w-200 max-h-full h-full">
-              <div>{formatTime(timeLeft)}</div>
+              <PollTimer timeLeft={timeLeft} formatTime={formatTime} />
               <div className="flex flex-col gap-5 items-center w-full max-h-full h-full overflow-y-auto px-6">
-                {orderedQuestions.map((question, index) =>
-                  renderQuestion(question, index)
-                )}
+                {orderedQuestions.map((question, index) => (
+                  <PollQuestion
+                    key={question.id}
+                    question={question}
+                    index={index}
+                    answers={answers}
+                    requiredError={requiredError}
+                    custStyle={custStyle}
+                    handleChange={handleChange}
+                    handleDropdownChange={(nextIndex) => {}}
+                  />
+                ))}
               </div>
-              <div className="flex flex-row gap-4">
-                <CustomButton
-                  title={"Буцах"}
-                  onClick={() => setStep("start")}
-                  className="bg-[#888] !text-xs px-8 rounded-[99px] !h-10 hover:cursor-pointer hover:bg-main-purple"
-                />
-                <Button
-                  type="primary"
-                  size="large"
-                  className="hover:cursor-pointer"
-                  loading={isSubmitting}
-                  disabled={!areAllRequiredAnswered()}
-                  onClick={handleSubmit}
-                  style={{
-                    backgroundColor: areAllRequiredAnswered()
-                      ? custStyle.primaryColor
-                      : "#D9D9D9",
-                    color: custStyle.backgroundColor,
-                    borderRadius: 99,
-                    height: 40,
-                    width: 280,
-                  }}
-                >
-                  Дуусгах
-                </Button>
-              </div>
+              <PollNavigation
+                questionNo={questionNo}
+                totalQuestions={orderedQuestions.length}
+                isButtonDisabled={!areAllRequiredAnswered()}
+                custStyle={custStyle}
+                onBack={() => setStep("start")}
+                onNext={handleSubmit}
+                isSubmitting={isSubmitting}
+                showSubmit={true}
+              />
             </div>
           )}
           {step === "end" && (
-            <div className="flex flex-col items-center gap-10">
-              <div className="flex flex-col items-center gap-4">
-                <p
-                  className="text-base font-medium"
-                  style={{ color: custStyle.primaryColor }}
-                >
-                  Таны асуулга амжилттай илгээгдлээ
-                </p>
-                <BoxIcon />
-              </div>
-              <CustomButton
-                style={{
-                  color: custStyle.backgroundColor,
-                  backgroundColor: custStyle.primaryColor,
-                }}
-                title={
-                  <div className="flex flex-row items-center justify-center gap-[10px] text-xs">
-                    <span>Миний асуулга</span>
-                    <ArrowRightIcon />
-                  </div>
-                }
-                onClick={() => {
-                  setAnswers([]);
-                  setQuestionNo(0);
-                  setHistory([]);
-                  router.push("/mypolls");
-                }}
-                className="text-[13px] font-semibold h-9 w-[220px] rounded-[99px] hover:cursor-pointer"
-              />
-            </div>
+            <PollEndScreen
+              custStyle={custStyle}
+              onMyPolls={() => {
+                setAnswers([]);
+                setQuestionNo(0);
+                setHistory([]);
+                router.push("/mypolls");
+              }}
+            />
           )}
         </div>
         <div
