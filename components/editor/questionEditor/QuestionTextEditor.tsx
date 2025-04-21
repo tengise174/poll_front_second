@@ -6,6 +6,7 @@ import QuestionSettings from "./QuestionSettings";
 import RatingOptionsEditor from "./RatingOptionsEditor";
 import GridOptionsEditor from "./GridOptionsEditor";
 import TickBoxGridOptionsEditor from "./TickBoxGridOptionsEditor";
+import LinearScaleOptionsEditor from "./LinearScaleOptionsEditor";
 import AnswerOptionsEditor from "./AnswerOptionsEditor";
 import DeleteQuestionButton from "./DeleteQuestionButton";
 import { QuestionTextEditorProps } from "@/utils/componentTypes";
@@ -60,6 +61,15 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
         )}
         {currentQuestion?.questionType === "TICK_BOX_GRID" && (
           <TickBoxGridOptionsEditor
+            currentQuestion={currentQuestion}
+            setCurrentQuestion={setCurrentQuestion}
+            newQuestions={newQuestions}
+            setNewQuestions={setNewQuestions}
+            currentPage={currentPage}
+          />
+        )}
+        {currentQuestion?.questionType === "LINEAR_SCALE" && (
+          <LinearScaleOptionsEditor
             currentQuestion={currentQuestion}
             setCurrentQuestion={setCurrentQuestion}
             newQuestions={newQuestions}

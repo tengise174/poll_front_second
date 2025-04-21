@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  Checkbox,
-  Radio,
-  Rate,
-  Card,
-  Image,
-  Select,
-  Table,
-  Tag,
-} from "antd";
+import { Checkbox, Radio, Rate, Card, Image, Select, Table, Tag } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import RateStarIcon from "@/public/icons/rate_star";
 import { questionTypeTranslations } from "@/utils/utils";
@@ -40,6 +31,10 @@ interface Question {
   hasCorrectAnswer?: boolean;
   gridRows?: string[];
   gridColumns?: string[];
+  minValue?: number;
+  maxValue?: number;
+  minLabel?: string;
+  maxLabel?: string;
 }
 
 interface PollQuestionProps {
@@ -150,11 +145,17 @@ export default function PollQuestion({
                         if (newOption) {
                           const updatedOptions =
                             answers
-                              .find((answer) => answer.questionId === question.id)
+                              .find(
+                                (answer) => answer.questionId === question.id
+                              )
                               ?.option.filter(
                                 (opt) => opt.rowIndex !== rowIndex
                               ) || [];
-                          handleChange(question.id, [...updatedOptions, newOption], "");
+                          handleChange(
+                            question.id,
+                            [...updatedOptions, newOption],
+                            ""
+                          );
                         }
                       }}
                       style={{ color: custStyle.primaryColor }}
@@ -212,9 +213,9 @@ export default function PollQuestion({
                         );
                         if (newOption) {
                           let updatedOptions =
-                            answers
-                              .find((answer) => answer.questionId === question.id)
-                              ?.option || [];
+                            answers.find(
+                              (answer) => answer.questionId === question.id
+                            )?.option || [];
                           if (e.target.checked) {
                             updatedOptions = [...updatedOptions, newOption];
                           } else {
@@ -239,10 +240,55 @@ export default function PollQuestion({
         </div>
       )}
 
+      {question.questionType === "LINEAR_SCALE" && (
+        <div className="flex flex-col gap-3 w-full">
+          <div
+            className="flex flex-row justify-between text-xs mb-2"
+            style={{ color: custStyle.primaryColor }}
+          >
+            <span>{question.minLabel}</span>
+            <div className="flex flex-row gap-6 items-end">
+              <Radio.Group
+                onChange={(e) =>
+                  handleChange(question.id, [e.target.value], "")
+                }
+                value={
+                  answers.find((answer) => answer.questionId === question.id)
+                    ?.option?.[0] || undefined
+                }
+              >
+                <div className="flex flex-row gap-4">
+                  {question.options.map((item: Option, idx: number) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col items-center justify-center"
+                    >
+                      <Radio
+                        value={item}
+                        className="custom-radio"
+                        style={{ color: custStyle.primaryColor }}
+                      />
+                      <span
+                        className="text-[13px] font-medium mt-1 text-center font-open"
+                        style={{ color: custStyle.primaryColor }}
+                      >
+                        {item.content}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Radio.Group>
+            </div>
+            <span>{question.maxLabel}</span>
+          </div>
+        </div>
+      )}
+
       {question.questionType === "MULTI_CHOICE" && (
         <Checkbox.Group
           value={
-            answers.find((answer) => answer.questionId === question.id)?.option || []
+            answers.find((answer) => answer.questionId === question.id)
+              ?.option || []
           }
           onChange={(checkedValues) =>
             handleChange(question.id, checkedValues, "")
@@ -282,8 +328,8 @@ export default function PollQuestion({
         <Radio.Group
           onChange={(e) => handleChange(question.id, [e.target.value], "")}
           value={
-            answers.find((answer) => answer.questionId === question.id)?.option?.[0] ||
-            undefined
+            answers.find((answer) => answer.questionId === question.id)
+              ?.option?.[0] || undefined
           }
           className="flex flex-col w-full max-h-full overflow-y-auto"
         >
@@ -320,16 +366,24 @@ export default function PollQuestion({
         <Select
           style={{ width: "100%", color: custStyle.primaryColor }}
           value={
-            answers.find((answer) => answer.questionId === question.id)?.option?.[0]
-              ?.id || undefined
+            answers.find((answer) => answer.questionId === question.id)
+              ?.option?.[0]?.id || undefined
           }
           onChange={(value) => {
-            const selectedOption = question.options.find((opt) => opt.id === value);
-            handleChange(question.id, selectedOption ? [selectedOption] : [], "");
+            const selectedOption = question.options.find(
+              (opt) => opt.id === value
+            );
+            handleChange(
+              question.id,
+              selectedOption ? [selectedOption] : [],
+              ""
+            );
             if (selectedOption?.nextQuestionOrder !== null) {
               const nextIndex =
                 question.options.find(
-                  (q) => selectedOption && q.order === selectedOption.nextQuestionOrder
+                  (q) =>
+                    selectedOption &&
+                    q.order === selectedOption.nextQuestionOrder
                 )?.order || 0;
               handleDropdownChange(nextIndex);
             }
@@ -365,8 +419,8 @@ export default function PollQuestion({
           <Rate
             count={question.rateNumber}
             value={Number(
-              answers.find((answer) => answer.questionId === question.id)?.option?.[0]
-                ?.content || 0
+              answers.find((answer) => answer.questionId === question.id)
+                ?.option?.[0]?.content || 0
             )}
             onChange={(value) => {
               const selectedOption = question.options.find(
@@ -382,8 +436,9 @@ export default function PollQuestion({
                     color:
                       index <
                       Number(
-                        answers.find((answer) => answer.questionId === question.id)
-                          ?.option?.[0]?.content || 0
+                        answers.find(
+                          (answer) => answer.questionId === question.id
+                        )?.option?.[0]?.content || 0
                       )
                         ? custStyle.primaryColor
                         : "#E0E8F1",
@@ -396,8 +451,9 @@ export default function PollQuestion({
                   fill={
                     index <
                     Number(
-                      answers.find((answer) => answer.questionId === question.id)
-                        ?.option?.[0]?.content || 0
+                      answers.find(
+                        (answer) => answer.questionId === question.id
+                      )?.option?.[0]?.content || 0
                     )
                       ? custStyle.primaryColor
                       : "#E0E8F1"
@@ -415,8 +471,8 @@ export default function PollQuestion({
           buttonStyle="solid"
           onChange={(e) => handleChange(question.id, [e.target.value], "")}
           value={
-            answers.find((answer) => answer.questionId === question.id)?.option?.[0] ||
-            undefined
+            answers.find((answer) => answer.questionId === question.id)
+              ?.option?.[0] || undefined
           }
           className="flex flex-col w-full max-h-full overflow-y-auto"
         >
@@ -453,8 +509,8 @@ export default function PollQuestion({
         <TextArea
           onChange={(e) => handleChange(question.id, [], e.target.value)}
           value={
-            answers.find((answer) => answer.questionId === question.id)?.textAnswer ||
-            ""
+            answers.find((answer) => answer.questionId === question.id)
+              ?.textAnswer || ""
           }
           style={{
             backgroundColor: custStyle.backgroundColor,

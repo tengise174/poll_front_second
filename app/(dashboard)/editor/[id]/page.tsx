@@ -38,6 +38,7 @@ export default function SurveyDetailPage() {
     | "DROPDOWN"
     | "MULTIPLE_CHOICE_GRID"
     | "TICK_BOX_GRID"
+    | "LINEAR_SCALE"
     | null
   >(null);
 
@@ -110,6 +111,10 @@ export default function SurveyDetailPage() {
     hasCorrectAnswer: false,
     gridRows: [],
     gridColumns: [],
+    minValue: 1,
+    maxValue: 5,
+    minLabel: "",
+    maxLabel: "",
   });
 
   const [newQuestions, setNewQuestions] = useState<QuestionProps[]>([
@@ -127,6 +132,10 @@ export default function SurveyDetailPage() {
       hasCorrectAnswer: false,
       gridRows: [],
       gridColumns: [],
+      minValue: 1,
+      maxValue: 5,
+      minLabel: "",
+      maxLabel: "",
     },
   ]);
 
@@ -183,6 +192,10 @@ export default function SurveyDetailPage() {
           hasCorrectAnswer: question.hasCorrectAnswer || false,
           gridRows: question.gridRows || [],
           gridColumns: question.gridColumns || [],
+          minValue: question.minValue || 1,
+          maxValue: question.maxValue || 5,
+          minLabel: question.minLabel || "",
+          maxLabel: question.maxLabel || "",
           options:
             question.options
               ?.map((option: any) => ({
@@ -220,6 +233,10 @@ export default function SurveyDetailPage() {
       ...q,
       gridRows: q.gridRows || [],
       gridColumns: q.gridColumns || [],
+      minValue: q.minValue || 1,
+      maxValue: q.maxValue || 5,
+      minLabel: q.minLabel || "",
+      maxLabel: q.maxLabel || "",
       options: (q.options ?? []).map((opt) => ({
         ...opt,
         rowIndex: opt.rowIndex || 0,
@@ -258,12 +275,12 @@ export default function SurveyDetailPage() {
           "DROPDOWN",
           "MULTIPLE_CHOICE_GRID",
           "TICK_BOX_GRID",
+          "LINEAR_SCALE",
         ].includes(question.questionType ?? "") &&
         question.hasCorrectAnswer &&
         question.options
       ) {
         if (question.questionType === "MULTIPLE_CHOICE_GRID") {
-          // Validate one correct answer per row
           const rowCount = question.gridRows?.length || 0;
           const correctPerRow = Array(rowCount).fill(false);
           question.options.forEach((opt) => {
@@ -281,7 +298,6 @@ export default function SurveyDetailPage() {
             return;
           }
         } else if (question.questionType === "TICK_BOX_GRID") {
-          // Validate at least one correct answer per row
           const rowCount = question.gridRows?.length || 0;
           const correctPerRow = Array(rowCount).fill(false);
           question.options.forEach((opt) => {
@@ -298,15 +314,31 @@ export default function SurveyDetailPage() {
             );
             return;
           }
-        } else {
-          const correctCount = question.options.filter(
-            (opt) => opt.isCorrect
-          ).length;
+        } else if (question.questionType === "LINEAR_SCALE") {
+          const correctCount = question.options.filter((opt) => opt.isCorrect).length;
           if (correctCount === 0) {
             showAlert(
-              `Question ${
-                question.order + 1
-              }: At least one correct answer must be set`,
+              `Question ${question.order + 1}: At least one correct answer must be set`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
+          if (correctCount > 1) {
+            showAlert(
+              `Question ${question.order + 1}: Only one correct answer is allowed for LINEAR_SCALE`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
+        } else {
+          const correctCount = question.options.filter((opt) => opt.isCorrect).length;
+          if (correctCount === 0) {
+            showAlert(
+              `Question ${question.order + 1}: At least one correct answer must be set`,
               "warning",
               "",
               true
@@ -314,15 +346,11 @@ export default function SurveyDetailPage() {
             return;
           }
           if (
-            ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
-              question.questionType ?? ""
-            ) &&
+            ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(question.questionType ?? "") &&
             correctCount > 1
           ) {
             showAlert(
-              `Question ${
-                question.order + 1
-              }: Only one correct answer is allowed for ${question.questionType}`,
+              `Question ${question.order + 1}: Only one correct answer is allowed for ${question.questionType}`,
               "warning",
               "",
               true
@@ -333,9 +361,7 @@ export default function SurveyDetailPage() {
       }
       if (question.hasCorrectAnswer && question.isPointBased) {
         showAlert(
-          `Question ${
-            question.order + 1
-          }: A question cannot have both correct answers and points`,
+          `Question ${question.order + 1}: A question cannot have both correct answers and points`,
           "warning",
           "",
           true
@@ -350,23 +376,17 @@ export default function SurveyDetailPage() {
           "DROPDOWN",
           "MULTIPLE_CHOICE_GRID",
           "TICK_BOX_GRID",
+          "LINEAR_SCALE",
         ].includes(question.questionType ?? "") &&
         question.options
       ) {
         for (const [optIndex, option] of question.options.entries()) {
-          if (
-            option.nextQuestionOrder !== null &&
-            option.nextQuestionOrder !== undefined
-          ) {
+          if (option.nextQuestionOrder !== null && option.nextQuestionOrder !== undefined) {
             const nextOrder = option.nextQuestionOrder;
-            const isValidOrder = newQuestions.some(
-              (q) => q.order === nextOrder
-            );
+            const isValidOrder = newQuestions.some((q) => q.order === nextOrder);
             if (!isValidOrder) {
               showAlert(
-                `Question ${question.order + 1}, Option ${
-                  optIndex + 1
-                }: Invalid next question order`,
+                `Question ${question.order + 1}, Option ${optIndex + 1}: Invalid next question order`,
                 "warning",
                 "",
                 true
@@ -375,9 +395,7 @@ export default function SurveyDetailPage() {
             }
             if (nextOrder <= question.order) {
               showAlert(
-                `Question ${question.order + 1}, Option ${
-                  optIndex + 1
-                }: Next question order must be greater than current question order`,
+                `Question ${question.order + 1}, Option ${optIndex + 1}: Next question order must be greater than current question order`,
                 "warning",
                 "",
                 true
@@ -387,11 +405,7 @@ export default function SurveyDetailPage() {
           }
         }
       }
-      if (
-        ["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
-          question.questionType ?? ""
-        )
-      ) {
+      if (["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(question.questionType ?? "")) {
         if (!question.gridRows?.length || !question.gridColumns?.length) {
           showAlert(
             `Question ${question.order + 1}: Grid must have at least one row and one column`,
@@ -401,11 +415,38 @@ export default function SurveyDetailPage() {
           );
           return;
         }
-        const expectedOptions =
-          (question.gridRows.length * question.gridColumns.length);
+        const expectedOptions = (question.gridRows.length * question.gridColumns.length);
         if ((question.options ?? []).length !== expectedOptions) {
           showAlert(
             `Question ${question.order + 1}: Grid must have options for all cells`,
+            "warning",
+            "",
+            true
+          );
+          return;
+        }
+      }
+      if (question.questionType === "LINEAR_SCALE") {
+        if (
+          question.minValue === undefined ||
+          question.maxValue === undefined ||
+          question.minValue < 0 ||
+          question.minValue > 1 ||
+          question.maxValue > 10 ||
+          question.maxValue <= question.minValue
+        ) {
+          showAlert(
+            `Question ${question.order + 1}: Invalid linear scale range (min: 0 or 1, max: ≤10, max > min)`,
+            "warning",
+            "",
+            true
+          );
+          return;
+        }
+        const expectedOptions = question.maxValue - question.minValue + 1;
+        if ((question.options ?? []).length !== expectedOptions) {
+          showAlert(
+            `Question ${question.order + 1}: Linear scale must have options for all values in range`,
             "warning",
             "",
             true
@@ -460,6 +501,7 @@ export default function SurveyDetailPage() {
       | "DROPDOWN"
       | "MULTIPLE_CHOICE_GRID"
       | "TICK_BOX_GRID"
+      | "LINEAR_SCALE"
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
@@ -484,6 +526,10 @@ export default function SurveyDetailPage() {
       options: [],
       gridRows: [],
       gridColumns: [],
+      minValue: 1,
+      maxValue: 5,
+      minLabel: "",
+      maxLabel: "",
       ...(questionType === "RATING" && {
         rateNumber: 5,
         rateType: "STAR",
@@ -613,6 +659,22 @@ export default function SurveyDetailPage() {
             columnIndex: 1,
           },
         ],
+      }),
+      ...(questionType === "LINEAR_SCALE" && {
+        minValue: 1,
+        maxValue: 5,
+        minLabel: "Low",
+        maxLabel: "High",
+        options: Array.from({ length: 5 }, (_, i) => ({
+          content: (i + 1).toString(),
+          order: i + 1,
+          poster: null,
+          points: 0,
+          isCorrect: false,
+          nextQuestionOrder: null,
+          rowIndex: null,
+          columnIndex: null,
+        })),
       }),
       ...(shouldAddAnswers &&
         !["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(questionType) && {

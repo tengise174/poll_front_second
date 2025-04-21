@@ -40,6 +40,7 @@ export const questionTypeTranslations: Record<string, string> = {
   DROPDOWN: "Dropdown",
   MULTIPLE_CHOICE_GRID: "Хүснэгтийн олон сонголттой",
   TICK_BOX_GRID: "Тэмдэглээний Хүснэгт",
+  LINEAR_SCALE: "Шугаман масштаб",
 };
 
 export const questionTypes: QuestionTypeProps[] = [
@@ -82,6 +83,11 @@ export const questionTypes: QuestionTypeProps[] = [
     icon: null,
     title: questionTypeTranslations["TICK_BOX_GRID"],
     questionType: "TICK_BOX_GRID",
+  },
+  {
+    icon: null,
+    title: questionTypeTranslations["LINEAR_SCALE"],
+    questionType: "LINEAR_SCALE",
   },
 ];
 

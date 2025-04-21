@@ -276,6 +276,40 @@ const QuestionDisplay = ({
                           rateNumber={question.rateNumber ?? 5}
                         />
                       )}
+                      {question.questionType === "LINEAR_SCALE" && (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex justify-between">
+                            <span className="text-[14px]">
+                              {question.minLabel || "Low"}
+                            </span>
+                            <Radio.Group
+                              disabled
+                              className="flex justify-between"
+                            >
+                              {question.options?.map((item) => (
+                                <Radio
+                                  key={item.order}
+                                  value={item.content}
+                                  className="flex flex-col gap-2"
+                                >
+                                  {item.content}
+                                  {item.isCorrect && (
+                                    <CheckCircleOutlined
+                                      style={{
+                                        color: "#52c41a",
+                                        marginLeft: 12,
+                                      }}
+                                    />
+                                  )}
+                                </Radio>
+                              ))}
+                            </Radio.Group>
+                            <span className="text-[14px]">
+                              {question.maxLabel || "High"}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                       {["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
                         question.questionType ?? ""
                       ) && (
@@ -476,6 +510,30 @@ const QuestionDisplay = ({
                       rateType={currentQuestion.rateType ?? "NUMBER"}
                       rateNumber={currentQuestion.rateNumber ?? 5}
                     />
+                  )}
+                  {currentQuestion?.questionType === "LINEAR_SCALE" && (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between">
+                        <span className="text-[14px]">
+                          {currentQuestion.minLabel || "Low"}
+                        </span>
+                        <span className="text-[14px]">
+                          {currentQuestion.maxLabel || "High"}
+                        </span>
+                      </div>
+                      <Radio.Group disabled className="flex justify-between">
+                        {currentQuestion.options?.map((item) => (
+                          <Radio key={item.order} value={item.content}>
+                            {item.content}
+                            {item.isCorrect && (
+                              <CheckCircleOutlined
+                                style={{ color: "#52c41a", marginLeft: 8 }}
+                              />
+                            )}
+                          </Radio>
+                        ))}
+                      </Radio.Group>
+                    </div>
                   )}
                   {["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
                     currentQuestion?.questionType ?? ""

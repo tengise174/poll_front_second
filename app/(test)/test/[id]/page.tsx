@@ -42,6 +42,10 @@ interface Question {
   hasCorrectAnswer?: boolean;
   gridRows?: string[];
   gridColumns?: string[];
+  minValue?: number;
+  maxValue?: number;
+  minLabel?: string;
+  maxLabel?: string;
 }
 
 export default function TestPage() {
@@ -202,7 +206,7 @@ export default function TestPage() {
       return answer.option.length >= minAnswerCount;
     }
 
-    if (type === "SINGLE_CHOICE" || type === "RATING" || type === "YES_NO" || type === "DROPDOWN") {
+    if (type === "SINGLE_CHOICE" || type === "RATING" || type === "YES_NO" || type === "DROPDOWN" || type === "LINEAR_SCALE") {
       return answer !== undefined && answer.option?.length > 0;
     }
 

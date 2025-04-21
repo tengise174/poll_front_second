@@ -1,36 +1,15 @@
 import React from "react";
 import CustomButton from "../../CustomButton";
-import { QuestionProps } from "@/utils/componentTypes";
+import { DeleteQuestionButtonProps } from "@/utils/componentTypes";
 
-interface DeleteQuestionButtonProps {
-  newQuestions: QuestionProps[];
-  setNewQuestions: React.Dispatch<React.SetStateAction<QuestionProps[]>>;
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  setCurrentQuestion: React.Dispatch<React.SetStateAction<QuestionProps>>;
-  setChosenType: React.Dispatch<
-    React.SetStateAction<
-      | "MULTI_CHOICE"
-      | "SINGLE_CHOICE"
-      | "RATING"
-      | "YES_NO"
-      | "TEXT"
-      | "DROPDOWN"
-      | "MULTIPLE_CHOICE_GRID"
-      | "TICK_BOX_GRID"
-      | null
-    >
-  >;
-}
-
-const DeleteQuestionButton: React.FC<DeleteQuestionButtonProps> = ({
+const DeleteQuestionButton = ({
   newQuestions,
   setNewQuestions,
   currentPage,
   setCurrentPage,
   setCurrentQuestion,
   setChosenType,
-}) => {
+}: DeleteQuestionButtonProps) => {
   const handleDeleteQuestion = () => {
     if (newQuestions.length <= 1) {
       setNewQuestions([

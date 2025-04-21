@@ -73,7 +73,7 @@ const QuestionSettings = ({
           <p className="text-[13px] text-[#1E1E1E]">Оноотой асуулт</p>
         </div>
       )}
-      {["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN", "MULTIPLE_CHOICE_GRID"].includes(
+      {["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN", "MULTIPLE_CHOICE_GRID", "LINEAR_SCALE"].includes(
         currentQuestion?.questionType ?? ""
       ) && (
         <div className="flex items-center gap-2">

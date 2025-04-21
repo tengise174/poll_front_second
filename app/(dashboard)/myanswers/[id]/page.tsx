@@ -11,6 +11,7 @@ import {
   Rate,
   Image,
   Table,
+  Radio,
 } from "antd";
 import { getAnsweredPollDetail } from "@/api/action";
 import { dualColors } from "@/utils/utils";
@@ -22,6 +23,7 @@ const { Text } = Typography;
 interface OptionsProps {
   id: string;
   content: string;
+  order: number;
   poster?: string | null;
   points?: number;
   isCorrect?: boolean;
@@ -40,7 +42,8 @@ interface QuestionProps {
     | "SINGLE_CHOICE"
     | "DROPDOWN"
     | "MULTIPLE_CHOICE_GRID"
-    | "TICK_BOX_GRID";
+    | "TICK_BOX_GRID"
+    | "LINEAR_SCALE";
   rateNumber?: number | null;
   rateType?: "STAR" | "NUMBER" | null;
   allOptions?: OptionsProps[];
@@ -51,6 +54,10 @@ interface QuestionProps {
   hasCorrectAnswer?: boolean;
   gridColumns?: string[];
   gridRows?: string[];
+  minValue?: number;
+  maxValue?: number;
+  minLabel?: string;
+  maxLabel?: string;
 }
 
 interface PollProps {
@@ -221,6 +228,73 @@ const MyAnswersDetail = () => {
     );
   };
 
+  const renderLinearScaleQuestion = (question: QuestionProps) => {
+    const { allOptions, selectedOptions } = question;
+    if (!allOptions) return null;
+
+    return (
+      <div className="flex flex-col w-full">
+        <div className="flex flex-row justify-between mb-4 w-full">
+          <Text>{question.minLabel}</Text>
+          <Radio.Group
+            value={selectedOptions?.[0]?.id}
+            disabled
+            className="flex justify-between"
+          >
+            <div className="flex flex-row">
+              {allOptions
+                .sort((a, b) => a.order - b.order)
+                .map((option) => (
+                  <div key={option.id} className="flex flex-col items-center">
+                    <Radio value={option.id} />
+                    <Text className="mt-1">{option.content}</Text>
+                  </div>
+                ))}
+            </div>
+          </Radio.Group>
+          <Text>{question.maxLabel}</Text>
+        </div>
+        {question.hasCorrectAnswer && (
+          <div className="mt-4">
+            <Text strong>
+              Зөв хариулт: {getCorrectAnswers(question.allOptions)}
+            </Text>
+            <br />
+            <Text
+              type={
+                isUserAnswerCorrect(
+                  question.selectedOptions,
+                  question.allOptions
+                )
+                  ? "success"
+                  : "danger"
+              }
+            >
+              Таны хариулт:{" "}
+              {isUserAnswerCorrect(
+                question.selectedOptions,
+                question.allOptions
+              )
+                ? "Зөв"
+                : "Буруу"}
+            </Text>
+          </div>
+        )}
+        {question.isPointBased && (
+          <div className="mt-2">
+            <Text strong>
+              Нийт оноо:{" "}
+              {calculateTotalPoints(
+                question.selectedOptions,
+                question.allOptions
+              )}
+            </Text>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="w-200 flex flex-col items-center justify-center mx-auto">
       <div className="w-full font-bold">
@@ -248,7 +322,9 @@ const MyAnswersDetail = () => {
                   {index + 1}. {question.content}
                 </h2>
                 <Text type="secondary">
-                  Асуулгын төрөл: {questionTypeTranslations[question.questionType] || question.questionType}
+                  Асуулгын төрөл:{" "}
+                  {questionTypeTranslations[question.questionType] ||
+                    question.questionType}
                 </Text>
               </div>
             }
@@ -326,6 +402,8 @@ const MyAnswersDetail = () => {
                   </div>
                 )}
               </div>
+            ) : question.questionType === "LINEAR_SCALE" ? (
+              renderLinearScaleQuestion(question)
             ) : (
               <div className="flex flex-col">
                 {question.allOptions?.map((option) => {

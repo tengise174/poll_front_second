@@ -88,7 +88,7 @@ export interface SurveyProps {
 export interface QuestionTypeProps {
   icon: any;
   title: string;
-  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | "TICK_BOX_GRID";
+  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | "TICK_BOX_GRID" | "LINEAR_SCALE";
 }
 interface SettingsPageProps {
   isAccessLevel: boolean;
@@ -156,6 +156,7 @@ export interface QuestionProps {
     | "DROPDOWN"
     | "MULTIPLE_CHOICE_GRID"
     | "TICK_BOX_GRID"
+    | "LINEAR_SCALE"
     | null;
   minAnswerCount?: number;
   order: number;
@@ -168,6 +169,10 @@ export interface QuestionProps {
   hasCorrectAnswer: boolean;
   gridRows: string[];
   gridColumns: string[];
+  minValue?: number;
+  maxValue?: number;
+  minLabel?: string;
+  maxLabel?: string;
 }
 
 type ChosenTypeProps =
@@ -179,6 +184,7 @@ type ChosenTypeProps =
   | "DROPDOWN"
   | "MULTIPLE_CHOICE_GRID"
   | "TICK_BOX_GRID"
+  | "LINEAR_SCALE"
   | null;
 
 export interface QuestionTextEditorProps {
@@ -236,4 +242,26 @@ interface QuestionSettingsProps {
   newQuestions: QuestionProps[];
   setNewQuestions: React.Dispatch<React.SetStateAction<QuestionProps[]>>;
   currentPage: number;
+}
+
+export interface DeleteQuestionButtonProps {
+  newQuestions: QuestionProps[];
+  setNewQuestions: React.Dispatch<React.SetStateAction<QuestionProps[]>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentQuestion: React.Dispatch<React.SetStateAction<QuestionProps>>;
+  setChosenType: React.Dispatch<
+    React.SetStateAction<
+      | "MULTI_CHOICE"
+      | "SINGLE_CHOICE"
+      | "RATING"
+      | "YES_NO"
+      | "TEXT"
+      | "DROPDOWN"
+      | "MULTIPLE_CHOICE_GRID"
+      | "TICK_BOX_GRID"
+      | "LINEAR_SCALE"
+      | null
+    >
+  >;
 }
