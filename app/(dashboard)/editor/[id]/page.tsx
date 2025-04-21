@@ -8,7 +8,7 @@ import { Button, Modal, QRCode } from "antd";
 import { createPoll, getPollById, updatePoll } from "@/api/action";
 import { CopyOutlined } from "@ant-design/icons";
 import StartShapeEditor from "@/components/editor/StartShapeEditor";
-import QuestionTextEditor from "@/components/editor/QuestionTextEditor";
+import QuestionTextEditor from "@/components/editor/testEditor/QuestionTextEditor";
 import StartDisplay from "@/components/editor/StartDisplay";
 import QuestionDisplay from "@/components/editor/QuestionDisplay";
 import EndEditor from "@/components/editor/EndEditor";
@@ -88,7 +88,21 @@ export default function SurveyDetailPage() {
     thankYouMessage: "",
   });
 
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionProps>();
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionProps>({
+    content: "",
+    questionType: null,
+    order: 0,
+    minAnswerCount: 1,
+    rateNumber: 4,
+    rateType: "STAR",
+    options: [],
+    required: false,
+    poster: null,
+    isPointBased: false,
+    hasCorrectAnswer: false,
+    gridRows: [],
+    gridColumns: [],
+  });
 
   const [newQuestions, setNewQuestions] = useState<QuestionProps[]>([
     {

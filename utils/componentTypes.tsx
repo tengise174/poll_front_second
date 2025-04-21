@@ -186,8 +186,8 @@ export interface QuestionTextEditorProps {
   newQuestions: QuestionProps[];
   setNewQuestions: Dispatch<SetStateAction<Array<QuestionProps>>>;
   currentPage: number;
-  currentQuestion: QuestionProps | undefined;
-  setCurrentQuestion: Dispatch<SetStateAction<QuestionProps | undefined>>;
+  currentQuestion: QuestionProps;
+  setCurrentQuestion: Dispatch<SetStateAction<QuestionProps>>;
 }
 
 export interface StartDisplayProps {
@@ -203,8 +203,8 @@ export interface QuestionDisplayProps {
   themeId: number;
   currentPage: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
-  currentQuestion: QuestionProps | undefined;
-  setCurrentQuestion: Dispatch<SetStateAction<QuestionProps | undefined>>;
+  currentQuestion: QuestionProps;
+  setCurrentQuestion: Dispatch<SetStateAction<QuestionProps>>;
   newQuestions: QuestionProps[];
   setNewQuestions: Dispatch<SetStateAction<Array<QuestionProps>>>;
 }
@@ -225,4 +225,13 @@ export interface StartEditorProps {
   endPage: endPageProps;
   setEndPage: Dispatch<SetStateAction<endPageProps>>;
   handleCreatPoll: Function;
+}
+
+
+interface QuestionSettingsProps {
+  currentQuestion: QuestionProps | undefined;
+  setCurrentQuestion: React.Dispatch<React.SetStateAction<QuestionProps | undefined>>;
+  newQuestions: QuestionProps[];
+  setNewQuestions: React.Dispatch<React.SetStateAction<QuestionProps[]>>;
+  currentPage: number;
 }
