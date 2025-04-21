@@ -3,7 +3,8 @@ import { Image, Table, Tag } from "antd";
 import { ResponsiveContainer } from "recharts";
 import ChartSelector from "./ChartSelector";
 import GridTable from "./GridTable";
-import { PollQuestion, ChartType, questionTypeTranslations, PollOption } from "./types";
+import { PollQuestion, ChartType,  PollOption } from "./types";
+import { questionTypeTranslations } from "@/utils/utils";
 import { renderChart } from "./utils";
 
 interface QuestionCardProps {
@@ -82,7 +83,7 @@ const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardPr
     );
   }
 
-  if (question.questionType === "MULTIPLE_CHOICE_GRID") {
+  if (question.questionType === "MULTIPLE_CHOICE_GRID" || question.questionType === "TICK_BOX_GRID") {
     return (
       <div className="p-6 bg-second-gray rounded-lg shadow-md">
         <div className="text-xl font-semibold text-gray-700 mb-4">
@@ -95,6 +96,11 @@ const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardPr
           {question.hasCorrectAnswer && (
             <Tag color="green" className="ml-2">
               Зөв хариулттай
+            </Tag>
+          )}
+          {question.questionType === "TICK_BOX_GRID" && (
+            <Tag color="purple" className="ml-2">
+              Олон сонголттой
             </Tag>
           )}
         </div>

@@ -31,41 +31,57 @@ export const manualStatusTag = ({ status }: { status: string }) => {
   }
 };
 
+export const questionTypeTranslations: Record<string, string> = {
+  MULTI_CHOICE: "Олон сонголттой",
+  RATING: "Үнэлгээ",
+  YES_NO: "Тийм/Үгүй",
+  TEXT: "Текст",
+  SINGLE_CHOICE: "Ганц сонголттой",
+  DROPDOWN: "Dropdown",
+  MULTIPLE_CHOICE_GRID: "Хүснэгтийн олон сонголттой",
+  TICK_BOX_GRID: "Тэмдэглээний Хүснэгт",
+};
+
 export const questionTypes: QuestionTypeProps[] = [
   {
-    icon: <div>📝</div>, 
-    title: "Олон сонголттой",
+    icon: <div>📝</div>,
+    title: questionTypeTranslations["MULTI_CHOICE"],
     questionType: "MULTI_CHOICE",
   },
   {
-    icon: <div>🔘</div>, 
-    title: "Нэг сонголттой",
+    icon: <div>🔘</div>,
+    title: questionTypeTranslations["SINGLE_CHOICE"],
     questionType: "SINGLE_CHOICE",
   },
   {
-    icon: <div>⭐</div>, 
-    title: "Үнэлгээ",
+    icon: <div>⭐</div>,
+    title: questionTypeTranslations["RATING"],
     questionType: "RATING",
   },
   {
-    icon: <div>✅</div>, 
-    title: "Тийм/Үгүй",
+    icon: <div>✅</div>,
+    title: questionTypeTranslations["YES_NO"],
     questionType: "YES_NO",
   },
   {
-    icon: <div>📜</div>, 
-    title: "Текст",
+    icon: <div>📜</div>,
+    title: questionTypeTranslations["TEXT"],
     questionType: "TEXT",
   },
   {
-    icon: <div>📜</div>, 
-    title: "Dropdown",
+    icon: <div>📜</div>,
+    title: questionTypeTranslations["DROPDOWN"],
     questionType: "DROPDOWN",
   },
   {
+    icon: null,
+    title: questionTypeTranslations["MULTIPLE_CHOICE_GRID"],
     questionType: "MULTIPLE_CHOICE_GRID",
-    title: "Олон сонголттой тор",
-    icon: null, // Replace with appropriate icon
+  },
+  {
+    icon: null,
+    title: questionTypeTranslations["TICK_BOX_GRID"],
+    questionType: "TICK_BOX_GRID",
   },
 ];
 

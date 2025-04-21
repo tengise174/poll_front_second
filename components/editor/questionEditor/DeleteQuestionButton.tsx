@@ -17,6 +17,7 @@ interface DeleteQuestionButtonProps {
       | "TEXT"
       | "DROPDOWN"
       | "MULTIPLE_CHOICE_GRID"
+      | "TICK_BOX_GRID"
       | null
     >
   >;

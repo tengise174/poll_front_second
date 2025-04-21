@@ -7,9 +7,11 @@ import {
   Image,
   Select,
   Table,
+  Tag,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import RateStarIcon from "@/public/icons/rate_star";
+import { questionTypeTranslations } from "@/utils/utils";
 
 interface Option {
   id: string;
@@ -65,12 +67,15 @@ export default function PollQuestion({
     <Card
       key={question.id}
       title={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col justify-start items-start gap-2 p-2">
           <span>
             {index !== undefined
               ? `${index + 1}. ${question.content}`
               : question.content}
           </span>
+          <Tag color="green">
+            {questionTypeTranslations[question.questionType]}
+          </Tag>
           {question.required && <span className="text-red-500">*</span>}
         </div>
       }
@@ -132,9 +137,7 @@ export default function PollQuestion({
                   );
                   const selectedOption = answers
                     .find((answer) => answer.questionId === question.id)
-                    ?.option.find(
-                      (opt) => opt.rowIndex === rowIndex
-                    );
+                    ?.option.find((opt) => opt.rowIndex === rowIndex);
                   return (
                     <Radio
                       checked={selectedOption?.id === option?.id}
@@ -145,12 +148,81 @@ export default function PollQuestion({
                             opt.columnIndex === colIndex
                         );
                         if (newOption) {
-                          const updatedOptions = answers
-                            .find((answer) => answer.questionId === question.id)
-                            ?.option.filter(
-                              (opt) => opt.rowIndex !== rowIndex
-                            ) || [];
+                          const updatedOptions =
+                            answers
+                              .find((answer) => answer.questionId === question.id)
+                              ?.option.filter(
+                                (opt) => opt.rowIndex !== rowIndex
+                              ) || [];
                           handleChange(question.id, [...updatedOptions, newOption], "");
+                        }
+                      }}
+                      style={{ color: custStyle.primaryColor }}
+                    />
+                  );
+                },
+              })) || []),
+            ]}
+            pagination={false}
+            bordered
+            size="small"
+            style={{ color: custStyle.primaryColor }}
+          />
+        </div>
+      )}
+
+      {question.questionType === "TICK_BOX_GRID" && (
+        <div className="w-full">
+          <Table
+            dataSource={question.gridRows?.map((row, rowIndex) => ({
+              key: rowIndex,
+              row,
+            }))}
+            columns={[
+              {
+                title: "",
+                dataIndex: "row",
+                key: "row",
+                render: (text) => (
+                  <span style={{ color: custStyle.primaryColor }}>{text}</span>
+                ),
+              },
+              ...(question.gridColumns?.map((column, colIndex) => ({
+                title: column,
+                dataIndex: `col${colIndex}`,
+                key: `col${colIndex}`,
+                render: (_: any, record: { key: number; row: string }) => {
+                  const rowIndex = question.gridRows?.indexOf(record.row) || 0;
+                  const option = question.options.find(
+                    (opt) =>
+                      opt.rowIndex === rowIndex && opt.columnIndex === colIndex
+                  );
+                  const isChecked =
+                    answers
+                      .find((answer) => answer.questionId === question.id)
+                      ?.option.some((opt) => opt.id === option?.id) || false;
+                  return (
+                    <Checkbox
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const newOption = question.options.find(
+                          (opt) =>
+                            opt.rowIndex === rowIndex &&
+                            opt.columnIndex === colIndex
+                        );
+                        if (newOption) {
+                          let updatedOptions =
+                            answers
+                              .find((answer) => answer.questionId === question.id)
+                              ?.option || [];
+                          if (e.target.checked) {
+                            updatedOptions = [...updatedOptions, newOption];
+                          } else {
+                            updatedOptions = updatedOptions.filter(
+                              (opt) => opt.id !== newOption.id
+                            );
+                          }
+                          handleChange(question.id, updatedOptions, "");
                         }
                       }}
                       style={{ color: custStyle.primaryColor }}
@@ -170,8 +242,7 @@ export default function PollQuestion({
       {question.questionType === "MULTI_CHOICE" && (
         <Checkbox.Group
           value={
-            answers.find((answer) => answer.questionId === question.id)?.option ||
-            []
+            answers.find((answer) => answer.questionId === question.id)?.option || []
           }
           onChange={(checkedValues) =>
             handleChange(question.id, checkedValues, "")
@@ -247,19 +318,19 @@ export default function PollQuestion({
 
       {question.questionType === "DROPDOWN" && (
         <Select
-          style={{ width: '100%', color: custStyle.primaryColor }}
+          style={{ width: "100%", color: custStyle.primaryColor }}
           value={
-            answers.find((answer) => answer.questionId === question.id)?.option?.[0]?.id ||
-            undefined
+            answers.find((answer) => answer.questionId === question.id)?.option?.[0]
+              ?.id || undefined
           }
           onChange={(value) => {
             const selectedOption = question.options.find((opt) => opt.id === value);
             handleChange(question.id, selectedOption ? [selectedOption] : [], "");
-            
             if (selectedOption?.nextQuestionOrder !== null) {
-              const nextIndex = question.options.find(
-                (q) => selectedOption && q.order === selectedOption.nextQuestionOrder
-              )?.order || 0;
+              const nextIndex =
+                question.options.find(
+                  (q) => selectedOption && q.order === selectedOption.nextQuestionOrder
+                )?.order || 0;
               handleDropdownChange(nextIndex);
             }
           }}

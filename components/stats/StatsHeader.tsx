@@ -1,8 +1,9 @@
 "use client";
 import { Image, Button } from "antd";
 import * as XLSX from "xlsx";
-import { PollData, questionTypeTranslations, statusConv } from "./types";
+import { PollData, statusConv } from "./types";
 import { calculateNetPoints, calculateUserStats } from "./utils";
+import { questionTypeTranslations } from "@/utils/utils";
 
 interface StatsHeaderProps {
   data: PollData;

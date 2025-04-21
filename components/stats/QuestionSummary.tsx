@@ -1,6 +1,7 @@
 "use client";
 import { Card, Collapse } from "antd";
-import { PollData, questionTypeTranslations } from "./types";
+import { PollData } from "./types";
+import { questionTypeTranslations } from "@/utils/utils";
 
 const { Panel } = Collapse;
 
@@ -14,10 +15,12 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
     return acc;
   }, {} as Record<string, number>);
 
-  const questionTypeList = Object.entries(questionTypeCounts).map(([type, count]) => ({
-    type: questionTypeTranslations[type] || type,
-    count,
-  }));
+  const questionTypeList = Object.entries(questionTypeCounts).map(
+    ([type, count]) => ({
+      type: questionTypeTranslations[type] || type,
+      count,
+    })
+  );
 
   return (
     <Collapse defaultActiveKey={["1"]} expandIconPosition="end">

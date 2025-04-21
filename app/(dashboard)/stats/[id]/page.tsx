@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "antd";
 import { getStatById } from "@/api/action";
 import StatsHeader from "@/components/stats/StatsHeader";
-
 import StatsDetails from "@/components/stats/StatsDetails";
 import StatsSummary from "@/components/stats/StatsSummary";
 import { ChartType, PollData } from "@/components/stats/types";

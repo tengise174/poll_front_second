@@ -9,7 +9,7 @@ interface GridTableProps {
 const GridTable = ({ question }: GridTableProps) => {
   const prepareGridTableData = () => {
     if (
-      question.questionType !== "MULTIPLE_CHOICE_GRID" ||
+      (question.questionType !== "MULTIPLE_CHOICE_GRID" && question.questionType !== "TICK_BOX_GRID") ||
       !question.gridRows ||
       !question.gridColumns ||
       !question.options

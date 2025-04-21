@@ -8,7 +8,7 @@ import { Button, Modal, QRCode } from "antd";
 import { createPoll, getPollById, updatePoll } from "@/api/action";
 import { CopyOutlined } from "@ant-design/icons";
 import StartShapeEditor from "@/components/editor/StartShapeEditor";
-import QuestionTextEditor from "@/components/editor/testEditor/QuestionTextEditor";
+import QuestionTextEditor from "@/components/editor/questionEditor/QuestionTextEditor";
 import StartDisplay from "@/components/editor/StartDisplay";
 import QuestionDisplay from "@/components/editor/QuestionDisplay";
 import EndEditor from "@/components/editor/EndEditor";
@@ -30,7 +30,15 @@ export default function SurveyDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [chosenType, setChosenType] = useState<
-    "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | null
+    | "MULTI_CHOICE"
+    | "SINGLE_CHOICE"
+    | "RATING"
+    | "YES_NO"
+    | "TEXT"
+    | "DROPDOWN"
+    | "MULTIPLE_CHOICE_GRID"
+    | "TICK_BOX_GRID"
+    | null
   >(null);
 
   const handleCopyUrl = () => {
@@ -243,9 +251,14 @@ export default function SurveyDetailPage() {
         }
       }
       if (
-        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN", "MULTIPLE_CHOICE_GRID"].includes(
-          question.questionType ?? ""
-        ) &&
+        [
+          "MULTI_CHOICE",
+          "SINGLE_CHOICE",
+          "YES_NO",
+          "DROPDOWN",
+          "MULTIPLE_CHOICE_GRID",
+          "TICK_BOX_GRID",
+        ].includes(question.questionType ?? "") &&
         question.hasCorrectAnswer &&
         question.options
       ) {
@@ -261,6 +274,24 @@ export default function SurveyDetailPage() {
           if (correctPerRow.some((hasCorrect) => !hasCorrect)) {
             showAlert(
               `Question ${question.order + 1}: Each row must have exactly one correct answer`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
+        } else if (question.questionType === "TICK_BOX_GRID") {
+          // Validate at least one correct answer per row
+          const rowCount = question.gridRows?.length || 0;
+          const correctPerRow = Array(rowCount).fill(false);
+          question.options.forEach((opt) => {
+            if (opt.isCorrect && opt.rowIndex != null) {
+              correctPerRow[opt.rowIndex] = true;
+            }
+          });
+          if (correctPerRow.some((hasCorrect) => !hasCorrect)) {
+            showAlert(
+              `Question ${question.order + 1}: Each row must have at least one correct answer`,
               "warning",
               "",
               true
@@ -283,7 +314,9 @@ export default function SurveyDetailPage() {
             return;
           }
           if (
-            ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(question.questionType ?? "") &&
+            ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
+              question.questionType ?? ""
+            ) &&
             correctCount > 1
           ) {
             showAlert(
@@ -310,9 +343,14 @@ export default function SurveyDetailPage() {
         return;
       }
       if (
-        ["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN", "MULTIPLE_CHOICE_GRID"].includes(
-          question.questionType ?? ""
-        ) &&
+        [
+          "MULTI_CHOICE",
+          "SINGLE_CHOICE",
+          "YES_NO",
+          "DROPDOWN",
+          "MULTIPLE_CHOICE_GRID",
+          "TICK_BOX_GRID",
+        ].includes(question.questionType ?? "") &&
         question.options
       ) {
         for (const [optIndex, option] of question.options.entries()) {
@@ -349,7 +387,11 @@ export default function SurveyDetailPage() {
           }
         }
       }
-      if (question.questionType === "MULTIPLE_CHOICE_GRID") {
+      if (
+        ["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
+          question.questionType ?? ""
+        )
+      ) {
         if (!question.gridRows?.length || !question.gridColumns?.length) {
           showAlert(
             `Question ${question.order + 1}: Grid must have at least one row and one column`,
@@ -359,7 +401,8 @@ export default function SurveyDetailPage() {
           );
           return;
         }
-        const expectedOptions = (question.gridRows.length * question.gridColumns.length);
+        const expectedOptions =
+          (question.gridRows.length * question.gridColumns.length);
         if ((question.options ?? []).length !== expectedOptions) {
           showAlert(
             `Question ${question.order + 1}: Grid must have options for all cells`,
@@ -376,24 +419,24 @@ export default function SurveyDetailPage() {
       try {
         const result = await createPoll(pollData);
         if (result) {
-          showAlert("Амжилттай нэмлээ", "success", "", true);
+          showAlert("Successfully created", "success", "", true);
           setReqUrl(`http://localhost:3000/test/${result.id}`);
           setIsModalOpen(true);
         }
       } catch (e) {
-        showAlert("Амжилтгүй", "warning", "", true);
+        showAlert("Failed", "warning", "", true);
         console.log(e);
       }
     } else {
       try {
         const result = await updatePoll(id as string, pollData);
         if (result) {
-          showAlert("Амжилттай заслаа", "success", "", true);
+          showAlert("Successfully updated", "success", "", true);
           setReqUrl(`http://localhost:3000/test/${result.id}`);
           setIsModalOpen(true);
         }
       } catch (e) {
-        showAlert("Амжилтгүй", "warning", "", true);
+        showAlert("Failed", "warning", "", true);
         console.log(e);
       }
     }
@@ -416,6 +459,7 @@ export default function SurveyDetailPage() {
       | "TEXT"
       | "DROPDOWN"
       | "MULTIPLE_CHOICE_GRID"
+      | "TICK_BOX_GRID"
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
@@ -426,7 +470,8 @@ export default function SurveyDetailPage() {
       questionType === "SINGLE_CHOICE" ||
       questionType === "MULTI_CHOICE" ||
       questionType === "DROPDOWN" ||
-      questionType === "MULTIPLE_CHOICE_GRID";
+      questionType === "MULTIPLE_CHOICE_GRID" ||
+      questionType === "TICK_BOX_GRID";
 
     const newQuestion: QuestionProps = {
       content: "",
@@ -456,7 +501,7 @@ export default function SurveyDetailPage() {
       ...(questionType === "YES_NO" && {
         options: [
           {
-            content: "Тийм",
+            content: "Yes",
             order: 1,
             poster: null,
             points: 0,
@@ -466,7 +511,7 @@ export default function SurveyDetailPage() {
             columnIndex: null,
           },
           {
-            content: "Үгүй",
+            content: "No",
             order: 2,
             poster: null,
             points: 0,
@@ -523,8 +568,54 @@ export default function SurveyDetailPage() {
           },
         ],
       }),
+      ...(questionType === "TICK_BOX_GRID" && {
+        gridRows: ["Row 1", "Row 2"],
+        gridColumns: ["Column 1", "Column 2"],
+        options: [
+          {
+            content: "",
+            order: 1,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 0,
+            columnIndex: 0,
+          },
+          {
+            content: "",
+            order: 2,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 0,
+            columnIndex: 1,
+          },
+          {
+            content: "",
+            order: 3,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 1,
+            columnIndex: 0,
+          },
+          {
+            content: "",
+            order: 4,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: 1,
+            columnIndex: 1,
+          },
+        ],
+      }),
       ...(shouldAddAnswers &&
-        questionType !== "MULTIPLE_CHOICE_GRID" && {
+        !["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(questionType) && {
           options: [
             {
               content: "",
@@ -580,7 +671,6 @@ export default function SurveyDetailPage() {
     setCurrentQuestion(newQuestions[currentPage]);
   }, [currentPage, chosenType]);
 
-
   console.log(newQuestions);
 
   return (
@@ -589,23 +679,21 @@ export default function SurveyDetailPage() {
         <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] min-h-full py-3 rounded">
           <div className="px-5">
             <div className="rounded-full w-full flex items-center h-[34px] bg-[#D9D9D9]">
-              {["Тохиргоо", "Нүүр", "Асуултууд", "Төгсгөл"].map(
-                (text, index) => (
-                  <p
-                    onClick={() => {
-                      setActiveSection(index);
-                    }}
-                    key={index}
-                    className={`text-[13px] w-1/3 cursor-pointer flex items-center justify-center h-full ${
-                      activeSection === index
-                        ? "bg-black text-[#FDFDFD] rounded-full font-semibold"
-                        : "text-[#757575] font-medium"
-                    }`}
-                  >
-                    {text}
-                  </p>
-                )
-              )}
+              {["Settings", "Start", "Questions", "End"].map((text, index) => (
+                <p
+                  onClick={() => {
+                    setActiveSection(index);
+                  }}
+                  key={index}
+                  className={`text-[13px] w-1/3 cursor-pointer flex items-center justify-center h-full ${
+                    activeSection === index
+                      ? "bg-black text-[#FDFDFD] rounded-full font-semibold"
+                      : "text-[#757575] font-medium"
+                  }`}
+                >
+                  {text}
+                </p>
+              ))}
             </div>
           </div>
           {activeSection === 0 && (
@@ -637,7 +725,7 @@ export default function SurveyDetailPage() {
                   setCurrentQuestion={setCurrentQuestion}
                 />
               ) : (
-                <p className="p-5">Асуултын төрлийг сонгоно уу!</p>
+                <p className="p-5">Please select a question type!</p>
               )}
               <div
                 onClick={handleQuestionAdd}
@@ -645,7 +733,7 @@ export default function SurveyDetailPage() {
               >
                 <AddIcon className="text-[#071522]" />
                 <p className="text-[#071522] text-[14px] font-semibold">
-                  Асуулт нэмэх
+                  Add Question
                 </p>
               </div>
             </div>
@@ -697,7 +785,7 @@ export default function SurveyDetailPage() {
         </div>
       </div>
       <Modal
-        title="Асуултын төрөл сонгох"
+        title="Select Question Type"
         open={isQuestionTypeModalOpen}
         onCancel={() => setIsQuestionTypeModalOpen(false)}
         footer={null}
@@ -720,7 +808,7 @@ export default function SurveyDetailPage() {
       <Modal open={isModalOpen} onCancel={() => setIsModalOpen(false)}>
         <div className="flex flex-col gap-4">
           <div>
-            <p>Хүсэлтийн URL</p>
+            <p>Request URL</p>
             <div className="flex flex-row gap-2">
               <Link href={reqUrl}>{reqUrl}</Link>
               <Button
@@ -731,7 +819,7 @@ export default function SurveyDetailPage() {
             </div>
           </div>
           <div>
-            <p>Хүсэлтийн QR код</p>
+            <p>Request QR Code</p>
             <QRCode value={reqUrl || "-"} />
           </div>
         </div>

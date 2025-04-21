@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Switch, Image, Select, Table, Radio } from "antd";
+import { Card, Switch, Image, Select, Table, Checkbox, Radio } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import RateSection from "../RatingSection";
 import { QuestionDisplayProps } from "@/utils/componentTypes";
@@ -27,7 +27,7 @@ const QuestionDisplay = ({
     setChosenType(question.questionType);
   };
 
-  // Define table columns for MULTIPLE_CHOICE_GRID
+  // Define table columns for MULTIPLE_CHOICE_GRID and TICK_BOX_GRID
   const gridColumns = (question: any) => [
     {
       title: "",
@@ -49,7 +49,11 @@ const QuestionDisplay = ({
         );
         return (
           <div className="flex justify-center items-center">
-            <Radio disabled />
+            {question.questionType === "MULTIPLE_CHOICE_GRID" ? (
+              <Radio disabled />
+            ) : (
+              <Checkbox disabled checked={option?.isCorrect} />
+            )}
             {option?.isCorrect && (
               <CheckCircleOutlined
                 style={{ color: "#52c41a", marginLeft: 8 }}
@@ -61,7 +65,7 @@ const QuestionDisplay = ({
     })) || []),
   ];
 
-  // Define table data for MULTIPLE_CHOICE_GRID
+  // Define table data for MULTIPLE_CHOICE_GRID and TICK_BOX_GRID
   const gridData = (question: any) =>
     question.gridRows?.map((row: string, index: number) => ({
       key: index,
@@ -75,8 +79,8 @@ const QuestionDisplay = ({
         <Switch
           checked={isCardView}
           onChange={(checked) => setIsCardView(checked)}
-          checkedChildren="Цугт нь"
-          unCheckedChildren="Тусад нь"
+          checkedChildren="All Together"
+          unCheckedChildren="Separately"
         />
       </div>
       {isCardView ? (
@@ -208,7 +212,7 @@ const QuestionDisplay = ({
                         ))}
                       {question.questionType === "DROPDOWN" && (
                         <Select
-                          placeholder="Сонголт хийнэ үү"
+                          placeholder="Select an option"
                           style={{ width: "100%", height: 44 }}
                         >
                           {question.options?.map((item, optIndex) => (
@@ -263,7 +267,7 @@ const QuestionDisplay = ({
                         ))}
                       {question.questionType === "TEXT" && (
                         <div className="w-full h-[100px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5 flex items-center">
-                          Хариултаа бичнэ үү
+                          Enter your answer
                         </div>
                       )}
                       {question.questionType === "RATING" && (
@@ -272,7 +276,9 @@ const QuestionDisplay = ({
                           rateNumber={question.rateNumber ?? 5}
                         />
                       )}
-                      {question.questionType === "MULTIPLE_CHOICE_GRID" && (
+                      {["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
+                        question.questionType ?? ""
+                      ) && (
                         <Table
                           columns={gridColumns(question)}
                           dataSource={gridData(question)}
@@ -408,7 +414,7 @@ const QuestionDisplay = ({
                     ))}
                   {currentQuestion?.questionType === "DROPDOWN" && (
                     <Select
-                      placeholder="Сонголт хийнэ үү"
+                      placeholder="Select an option"
                       style={{ width: "100%", height: 44 }}
                       disabled
                     >
@@ -462,7 +468,7 @@ const QuestionDisplay = ({
                     ))}
                   {currentQuestion?.questionType === "TEXT" && (
                     <div className="w-full h-[200px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5">
-                      Хариултаа бичнэ үү
+                      Enter your answer
                     </div>
                   )}
                   {currentQuestion?.questionType === "RATING" && (
@@ -471,7 +477,9 @@ const QuestionDisplay = ({
                       rateNumber={currentQuestion.rateNumber ?? 5}
                     />
                   )}
-                  {currentQuestion?.questionType === "MULTIPLE_CHOICE_GRID" && (
+                  {["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
+                    currentQuestion?.questionType ?? ""
+                  ) && (
                     <Table
                       columns={gridColumns(currentQuestion)}
                       dataSource={gridData(currentQuestion)}
@@ -486,7 +494,7 @@ const QuestionDisplay = ({
           ) : (
             <div className="max-w-[340px] w-full">
               <p className="text-[14px] leading-[14px] font-medium text-[#757575] italic mb-5">
-                Асуулт нэмэх товчийг дарж асуултын төрөл сонгоно уу.
+                Click the Add Question button to select a question type.
               </p>
             </div>
           )}

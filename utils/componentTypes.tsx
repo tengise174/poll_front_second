@@ -88,7 +88,7 @@ export interface SurveyProps {
 export interface QuestionTypeProps {
   icon: any;
   title: string;
-  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID";
+  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | "TICK_BOX_GRID";
 }
 interface SettingsPageProps {
   isAccessLevel: boolean;
@@ -155,6 +155,7 @@ export interface QuestionProps {
     | "TEXT"
     | "DROPDOWN"
     | "MULTIPLE_CHOICE_GRID"
+    | "TICK_BOX_GRID"
     | null;
   minAnswerCount?: number;
   order: number;
@@ -177,6 +178,7 @@ type ChosenTypeProps =
   | "TEXT"
   | "DROPDOWN"
   | "MULTIPLE_CHOICE_GRID"
+  | "TICK_BOX_GRID"
   | null;
 
 export interface QuestionTextEditorProps {

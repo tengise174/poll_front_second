@@ -1,14 +1,6 @@
 "use client";
 
-export const questionTypeTranslations: Record<string, string> = {
-  MULTI_CHOICE: "Олон сонголттой",
-  RATING: "Үнэлгээ",
-  YES_NO: "Тийм/Үгүй",
-  TEXT: "Текст",
-  SINGLE_CHOICE: "Ганц сонголттой",
-  DROPDOWN: "Dropdown",
-  MULTIPLE_CHOICE_GRID: "Хүснэгтийн олон сонголттой",
-};
+
 
 export type ChartType = "pie" | "bar" | "line";
 
@@ -41,7 +33,7 @@ export interface PollAnswer {
 export interface PollQuestion {
   questionId: string;
   content: string;
-  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID";
+  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | "TICK_BOX_GRID";
   avgTimeTaken: number;
   order: number;
   options?: PollOption[];

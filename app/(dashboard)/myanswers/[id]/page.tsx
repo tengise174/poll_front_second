@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { getAnsweredPollDetail } from "@/api/action";
 import { dualColors } from "@/utils/utils";
+import { questionTypeTranslations } from "@/utils/utils";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -38,7 +39,8 @@ interface QuestionProps {
     | "TEXT"
     | "SINGLE_CHOICE"
     | "DROPDOWN"
-    | "MULTIPLE_CHOICE_GRID";
+    | "MULTIPLE_CHOICE_GRID"
+    | "TICK_BOX_GRID";
   rateNumber?: number | null;
   rateType?: "STAR" | "NUMBER" | null;
   allOptions?: OptionsProps[];
@@ -159,8 +161,9 @@ const MyAnswersDetail = () => {
       : "Зөв хариулт байхгүй";
   };
 
-  const renderMultipleChoiceGrid = (question: QuestionProps) => {
-    const { gridRows, gridColumns, allOptions, selectedOptions } = question;
+  const renderGridQuestion = (question: QuestionProps) => {
+    const { gridRows, gridColumns, allOptions, selectedOptions, questionType } =
+      question;
 
     if (!gridRows || !gridColumns || !allOptions) return null;
 
@@ -240,9 +243,14 @@ const MyAnswersDetail = () => {
           <Card
             key={question.questionId}
             title={
-              <h2 className="mb-6">
-                {index + 1}. {question.content}
-              </h2>
+              <div>
+                <h2 className="mb-2">
+                  {index + 1}. {question.content}
+                </h2>
+                <Text type="secondary">
+                  Асуулгын төрөл: {questionTypeTranslations[question.questionType] || question.questionType}
+                </Text>
+              </div>
             }
           >
             {question.poster && (
@@ -276,9 +284,10 @@ const MyAnswersDetail = () => {
                 rows={4}
                 style={{ marginTop: 8 }}
               />
-            ) : question.questionType === "MULTIPLE_CHOICE_GRID" ? (
+            ) : question.questionType === "MULTIPLE_CHOICE_GRID" ||
+              question.questionType === "TICK_BOX_GRID" ? (
               <div className="flex flex-col">
-                {renderMultipleChoiceGrid(question)}
+                {renderGridQuestion(question)}
                 {question.hasCorrectAnswer && (
                   <div className="mt-4">
                     <Text strong>
