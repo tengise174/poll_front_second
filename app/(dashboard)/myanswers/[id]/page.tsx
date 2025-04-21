@@ -16,6 +16,7 @@ import {
 import { getAnsweredPollDetail } from "@/api/action";
 import { dualColors } from "@/utils/utils";
 import { questionTypeTranslations } from "@/utils/utils";
+import { QuestionTypes } from "@/utils/componentTypes";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -34,16 +35,7 @@ interface OptionsProps {
 interface QuestionProps {
   questionId: string;
   content: string;
-  questionType:
-    | "MULTI_CHOICE"
-    | "RATING"
-    | "YES_NO"
-    | "TEXT"
-    | "SINGLE_CHOICE"
-    | "DROPDOWN"
-    | "MULTIPLE_CHOICE_GRID"
-    | "TICK_BOX_GRID"
-    | "LINEAR_SCALE";
+  questionType: QuestionTypes;
   rateNumber?: number | null;
   rateType?: "STAR" | "NUMBER" | null;
   allOptions?: OptionsProps[];
@@ -360,6 +352,27 @@ const MyAnswersDetail = () => {
                 rows={4}
                 style={{ marginTop: 8 }}
               />
+            ) : question.questionType === "DATE" ? (
+              <div>
+                {new Date(question.textAnswer ?? "").toLocaleDateString(
+                  "mn-MN",
+                  {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  }
+                )}
+              </div>
+            ) : question.questionType === "TIME" ? (
+              <div>
+                {new Date(
+                  `2000-01-01T${question.textAnswer}:00`
+                ).toLocaleTimeString("mn-MN", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: false,
+                })}
+              </div>
             ) : question.questionType === "MULTIPLE_CHOICE_GRID" ||
               question.questionType === "TICK_BOX_GRID" ? (
               <div className="flex flex-col">

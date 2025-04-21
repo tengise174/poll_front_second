@@ -3,7 +3,7 @@ import { Image, Table, Tag } from "antd";
 import { ResponsiveContainer } from "recharts";
 import ChartSelector from "./ChartSelector";
 import GridTable from "./GridTable";
-import { PollQuestion, ChartType,  PollOption } from "./types";
+import { PollQuestion, ChartType, PollOption } from "./types";
 import { questionTypeTranslations } from "@/utils/utils";
 import { renderChart } from "./utils";
 
@@ -13,7 +13,11 @@ interface QuestionCardProps {
   onChartTypeChange: (type: ChartType) => void;
 }
 
-const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardProps) => {
+const QuestionCard = ({
+  question,
+  chartType,
+  onChartTypeChange,
+}: QuestionCardProps) => {
   const optionColumns = [
     {
       title: "Сонголт",
@@ -49,7 +53,12 @@ const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardPr
     },
   ];
 
-  if (question.questionType === "TEXT") {
+  // Handle TEXT and DATE question types
+  if (
+    question.questionType === "TEXT" ||
+    question.questionType === "DATE" ||
+    question.questionType === "TIME"
+  ) {
     return (
       <div className="p-6 bg-second-gray rounded-lg shadow-md">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">
@@ -72,7 +81,22 @@ const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardPr
           <ul className="list-disc pl-5 space-y-2">
             {question.answers.map((answer, aIndex) => (
               <li key={aIndex} className="text-gray-800">
-                <span className="font-medium">{answer.answeredBy}</span>: {answer.textAnswer}
+                <span className="font-medium">{answer.answeredBy}</span>:{" "}
+                {question.questionType === "DATE"
+                  ? new Date(answer.textAnswer).toLocaleDateString("mn-MN", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : question.questionType === "TIME"
+                  ? new Date(
+                      `2000-01-01T${answer.textAnswer}:00`
+                    ).toLocaleTimeString("mn-MN", {
+                      hour: "numeric",
+                      minute: "numeric",
+                      hour12: false,
+                    })
+                  : answer.textAnswer}
               </li>
             ))}
           </ul>
@@ -83,7 +107,10 @@ const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardPr
     );
   }
 
-  if (question.questionType === "MULTIPLE_CHOICE_GRID" || question.questionType === "TICK_BOX_GRID") {
+  if (
+    question.questionType === "MULTIPLE_CHOICE_GRID" ||
+    question.questionType === "TICK_BOX_GRID"
+  ) {
     return (
       <div className="p-6 bg-second-gray rounded-lg shadow-md">
         <div className="text-xl font-semibold text-gray-700 mb-4">
@@ -127,7 +154,9 @@ const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardPr
     );
   }
 
-  const sortedOptions = [...(question.options || [])].sort((a, b) => a.order - b.order);
+  const sortedOptions = [...(question.options || [])].sort(
+    (a, b) => a.order - b.order
+  );
   const chartData = sortedOptions.map((option) => ({
     name: option.content,
     value: option.selectionCount,
@@ -157,12 +186,13 @@ const QuestionCard = ({ question, chartType, onChartTypeChange }: QuestionCardPr
           <span className="font-medium">Дундаж хариулах хугацаа: </span>
           {question.avgTimeTaken.toFixed(2)} секунд
         </p>
-        {question.questionType === "MULTI_CHOICE" && question.minAnswerCount !== null && (
-          <p className="text-gray-600">
-            <span className="font-medium">Хамгийн бага хариултын тоо: </span>
-            {question.minAnswerCount}
-          </p>
-        )}
+        {question.questionType === "MULTI_CHOICE" &&
+          question.minAnswerCount !== null && (
+            <p className="text-gray-600">
+              <span className="font-medium">Хамгийн бага хариултын тоо: </span>
+              {question.minAnswerCount}
+            </p>
+          )}
       </div>
       {question.poster && (
         <Image src={question.poster} height={100} style={{ width: "auto" }} />

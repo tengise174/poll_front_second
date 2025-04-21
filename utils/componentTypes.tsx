@@ -85,10 +85,23 @@ export interface SurveyProps {
   id: string;
 }
 
+export type QuestionTypes =
+  | "MULTI_CHOICE"
+  | "SINGLE_CHOICE"
+  | "RATING"
+  | "YES_NO"
+  | "TEXT"
+  | "DROPDOWN"
+  | "MULTIPLE_CHOICE_GRID"
+  | "TICK_BOX_GRID"
+  | "LINEAR_SCALE"
+  | "DATE"
+  | "TIME";
+
 export interface QuestionTypeProps {
   icon: any;
   title: string;
-  questionType: "MULTI_CHOICE" | "SINGLE_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | "TICK_BOX_GRID" | "LINEAR_SCALE";
+  questionType: QuestionTypes;
 }
 interface SettingsPageProps {
   isAccessLevel: boolean;
@@ -147,17 +160,7 @@ export interface OptionProps {
 export interface QuestionProps {
   content: string;
   options?: OptionProps[];
-  questionType:
-    | "MULTI_CHOICE"
-    | "SINGLE_CHOICE"
-    | "RATING"
-    | "YES_NO"
-    | "TEXT"
-    | "DROPDOWN"
-    | "MULTIPLE_CHOICE_GRID"
-    | "TICK_BOX_GRID"
-    | "LINEAR_SCALE"
-    | null;
+  questionType: QuestionTypes | null;
   minAnswerCount?: number;
   order: number;
   rateNumber?: number;
@@ -175,17 +178,7 @@ export interface QuestionProps {
   maxLabel?: string;
 }
 
-type ChosenTypeProps =
-  | "MULTI_CHOICE"
-  | "SINGLE_CHOICE"
-  | "RATING"
-  | "YES_NO"
-  | "TEXT"
-  | "DROPDOWN"
-  | "MULTIPLE_CHOICE_GRID"
-  | "TICK_BOX_GRID"
-  | "LINEAR_SCALE"
-  | null;
+type ChosenTypeProps = QuestionTypes | null;
 
 export interface QuestionTextEditorProps {
   id: string;
@@ -235,10 +228,11 @@ export interface StartEditorProps {
   handleCreatPoll: Function;
 }
 
-
 interface QuestionSettingsProps {
   currentQuestion: QuestionProps | undefined;
-  setCurrentQuestion: React.Dispatch<React.SetStateAction<QuestionProps | undefined>>;
+  setCurrentQuestion: React.Dispatch<
+    React.SetStateAction<QuestionProps | undefined>
+  >;
   newQuestions: QuestionProps[];
   setNewQuestions: React.Dispatch<React.SetStateAction<QuestionProps[]>>;
   currentPage: number;
@@ -252,15 +246,7 @@ export interface DeleteQuestionButtonProps {
   setCurrentQuestion: React.Dispatch<React.SetStateAction<QuestionProps>>;
   setChosenType: React.Dispatch<
     React.SetStateAction<
-      | "MULTI_CHOICE"
-      | "SINGLE_CHOICE"
-      | "RATING"
-      | "YES_NO"
-      | "TEXT"
-      | "DROPDOWN"
-      | "MULTIPLE_CHOICE_GRID"
-      | "TICK_BOX_GRID"
-      | "LINEAR_SCALE"
+      QuestionTypes
       | null
     >
   >;

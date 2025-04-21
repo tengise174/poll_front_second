@@ -394,6 +394,8 @@ export default function TestPage() {
     );
   }
 
+  console.log(answers);
+
   return (
     <ConfigProvider
       theme={{

@@ -1,6 +1,6 @@
 "use client";
 
-
+import { QuestionTypes } from "@/utils/componentTypes";
 
 export type ChartType = "pie" | "bar" | "line";
 
@@ -33,7 +33,7 @@ export interface PollAnswer {
 export interface PollQuestion {
   questionId: string;
   content: string;
-  questionType: "MULTI_CHOICE" | "RATING" | "YES_NO" | "TEXT" | "SINGLE_CHOICE" | "DROPDOWN" | "MULTIPLE_CHOICE_GRID" | "TICK_BOX_GRID";
+  questionType: QuestionTypes;
   avgTimeTaken: number;
   order: number;
   options?: PollOption[];

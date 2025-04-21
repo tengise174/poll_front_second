@@ -18,7 +18,7 @@ import SettingsDisplay from "@/components/editor/SettingsDisplay";
 import { dualColors, questionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
-import { QuestionProps } from "@/utils/componentTypes";
+import { QuestionProps, QuestionTypes } from "@/utils/componentTypes";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
@@ -30,15 +30,7 @@ export default function SurveyDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [chosenType, setChosenType] = useState<
-    | "MULTI_CHOICE"
-    | "SINGLE_CHOICE"
-    | "RATING"
-    | "YES_NO"
-    | "TEXT"
-    | "DROPDOWN"
-    | "MULTIPLE_CHOICE_GRID"
-    | "TICK_BOX_GRID"
-    | "LINEAR_SCALE"
+    QuestionTypes
     | null
   >(null);
 
@@ -493,15 +485,7 @@ export default function SurveyDetailPage() {
 
   const handleQuestionTypeSelect = (
     questionType:
-      | "MULTI_CHOICE"
-      | "SINGLE_CHOICE"
-      | "RATING"
-      | "YES_NO"
-      | "TEXT"
-      | "DROPDOWN"
-      | "MULTIPLE_CHOICE_GRID"
-      | "TICK_BOX_GRID"
-      | "LINEAR_SCALE"
+      QuestionTypes
   ) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
@@ -675,6 +659,9 @@ export default function SurveyDetailPage() {
           rowIndex: null,
           columnIndex: null,
         })),
+      }),
+      ...(questionType === "DATE" && {
+        options: [], // No options needed for DATE
       }),
       ...(shouldAddAnswers &&
         !["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(questionType) && {

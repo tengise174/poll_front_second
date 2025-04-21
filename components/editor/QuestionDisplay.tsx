@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Switch, Image, Select, Table, Checkbox, Radio } from "antd";
+import {
+  Card,
+  Switch,
+  Image,
+  Select,
+  Table,
+  Checkbox,
+  Radio,
+  DatePicker,
+  TimePicker,
+} from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import RateSection from "../RatingSection";
 import { QuestionDisplayProps } from "@/utils/componentTypes";
@@ -270,6 +280,20 @@ const QuestionDisplay = ({
                           Enter your answer
                         </div>
                       )}
+                      {question.questionType === "DATE" && (
+                        <DatePicker
+                          style={{ width: "100%", height: 44 }}
+                          placeholder="Select a date"
+                          disabled
+                        />
+                      )}
+                      {question.questionType === "TIME" && (
+                        <TimePicker
+                          style={{ width: "100%", height: 44 }}
+                          placeholder="Select a time"
+                          disabled
+                        />
+                      )}
                       {question.questionType === "RATING" && (
                         <RateSection
                           rateType={question.rateType ?? "NUMBER"}
@@ -504,6 +528,20 @@ const QuestionDisplay = ({
                     <div className="w-full h-[200px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5">
                       Enter your answer
                     </div>
+                  )}
+                  {currentQuestion?.questionType === "DATE" && (
+                    <DatePicker
+                      style={{ width: "100%", height: 44 }}
+                      placeholder="Select a date"
+                      disabled
+                    />
+                  )}
+                  {currentQuestion?.questionType === "TIME" && (
+                    <TimePicker
+                      style={{ width: "100%", height: 44 }}
+                      placeholder="Select a time"
+                      disabled
+                    />
                   )}
                   {currentQuestion?.questionType === "RATING" && (
                     <RateSection

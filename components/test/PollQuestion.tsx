@@ -1,8 +1,20 @@
 import React from "react";
-import { Checkbox, Radio, Rate, Card, Image, Select, Table, Tag } from "antd";
+import {
+  Checkbox,
+  Radio,
+  Rate,
+  Card,
+  Image,
+  Select,
+  Table,
+  Tag,
+  DatePicker,
+  TimePicker,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import RateStarIcon from "@/public/icons/rate_star";
 import { questionTypeTranslations } from "@/utils/utils";
+import dayjs, { Dayjs } from "dayjs";
 
 interface Option {
   id: string;
@@ -58,6 +70,25 @@ export default function PollQuestion({
 }: PollQuestionProps) {
   const isError = requiredError.includes(question.id);
 
+  // Helper function to get valid Dayjs value or null
+  const getValidDayjsValue = (
+    textAnswer: string | undefined,
+    format: string
+  ): Dayjs | null => {
+    if (!textAnswer) {
+      console.warn("No textAnswer provided for TimePicker");
+      return null;
+    }
+    const parsed = dayjs(textAnswer, format, true); // Strict parsing
+    if (!parsed.isValid()) {
+      console.warn(
+        `Invalid time format for textAnswer: "${textAnswer}", expected format: ${format}`
+      );
+      return null;
+    }
+    return parsed;
+  };
+
   return (
     <Card
       key={question.id}
@@ -69,7 +100,7 @@ export default function PollQuestion({
               : question.content}
           </span>
           <Tag color="green">
-            {questionTypeTranslations[question.questionType]}
+            {questionTypeTranslations[question.questionType] || "Цаг"}
           </Tag>
           {question.required && <span className="text-red-500">*</span>}
         </div>
@@ -518,6 +549,53 @@ export default function PollQuestion({
           }}
           placeholder="Enter text"
           className=""
+        />
+      )}
+
+      {question.questionType === "DATE" && (
+        <DatePicker
+          onChange={(date, dateString) =>
+            handleChange(question.id, [], dateString as string)
+          }
+          value={getValidDayjsValue(
+            answers.find((answer) => answer.questionId === question.id)
+              ?.textAnswer,
+            "YYYY-MM-DD"
+          )}
+          style={{
+            width: "100%",
+            backgroundColor: custStyle.backgroundColor,
+            color: custStyle.primaryColor,
+            borderColor: "#D9D9D9",
+          }}
+          placeholder="Огноо сонгоно уу"
+          format="YYYY-MM-DD"
+          className="w-full"
+        />
+      )}
+
+      {question.questionType === "TIME" && (
+        <TimePicker
+          onChange={(time, timeString) => {
+            const formattedTime = time ? dayjs(time).format("HH:mm") : "";
+            handleChange(question.id, [], formattedTime);
+          }}
+          value={getValidDayjsValue(
+            `2000-01-01 ${
+              answers.find((answer) => answer.questionId === question.id)
+                ?.textAnswer
+            }`,
+            "HH:mm"
+          )}
+          format="HH:mm"
+          placeholder="Цаг сонгоно уу"
+          style={{
+            width: "100%",
+            backgroundColor: custStyle.backgroundColor,
+            color: custStyle.primaryColor,
+            borderColor: "#D9D9D9",
+          }}
+          className="w-full"
         />
       )}
     </Card>

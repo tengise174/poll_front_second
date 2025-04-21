@@ -10,6 +10,8 @@ import LinearScaleOptionsEditor from "./LinearScaleOptionsEditor";
 import AnswerOptionsEditor from "./AnswerOptionsEditor";
 import DeleteQuestionButton from "./DeleteQuestionButton";
 import { QuestionTextEditorProps } from "@/utils/componentTypes";
+import { CalendarOutlined } from "@ant-design/icons";
+import { ClockCircleFilled } from "@ant-design/icons";
 
 const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
   id,
@@ -87,6 +89,18 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
             setNewQuestions={setNewQuestions}
             currentPage={currentPage}
           />
+        )}
+        {currentQuestion?.questionType === "DATE" && (
+          <div className="mt-4 flex items-center gap-4">
+            <CalendarOutlined className="text-xl"/>
+            <p>Огноо сонгох асуулт</p>
+          </div>
+        )}
+        {currentQuestion?.questionType === "TIME" && (
+          <div className="mt-4 flex items-center gap-4">
+            <ClockCircleFilled className="text-xl"/>
+            <p>Цаг сонгох асуулт</p>
+          </div>
         )}
       </div>
       <DeleteQuestionButton
