@@ -3,11 +3,7 @@ import { useEffect, useState } from "react";
 import { Card, Modal, Skeleton } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Meta from "antd/es/card/Meta";
-import {
-  deletePollById,
-  getAllPollBasic,
-  getPollById,
-} from "@/api/action";
+import { deletePollById, getAllPollBasic, getPollById } from "@/api/action";
 import CustomButton from "@/components/CustomButton";
 import PollCard from "@/components/PollCard";
 import { useAlert } from "@/context/AlertProvider";

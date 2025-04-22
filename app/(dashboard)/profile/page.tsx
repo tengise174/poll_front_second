@@ -199,7 +199,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="w-full flex items-center justify-center">
+    <div className="w-full flex items-center justify-center mt-20">
       <Card className="w-100" title="Хэрэглэгчийн мэдээлэл">
         <Form layout="vertical">
           <Form.Item label="Хэрэглэгчийн нэр">

@@ -78,11 +78,6 @@ export const getPollForTest = async (id: string) => {
   }
 };
 
-
-
-
-
-
 export default instance;
 
 export const getProfile = async () => {
