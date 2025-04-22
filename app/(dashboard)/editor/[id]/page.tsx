@@ -19,6 +19,7 @@ import { dualColors, questionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { QuestionProps, QuestionTypes } from "@/utils/componentTypes";
+import { OrderedListOutlined } from "@ant-design/icons";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
@@ -29,10 +30,7 @@ export default function SurveyDetailPage() {
   const [activeSection, setActiveSection] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
-  const [chosenType, setChosenType] = useState<
-    QuestionTypes
-    | null
-  >(null);
+  const [chosenType, setChosenType] = useState<QuestionTypes | null>(null);
 
   const handleCopyUrl = () => {
     navigator.clipboard
@@ -268,6 +266,7 @@ export default function SurveyDetailPage() {
           "MULTIPLE_CHOICE_GRID",
           "TICK_BOX_GRID",
           "LINEAR_SCALE",
+          "RANKING",
         ].includes(question.questionType ?? "") &&
         question.hasCorrectAnswer &&
         question.options
@@ -326,6 +325,26 @@ export default function SurveyDetailPage() {
             );
             return;
           }
+        } else if (question.questionType === "RANKING") {
+          const correctCount = question.options.filter((opt) => opt.isCorrect).length;
+          if (correctCount === 0) {
+            showAlert(
+              `Question ${question.order + 1}: At least one correct ranking must be set`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
+          if (correctCount !== question.options.length) {
+            showAlert(
+              `Question ${question.order + 1}: All options must be marked as correct for RANKING`,
+              "warning",
+              "",
+              true
+            );
+            return;
+          }
         } else {
           const correctCount = question.options.filter((opt) => opt.isCorrect).length;
           if (correctCount === 0) {
@@ -369,6 +388,7 @@ export default function SurveyDetailPage() {
           "MULTIPLE_CHOICE_GRID",
           "TICK_BOX_GRID",
           "LINEAR_SCALE",
+          "RANKING",
         ].includes(question.questionType ?? "") &&
         question.options
       ) {
@@ -446,6 +466,17 @@ export default function SurveyDetailPage() {
           return;
         }
       }
+      if (question.questionType === "RANKING") {
+        if ((question.options ?? []).length < 2) {
+          showAlert(
+            `Question ${question.order + 1}: Ranking question must have at least 2 options`,
+            "warning",
+            "",
+            true
+          );
+          return;
+        }
+      }
     }
 
     if (id === "new") {
@@ -483,10 +514,7 @@ export default function SurveyDetailPage() {
     setIsQuestionTypeModalOpen(true);
   };
 
-  const handleQuestionTypeSelect = (
-    questionType:
-      QuestionTypes
-  ) => {
+  const handleQuestionTypeSelect = (questionType: QuestionTypes) => {
     const lastIndex =
       newQuestions.length === 1 && newQuestions[0].content === ""
         ? 0
@@ -497,7 +525,8 @@ export default function SurveyDetailPage() {
       questionType === "MULTI_CHOICE" ||
       questionType === "DROPDOWN" ||
       questionType === "MULTIPLE_CHOICE_GRID" ||
-      questionType === "TICK_BOX_GRID";
+      questionType === "TICK_BOX_GRID" ||
+      questionType === "RANKING";
 
     const newQuestion: QuestionProps = {
       content: "",
@@ -663,8 +692,42 @@ export default function SurveyDetailPage() {
       ...(questionType === "DATE" && {
         options: [], // No options needed for DATE
       }),
+      ...(questionType === "RANKING" && {
+        options: [
+          {
+            content: "Option 1",
+            order: 1,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: null,
+            columnIndex: null,
+          },
+          {
+            content: "Option 2",
+            order: 2,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: null,
+            columnIndex: null,
+          },
+          {
+            content: "Option 3",
+            order: 3,
+            poster: null,
+            points: 0,
+            isCorrect: false,
+            nextQuestionOrder: null,
+            rowIndex: null,
+            columnIndex: null,
+          },
+        ],
+      }),
       ...(shouldAddAnswers &&
-        !["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(questionType) && {
+        !["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID", "RANKING"].includes(questionType) && {
           options: [
             {
               content: "",
@@ -719,8 +782,6 @@ export default function SurveyDetailPage() {
         : newQuestions.length - 1;
     setCurrentQuestion(newQuestions[currentPage]);
   }, [currentPage, chosenType]);
-
-  console.log(newQuestions);
 
   return (
     <div className="h-screen bg-[#F4F6F8] font-open">

@@ -135,7 +135,7 @@ const QuestionDisplay = ({
                       />
                     )}
                     <div className="flex flex-col gap-y-[18px] mt-[18px]">
-                      {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                      {["MULTI_CHOICE", "SINGLE_CHOICE", "RANKING"].includes(
                         question.questionType ?? ""
                       ) &&
                         question.options?.map((item, optIndex) => (
@@ -146,7 +146,9 @@ const QuestionDisplay = ({
                             <div className="flex flex-1 items-center">
                               <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
                                 <span className="mr-1.5 not-italic">
-                                  {String.fromCharCode(65 + optIndex)}.
+                                  {question.questionType === "RANKING"
+                                    ? `${optIndex + 1}.`
+                                    : String.fromCharCode(65 + optIndex) + "."}
                                 </span>
                                 {item.content || "Answer"}
                                 {question.isPointBased && (
@@ -393,7 +395,7 @@ const QuestionDisplay = ({
                   />
                 )}
                 <div className="flex flex-col gap-y-[18px] mt-[18px]">
-                  {["MULTI_CHOICE", "SINGLE_CHOICE"].includes(
+                  {["MULTI_CHOICE", "SINGLE_CHOICE", "RANKING"].includes(
                     currentQuestion?.questionType ?? ""
                   ) &&
                     currentQuestion?.options?.map((item, index) => (
@@ -401,7 +403,9 @@ const QuestionDisplay = ({
                         <div className="flex items-center flex-1">
                           <div className="w-full h-11 border border-[#D9D9D9] rounded-[10px] italic text-[16px] px-5 flex items-center">
                             <span className="mr-1.5 not-italic">
-                              {String.fromCharCode(65 + index)}.
+                              {currentQuestion?.questionType === "RANKING"
+                                ? `${index + 1}.`
+                                : String.fromCharCode(65 + index) + "."}
                             </span>
                             {item.content || "Answer"}
                             {currentQuestion?.isPointBased && (

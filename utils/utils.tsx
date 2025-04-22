@@ -43,6 +43,7 @@ export const questionTypeTranslations: Record<string, string> = {
   LINEAR_SCALE: "Шугаман масштаб",
   DATE: "Огноо",
   TIME: "Цаг",
+  RANKING: "Ranking",
 };
 
 export const questionTypes: QuestionTypeProps[] = [
@@ -100,6 +101,11 @@ export const questionTypes: QuestionTypeProps[] = [
     icon: null,
     title: questionTypeTranslations["TIME"],
     questionType: "TIME",
+  },
+  {
+    icon: null,
+    title: questionTypeTranslations["RANKING"],
+    questionType: "RANKING",
   },
 ];
 

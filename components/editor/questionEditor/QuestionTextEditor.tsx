@@ -8,9 +8,10 @@ import GridOptionsEditor from "./GridOptionsEditor";
 import TickBoxGridOptionsEditor from "./TickBoxGridOptionsEditor";
 import LinearScaleOptionsEditor from "./LinearScaleOptionsEditor";
 import AnswerOptionsEditor from "./AnswerOptionsEditor";
+import RankingOptionsEditor from "./RankingOptionsEditor";
 import DeleteQuestionButton from "./DeleteQuestionButton";
 import { QuestionTextEditorProps } from "@/utils/componentTypes";
-import { CalendarOutlined } from "@ant-design/icons";
+import { CalendarOutlined, OrderedListOutlined } from "@ant-design/icons";
 import { ClockCircleFilled } from "@ant-design/icons";
 
 const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
@@ -79,6 +80,15 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
             currentPage={currentPage}
           />
         )}
+        {currentQuestion?.questionType === "RANKING" && (
+          <RankingOptionsEditor
+            currentQuestion={currentQuestion}
+            setCurrentQuestion={setCurrentQuestion}
+            newQuestions={newQuestions}
+            setNewQuestions={setNewQuestions}
+            currentPage={currentPage}
+          />
+        )}
         {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN", "YES_NO"].includes(
           currentQuestion?.questionType ?? ""
         ) && (
@@ -100,6 +110,11 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
           <div className="mt-4 flex items-center gap-4">
             <ClockCircleFilled className="text-xl"/>
             <p>Цаг сонгох асуулт</p>
+          </div>
+        )}
+        {currentQuestion?.questionType === "RANKING" && (
+          <div className="mt-4 flex items-center gap-4">
+            <OrderedListOutlined className="text-xl"/>
           </div>
         )}
       </div>

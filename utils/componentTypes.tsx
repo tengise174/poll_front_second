@@ -96,7 +96,8 @@ export type QuestionTypes =
   | "TICK_BOX_GRID"
   | "LINEAR_SCALE"
   | "DATE"
-  | "TIME";
+  | "TIME"
+  | "RANKING";
 
 export interface QuestionTypeProps {
   icon: any;
