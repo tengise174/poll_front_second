@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button, ConfigProvider, Menu, MenuProps } from "antd";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import Sider from "antd/es/layout/Sider";
+import CustomButton from "./CustomButton";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -24,6 +25,10 @@ const baseItems: MenuItem[] = [
   {
     key: "3",
     label: "Миний оролцсон",
+  },
+  {
+    key: "4",
+    label: "Хувийн тохиргоо",
   },
 ];
 
@@ -64,7 +69,7 @@ const CustomMenu = () => {
       }
       case "4": {
         setSelectedKey("4");
-        router.push("/templates");
+        router.push("/profile");
         break;
       }
       default:
@@ -92,27 +97,44 @@ const CustomMenu = () => {
         },
       }}
     >
-      <Sider trigger={null} collapsible collapsed={collapsed} 
-      className="!bg-main-bg"
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        className="!bg-main-bg h-full" 
       >
-        <Button
-          type="text"
-          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            fontSize: "16px",
-            width: 64,
-            height: 64,
+        <div className="h-full flex flex-col justify-between">
+        <div>
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              fontSize: "16px",
+              width: 64,
+              height: 64,
+            }}
+          />
+          <Menu
+            onClick={onClick}
+            className="bg-transparent border-none font-medium font-monts mt-[10px]"
+            selectedKeys={[selectedKey]}
+            mode="inline"
+            items={items}
+            style={{ borderInlineEnd: "none" }}
+          />
+        </div>
+        <CustomButton
+          title={"Гарах"}
+          className="bg-main-purple hover:cursor-pointer hover:bg-clicked"
+          onClick={() => {
+            localStorage.removeItem("profile");
+            localStorage.removeItem("token");
+            setUserProfile(null);
+            router.push("/login");
           }}
         />
-        <Menu
-          onClick={onClick}
-          className="bg-transparent border-none font-medium font-monts mt-[10px]"
-          selectedKeys={[selectedKey]}
-          mode="inline"
-          items={items}
-          style={{ borderInlineEnd: "none" }}
-        />
+        </div>
       </Sider>
     </ConfigProvider>
   );

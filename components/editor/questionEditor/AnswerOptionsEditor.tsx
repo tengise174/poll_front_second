@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
-import { InputNumber, Checkbox, Radio, Upload, Button } from "antd";
+import { InputNumber, Checkbox, Radio, Upload, Button, Select } from "antd";
 import { FileImageOutlined } from "@ant-design/icons";
 import CustomInput from "../../CustomInput";
 import AddIcon from "@/public/icons/add";
@@ -146,6 +148,14 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
     );
   };
 
+  // Generate options for the next question dropdown
+  const nextQuestionOptions = newQuestions
+    .filter((q) => q.order > currentQuestion.order)
+    .map((q) => ({
+      value: q.order,
+      label: `Q${q.order}: ${q.content || "Гарчиггүй"}`,
+    }));
+
   return (
     <div>
       {currentQuestion?.questionType === "MULTI_CHOICE" && (
@@ -267,13 +277,18 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                             }));
                             setNewQuestions((prev) =>
                               prev.map((question, questionIndex) =>
-                                questionIndex === currentPage && question.options
+                                questionIndex === currentPage &&
+                                question.options
                                   ? {
                                       ...question,
-                                      options: question.options.map((option, i) =>
-                                        i === answerIndex
-                                          ? { ...option, content: e.target.value }
-                                          : option
+                                      options: question.options.map(
+                                        (option, i) =>
+                                          i === answerIndex
+                                            ? {
+                                                ...option,
+                                                content: e.target.value,
+                                              }
+                                            : option
                                       ),
                                     }
                                   : question
@@ -319,7 +334,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                           );
                           if (totalPoints > 100) {
                             showAlert(
-                              "Total points cannot exceed 100",
+                              "Нийт оноо 100 байна",
                               "warning",
                               "",
                               true
@@ -342,20 +357,18 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                           );
                         }}
                         className={`${questionInputClass} w-20 mt-2`}
-                        placeholder="Points"
+                        placeholder="Оноо"
                       />
                     )}
                   </div>
                   <div className="flex flex-row gap-2 mt-2">
-                    <InputNumber
-                      min={currentQuestion.order + 1}
-                      max={newQuestions.length}
+                    <Select
                       value={item.nextQuestionOrder || undefined}
-                      onChange={(value: number | null) => {
+                      onChange={(value: number | undefined) => {
                         const updatedOptions =
                           currentQuestion?.options?.map((opt, i) =>
                             i === answerIndex
-                              ? { ...opt, nextQuestionOrder: value }
+                              ? { ...opt, nextQuestionOrder: value || null }
                               : opt
                           ) || [];
                         setCurrentQuestion((prev) => ({
@@ -373,8 +386,10 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                           )
                         );
                       }}
-                      className={`${questionInputClass} w-24`}
-                      placeholder="Next Q"
+                      className="w-24"
+                      placeholder="Дараах А"
+                      allowClear
+                      options={nextQuestionOptions}
                     />
                     {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
                       currentQuestion?.questionType ?? ""
@@ -415,8 +430,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
             ) && (
               <div
                 onClick={() => {
-                  const newOrder =
-                    (currentQuestion?.options?.length || 0) + 1;
+                  const newOrder = (currentQuestion?.options?.length || 0) + 1;
                   setCurrentQuestion((prev) => ({
                     ...prev,
                     options: [

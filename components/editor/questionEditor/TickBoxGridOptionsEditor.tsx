@@ -6,6 +6,7 @@ import CustomInput from "../../CustomInput";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { QuestionProps } from "@/utils/componentTypes";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -77,26 +78,33 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
   };
 
   const handleAddRow = () => {
-    const newRows = [...(currentQuestion?.gridRows || []), `Row ${(currentQuestion?.gridRows?.length ?? 0) + 1}`];
+    const newRows = [
+      ...(currentQuestion?.gridRows || []),
+      `Мөр ${(currentQuestion?.gridRows?.length ?? 0) + 1}`,
+    ];
     updateGridOptions(newRows, currentQuestion?.gridColumns || []);
   };
 
   const handleAddColumn = () => {
-    const newColumns = [...(currentQuestion?.gridColumns || []), `Column ${(currentQuestion?.gridColumns?.length ?? 0) + 1}`];
+    const newColumns = [
+      ...(currentQuestion?.gridColumns || []),
+      `Багана ${(currentQuestion?.gridColumns?.length ?? 0) + 1}`,
+    ];
     updateGridOptions(currentQuestion?.gridRows || [], newColumns);
   };
 
   const handleRowLabelChange = (index: number, value: string) => {
-    const newRows = currentQuestion?.gridRows?.map((row, i) =>
-      i === index ? value : row
-    ) || [];
+    const newRows =
+      currentQuestion?.gridRows?.map((row, i) => (i === index ? value : row)) ||
+      [];
     updateGridOptions(newRows, currentQuestion?.gridColumns || []);
   };
 
   const handleColumnLabelChange = (index: number, value: string) => {
-    const newColumns = currentQuestion?.gridColumns?.map((col, i) =>
-      i === index ? value : col
-    ) || [];
+    const newColumns =
+      currentQuestion?.gridColumns?.map((col, i) =>
+        i === index ? value : col
+      ) || [];
     updateGridOptions(currentQuestion?.gridRows || [], newColumns);
   };
 
@@ -105,7 +113,8 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
       showAlert("At least one row is required", "warning", "", true);
       return;
     }
-    const newRows = currentQuestion?.gridRows?.filter((_, i) => i !== index) || [];
+    const newRows =
+      currentQuestion?.gridRows?.filter((_, i) => i !== index) || [];
     updateGridOptions(newRows, currentQuestion?.gridColumns || []);
   };
 
@@ -114,16 +123,21 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
       showAlert("At least one column is required", "warning", "", true);
       return;
     }
-    const newColumns = currentQuestion?.gridColumns?.filter((_, i) => i !== index) || [];
+    const newColumns =
+      currentQuestion?.gridColumns?.filter((_, i) => i !== index) || [];
     updateGridOptions(currentQuestion?.gridRows || [], newColumns);
   };
 
-  const handleGridCorrectAnswerChange = (rowIndex: number, optionIndex: number) => {
-    const updatedOptions = currentQuestion?.options?.map((opt, i) =>
-      opt.rowIndex === rowIndex && i === optionIndex
-        ? { ...opt, isCorrect: !opt.isCorrect }
-        : opt
-    ) || [];
+  const handleGridCorrectAnswerChange = (
+    rowIndex: number,
+    optionIndex: number
+  ) => {
+    const updatedOptions =
+      currentQuestion?.options?.map((opt, i) =>
+        opt.rowIndex === rowIndex && i === optionIndex
+          ? { ...opt, isCorrect: !opt.isCorrect }
+          : opt
+      ) || [];
     setCurrentQuestion((prev) => ({
       ...prev,
       options: updatedOptions,
@@ -141,66 +155,50 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
     <div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
         <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-          Rows
+          Мөрүүд
         </p>
         {currentQuestion?.gridRows?.map((row, index) => (
           <div key={index} className="flex flex-row gap-2 items-center">
             <CustomInput
               value={row}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRowLabelChange(index, e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleRowLabelChange(index, e.target.value)
+              }
               className={questionInputClass}
               placeholder={`Row ${index + 1}`}
             />
-            <Button
-              onClick={() => handleRemoveRow(index)}
-              className="mt-2"
-              danger
-            >
-              Delete
-            </Button>
+            <DeleteOutlined onClick={() => handleRemoveRow(index)} />
           </div>
         ))}
-        <Button
-          onClick={handleAddRow}
-          className="mt-2"
-          icon={<AddIcon />}
-        >
-          Add Row
+        <Button onClick={handleAddRow} className="mt-2" icon={<AddIcon />}>
+          Мөр нэмэх
         </Button>
       </div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
         <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-          Columns
+          Баганууд
         </p>
         {currentQuestion?.gridColumns?.map((col, index) => (
           <div key={index} className="flex flex-row gap-2 items-center">
             <CustomInput
               value={col}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleColumnLabelChange(index, e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleColumnLabelChange(index, e.target.value)
+              }
               className={questionInputClass}
               placeholder={`Column ${index + 1}`}
             />
-            <Button
-              onClick={() => handleRemoveColumn(index)}
-              className="mt-2"
-              danger
-            >
-              Delete
-            </Button>
+            <DeleteOutlined onClick={() => handleRemoveColumn(index)} />
           </div>
         ))}
-        <Button
-          onClick={handleAddColumn}
-          className="mt-2"
-          icon={<AddIcon />}
-        >
-          Add Column
+        <Button onClick={handleAddColumn} className="mt-2" icon={<AddIcon />}>
+          Багана нэмэх
         </Button>
       </div>
       {currentQuestion?.hasCorrectAnswer && (
         <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
           <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-            Correct Answers
+            Зөв хариултууд
           </p>
           {currentQuestion?.gridRows?.map((row, rowIndex) => (
             <div key={rowIndex} className="mt-2">
@@ -208,14 +206,20 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
               <div className="flex flex-wrap gap-4">
                 {currentQuestion?.gridColumns?.map((col, colIndex) => {
                   const optionIndex = currentQuestion?.options?.findIndex(
-                    (opt) => opt.rowIndex === rowIndex && opt.columnIndex === colIndex
+                    (opt) =>
+                      opt.rowIndex === rowIndex && opt.columnIndex === colIndex
                   );
-                  const isChecked = optionIndex !== undefined && currentQuestion?.options?.[optionIndex]?.isCorrect || false;
+                  const isChecked =
+                    (optionIndex !== undefined &&
+                      currentQuestion?.options?.[optionIndex]?.isCorrect) ||
+                    false;
                   return (
                     <Checkbox
                       key={colIndex}
                       checked={isChecked}
-                      onChange={() => handleGridCorrectAnswerChange(rowIndex, optionIndex!)}
+                      onChange={() =>
+                        handleGridCorrectAnswerChange(rowIndex, optionIndex!)
+                      }
                     >
                       {col}
                     </Checkbox>

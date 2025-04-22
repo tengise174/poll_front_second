@@ -281,7 +281,9 @@ export default function SurveyDetailPage() {
           });
           if (correctPerRow.some((hasCorrect) => !hasCorrect)) {
             showAlert(
-              `Question ${question.order + 1}: Each row must have exactly one correct answer`,
+              `Question ${
+                question.order + 1
+              }: 1 эгнээнд 1 зөв хариулт байх хэрэгтэй`,
               "warning",
               "",
               true
@@ -298,7 +300,9 @@ export default function SurveyDetailPage() {
           });
           if (correctPerRow.some((hasCorrect) => !hasCorrect)) {
             showAlert(
-              `Question ${question.order + 1}: Each row must have at least one correct answer`,
+              `Question ${
+                question.order + 1
+              }: Мөр бүр ядаж 1 зөв хариулттай байх ёстой`,
               "warning",
               "",
               true
@@ -306,10 +310,14 @@ export default function SurveyDetailPage() {
             return;
           }
         } else if (question.questionType === "LINEAR_SCALE") {
-          const correctCount = question.options.filter((opt) => opt.isCorrect).length;
+          const correctCount = question.options.filter(
+            (opt) => opt.isCorrect
+          ).length;
           if (correctCount === 0) {
             showAlert(
-              `Question ${question.order + 1}: At least one correct answer must be set`,
+              `Question ${
+                question.order + 1
+              }: At least one correct answer must be set`,
               "warning",
               "",
               true
@@ -318,7 +326,9 @@ export default function SurveyDetailPage() {
           }
           if (correctCount > 1) {
             showAlert(
-              `Question ${question.order + 1}: Only one correct answer is allowed for LINEAR_SCALE`,
+              `Question ${
+                question.order + 1
+              }: Only one correct answer is allowed for LINEAR_SCALE`,
               "warning",
               "",
               true
@@ -326,10 +336,14 @@ export default function SurveyDetailPage() {
             return;
           }
         } else if (question.questionType === "RANKING") {
-          const correctCount = question.options.filter((opt) => opt.isCorrect).length;
+          const correctCount = question.options.filter(
+            (opt) => opt.isCorrect
+          ).length;
           if (correctCount === 0) {
             showAlert(
-              `Question ${question.order + 1}: At least one correct ranking must be set`,
+              `Question ${
+                question.order + 1
+              }: At least one correct ranking must be set`,
               "warning",
               "",
               true
@@ -338,7 +352,9 @@ export default function SurveyDetailPage() {
           }
           if (correctCount !== question.options.length) {
             showAlert(
-              `Question ${question.order + 1}: All options must be marked as correct for RANKING`,
+              `Question ${
+                question.order + 1
+              }: All options must be marked as correct for RANKING`,
               "warning",
               "",
               true
@@ -346,10 +362,14 @@ export default function SurveyDetailPage() {
             return;
           }
         } else {
-          const correctCount = question.options.filter((opt) => opt.isCorrect).length;
+          const correctCount = question.options.filter(
+            (opt) => opt.isCorrect
+          ).length;
           if (correctCount === 0) {
             showAlert(
-              `Question ${question.order + 1}: At least one correct answer must be set`,
+              `Question ${
+                question.order + 1
+              }: At least one correct answer must be set`,
               "warning",
               "",
               true
@@ -357,11 +377,17 @@ export default function SurveyDetailPage() {
             return;
           }
           if (
-            ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(question.questionType ?? "") &&
+            ["SINGLE_CHOICE", "YES_NO", "DROPDOWN"].includes(
+              question.questionType ?? ""
+            ) &&
             correctCount > 1
           ) {
             showAlert(
-              `Question ${question.order + 1}: Only one correct answer is allowed for ${question.questionType}`,
+              `Question ${
+                question.order + 1
+              }: Only one correct answer is allowed for ${
+                question.questionType
+              }`,
               "warning",
               "",
               true
@@ -372,7 +398,9 @@ export default function SurveyDetailPage() {
       }
       if (question.hasCorrectAnswer && question.isPointBased) {
         showAlert(
-          `Question ${question.order + 1}: A question cannot have both correct answers and points`,
+          `Question ${
+            question.order + 1
+          }: A question cannot have both correct answers and points`,
           "warning",
           "",
           true
@@ -393,12 +421,19 @@ export default function SurveyDetailPage() {
         question.options
       ) {
         for (const [optIndex, option] of question.options.entries()) {
-          if (option.nextQuestionOrder !== null && option.nextQuestionOrder !== undefined) {
+          if (
+            option.nextQuestionOrder !== null &&
+            option.nextQuestionOrder !== undefined
+          ) {
             const nextOrder = option.nextQuestionOrder;
-            const isValidOrder = newQuestions.some((q) => q.order === nextOrder);
+            const isValidOrder = newQuestions.some(
+              (q) => q.order === nextOrder
+            );
             if (!isValidOrder) {
               showAlert(
-                `Question ${question.order + 1}, Option ${optIndex + 1}: Invalid next question order`,
+                `Question ${question.order + 1}, Option ${
+                  optIndex + 1
+                }: Invalid next question order`,
                 "warning",
                 "",
                 true
@@ -407,7 +442,9 @@ export default function SurveyDetailPage() {
             }
             if (nextOrder <= question.order) {
               showAlert(
-                `Question ${question.order + 1}, Option ${optIndex + 1}: Next question order must be greater than current question order`,
+                `Question ${question.order + 1}, Option ${
+                  optIndex + 1
+                }: Next question order must be greater than current question order`,
                 "warning",
                 "",
                 true
@@ -417,20 +454,29 @@ export default function SurveyDetailPage() {
           }
         }
       }
-      if (["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(question.questionType ?? "")) {
+      if (
+        ["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
+          question.questionType ?? ""
+        )
+      ) {
         if (!question.gridRows?.length || !question.gridColumns?.length) {
           showAlert(
-            `Question ${question.order + 1}: Grid must have at least one row and one column`,
+            `Question ${
+              question.order + 1
+            }: Ядаж 1 мөр, 1 баганатай байх ёстой`,
             "warning",
             "",
             true
           );
           return;
         }
-        const expectedOptions = (question.gridRows.length * question.gridColumns.length);
+        const expectedOptions =
+          question.gridRows.length * question.gridColumns.length;
         if ((question.options ?? []).length !== expectedOptions) {
           showAlert(
-            `Question ${question.order + 1}: Grid must have options for all cells`,
+            `Question ${
+              question.order + 1
+            }: Grid must have options for all cells`,
             "warning",
             "",
             true
@@ -448,7 +494,9 @@ export default function SurveyDetailPage() {
           question.maxValue <= question.minValue
         ) {
           showAlert(
-            `Question ${question.order + 1}: Invalid linear scale range (min: 0 or 1, max: ≤10, max > min)`,
+            `Question ${
+              question.order + 1
+            }: Invalid linear scale range (min: 0 or 1, max: ≤10, max > min)`,
             "warning",
             "",
             true
@@ -458,7 +506,9 @@ export default function SurveyDetailPage() {
         const expectedOptions = question.maxValue - question.minValue + 1;
         if ((question.options ?? []).length !== expectedOptions) {
           showAlert(
-            `Question ${question.order + 1}: Linear scale must have options for all values in range`,
+            `Question ${
+              question.order + 1
+            }: Linear scale must have options for all values in range`,
             "warning",
             "",
             true
@@ -469,7 +519,9 @@ export default function SurveyDetailPage() {
       if (question.questionType === "RANKING") {
         if ((question.options ?? []).length < 2) {
           showAlert(
-            `Question ${question.order + 1}: Ranking question must have at least 2 options`,
+            `Question ${
+              question.order + 1
+            }: Ranking question must have at least 2 options`,
             "warning",
             "",
             true
@@ -560,7 +612,7 @@ export default function SurveyDetailPage() {
       ...(questionType === "YES_NO" && {
         options: [
           {
-            content: "Yes",
+            content: "Тийм",
             order: 1,
             poster: null,
             points: 0,
@@ -570,7 +622,7 @@ export default function SurveyDetailPage() {
             columnIndex: null,
           },
           {
-            content: "No",
+            content: "Үгүй",
             order: 2,
             poster: null,
             points: 0,
@@ -582,8 +634,8 @@ export default function SurveyDetailPage() {
         ],
       }),
       ...(questionType === "MULTIPLE_CHOICE_GRID" && {
-        gridRows: ["Row 1", "Row 2"],
-        gridColumns: ["Column 1", "Column 2"],
+        gridRows: ["", ""],
+        gridColumns: ["", ""],
         options: [
           {
             content: "",
@@ -628,8 +680,8 @@ export default function SurveyDetailPage() {
         ],
       }),
       ...(questionType === "TICK_BOX_GRID" && {
-        gridRows: ["Row 1", "Row 2"],
-        gridColumns: ["Column 1", "Column 2"],
+        gridRows: ["", ""],
+        gridColumns: ["", ""],
         options: [
           {
             content: "",
@@ -676,8 +728,8 @@ export default function SurveyDetailPage() {
       ...(questionType === "LINEAR_SCALE" && {
         minValue: 1,
         maxValue: 5,
-        minLabel: "Low",
-        maxLabel: "High",
+        minLabel: "",
+        maxLabel: "",
         options: Array.from({ length: 5 }, (_, i) => ({
           content: (i + 1).toString(),
           order: i + 1,
@@ -727,7 +779,9 @@ export default function SurveyDetailPage() {
         ],
       }),
       ...(shouldAddAnswers &&
-        !["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID", "RANKING"].includes(questionType) && {
+        !["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID", "RANKING"].includes(
+          questionType
+        ) && {
           options: [
             {
               content: "",
@@ -784,12 +838,12 @@ export default function SurveyDetailPage() {
   }, [currentPage, chosenType]);
 
   return (
-    <div className="h-screen bg-[#F4F6F8] font-open">
-      <div className="flex flex-col md:flex-row h-auto md:h-full md:max-h-[calc(100vh-56px)]">
-        <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] min-h-full py-3 rounded">
+    <div className="bg-[#F4F6F8] font-open h-full">
+      <div className="flex flex-col md:flex-row h-full">
+        <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] max-h-full py-3 rounded">
           <div className="px-5">
             <div className="rounded-full w-full flex items-center h-[34px] bg-[#D9D9D9]">
-              {["Settings", "Start", "Questions", "End"].map((text, index) => (
+              {["Тохиргоо", "Нүүр", "Асуултууд", "Төгсгөл"].map((text, index) => (
                 <p
                   onClick={() => {
                     setActiveSection(index);
@@ -806,56 +860,63 @@ export default function SurveyDetailPage() {
               ))}
             </div>
           </div>
-          {activeSection === 0 && (
-            <SettingsEditor
-              settingsPage={settingsPage}
-              setSettingsPage={setSettingsPage}
-            />
-          )}
-          {activeSection === 1 && (
-            <StartShapeEditor
-              id={String(id)}
-              themeId={themeId}
-              setThemeId={setThemeId}
-              startPage={startPage}
-              setStartPage={setStartPage}
-            />
-          )}
-          {activeSection === 2 && (
-            <div className="flex flex-col h-full max-h-[calc(100vh-110px)] justify-between">
-              {chosenType ? (
-                <QuestionTextEditor
-                  id={String(id)}
-                  setChosenType={setChosenType}
-                  setCurrentPage={setCurrentPage}
-                  newQuestions={newQuestions}
-                  setNewQuestions={setNewQuestions}
-                  currentPage={currentPage}
-                  currentQuestion={currentQuestion}
-                  setCurrentQuestion={setCurrentQuestion}
-                />
-              ) : (
-                <p className="p-5">Please select a question type!</p>
-              )}
-              <div
-                onClick={handleQuestionAdd}
-                className="h-[40px] w-full bg-[#FDFDFD] border-t border-[#D9D9D9] cursor-pointer flex items-center justify-center gap-x-[10px]"
-              >
-                <AddIcon className="text-[#071522]" />
-                <p className="text-[#071522] text-[14px] font-semibold">
-                  Add Question
-                </p>
+          <div className="flex-1">
+            {activeSection === 0 && (
+              <SettingsEditor
+                settingsPage={settingsPage}
+                setSettingsPage={setSettingsPage}
+              />
+            )}
+            {activeSection === 1 && (
+              <StartShapeEditor
+                id={String(id)}
+                themeId={themeId}
+                setThemeId={setThemeId}
+                startPage={startPage}
+                setStartPage={setStartPage}
+              />
+            )}
+            {activeSection === 2 && (
+              <div className="flex flex-col h-full justify-between">
+                <div
+                  className="overflow-y-auto"
+                  style={{ maxHeight: "calc(100vh - 140px)" }}
+                >
+                  {chosenType ? (
+                    <QuestionTextEditor
+                      id={String(id)}
+                      setChosenType={setChosenType}
+                      setCurrentPage={setCurrentPage}
+                      newQuestions={newQuestions}
+                      setNewQuestions={setNewQuestions}
+                      currentPage={currentPage}
+                      currentQuestion={currentQuestion}
+                      setCurrentQuestion={setCurrentQuestion}
+                    />
+                  ) : (
+                    <p className="p-5">Асуултын төрлөө сонгоно уу!</p>
+                  )}
+                </div>
+                <div
+                  onClick={handleQuestionAdd}
+                  className="h-[32px] w-full bg-[#FDFDFD] border-t border-[#D9D9D9] cursor-pointer flex items-center justify-center gap-x-[10px]"
+                >
+                  <AddIcon className="text-[#071522]" />
+                  <p className="text-[#071522] text-[14px] font-semibold">
+                    Асуулт нэмэх
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
-          {activeSection === 3 && (
-            <EndEditor
-              id={String(id)}
-              endPage={endPage}
-              setEndPage={setEndPage}
-              handleCreatPoll={handleCreatePoll}
-            />
-          )}
+            )}
+            {activeSection === 3 && (
+              <EndEditor
+                id={String(id)}
+                endPage={endPage}
+                setEndPage={setEndPage}
+                handleCreatPoll={handleCreatePoll}
+              />
+            )}
+          </div>
         </div>
         <div className="w-full h-full py-5 px-5 md:px-[30px]">
           {activeSection === 0 && (
@@ -900,12 +961,12 @@ export default function SurveyDetailPage() {
         onCancel={() => setIsQuestionTypeModalOpen(false)}
         footer={null}
       >
-        <div className="flex flex-col gap-y-[10px]">
+        <div className="flex flex-col gap-y-[10px] max-h-100 overflow-auto">
           {questionTypes.map((item, index) => (
             <div
               key={index}
               onClick={() => handleQuestionTypeSelect(item.questionType)}
-              className="w-full group relative h-12 rounded-[10px] bg-[#FDFDFD] border border-[#D9D9D9] shadow-custom-100 flex items-center cursor-pointer px-2 hover:bg-gray-100"
+              className="w-full group relative !min-h-12 h-12 rounded-[10px] bg-[#FDFDFD] border border-[#D9D9D9] shadow-custom-100 flex items-center cursor-pointer px-2 hover:bg-gray-100"
             >
               {item.icon}
               <p className="text-[#071522] text-[13px] font-medium ml-[5px]">
@@ -929,7 +990,7 @@ export default function SurveyDetailPage() {
             </div>
           </div>
           <div>
-            <p>Request QR Code</p>
+            <p>QR Code</p>
             <QRCode value={reqUrl || "-"} />
           </div>
         </div>

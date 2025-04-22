@@ -4,6 +4,7 @@ import CustomInput from "../../CustomInput";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { QuestionProps } from "@/utils/componentTypes";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -75,53 +76,66 @@ const GridOptionsEditor: React.FC<GridOptionsEditorProps> = ({
   };
 
   const handleAddRow = () => {
-    const newRows = [...(currentQuestion?.gridRows || []), `Row ${(currentQuestion?.gridRows?.length ?? 0) + 1}`];
+    const newRows = [
+      ...(currentQuestion?.gridRows || []),
+      `Мөр ${(currentQuestion?.gridRows?.length ?? 0) + 1}`,
+    ];
     updateGridOptions(newRows, currentQuestion?.gridColumns || []);
   };
 
   const handleAddColumn = () => {
-    const newColumns = [...(currentQuestion?.gridColumns || []), `Column ${(currentQuestion?.gridColumns?.length ?? 0) + 1}`];
+    const newColumns = [
+      ...(currentQuestion?.gridColumns || []),
+      `Багана ${(currentQuestion?.gridColumns?.length ?? 0) + 1}`,
+    ];
     updateGridOptions(currentQuestion?.gridRows || [], newColumns);
   };
 
   const handleRowLabelChange = (index: number, value: string) => {
-    const newRows = currentQuestion?.gridRows?.map((row, i) =>
-      i === index ? value : row
-    ) || [];
+    const newRows =
+      currentQuestion?.gridRows?.map((row, i) => (i === index ? value : row)) ||
+      [];
     updateGridOptions(newRows, currentQuestion?.gridColumns || []);
   };
 
   const handleColumnLabelChange = (index: number, value: string) => {
-    const newColumns = currentQuestion?.gridColumns?.map((col, i) =>
-      i === index ? value : col
-    ) || [];
+    const newColumns =
+      currentQuestion?.gridColumns?.map((col, i) =>
+        i === index ? value : col
+      ) || [];
     updateGridOptions(currentQuestion?.gridRows || [], newColumns);
   };
 
   const handleRemoveRow = (index: number) => {
     if ((currentQuestion?.gridRows?.length ?? 0) <= 1) {
-      showAlert("At least one row is required", "warning", "", true);
+      showAlert("Дор хаяж нэг мөр байх хэрэгтэй", "warning", "", true);
       return;
     }
-    const newRows = currentQuestion?.gridRows?.filter((_, i) => i !== index) || [];
+    const newRows =
+      currentQuestion?.gridRows?.filter((_, i) => i !== index) || [];
     updateGridOptions(newRows, currentQuestion?.gridColumns || []);
   };
 
   const handleRemoveColumn = (index: number) => {
     if ((currentQuestion?.gridColumns?.length ?? 0) <= 1) {
-      showAlert("At least one column is required", "warning", "", true);
+      showAlert("Дор хаяж нэг багана байх хэрэгтэй", "warning", "", true);
       return;
     }
-    const newColumns = currentQuestion?.gridColumns?.filter((_, i) => i !== index) || [];
+    const newColumns =
+      currentQuestion?.gridColumns?.filter((_, i) => i !== index) || [];
     updateGridOptions(currentQuestion?.gridRows || [], newColumns);
   };
 
-  const handleGridCorrectAnswerChange = (rowIndex: number, optionIndex: number) => {
-    const updatedOptions = currentQuestion?.options?.map((opt, i) =>
-      opt.rowIndex === rowIndex
-        ? { ...opt, isCorrect: i === optionIndex }
-        : { ...opt, isCorrect: false }
-    ) || [];
+  const handleGridCorrectAnswerChange = (
+    rowIndex: number,
+    optionIndex: number
+  ) => {
+    const updatedOptions =
+      currentQuestion?.options?.map((opt, i) =>
+        opt.rowIndex === rowIndex
+          ? { ...opt, isCorrect: i === optionIndex }
+          : { ...opt, isCorrect: false }
+      ) || [];
     setCurrentQuestion((prev) => ({
       ...prev,
       options: updatedOptions,
@@ -145,24 +159,16 @@ const GridOptionsEditor: React.FC<GridOptionsEditorProps> = ({
           <div key={index} className="flex flex-row gap-2 items-center">
             <CustomInput
               value={row}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleRowLabelChange(index, e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleRowLabelChange(index, e.target.value)
+              }
               className={questionInputClass}
               placeholder={`Мөр ${index + 1}`}
             />
-            <Button
-              onClick={() => handleRemoveRow(index)}
-              className="mt-2"
-              danger
-            >
-              Устгах
-            </Button>
+            <DeleteOutlined onClick={() => handleRemoveRow(index)} />
           </div>
         ))}
-        <Button
-          onClick={handleAddRow}
-          className="mt-2"
-          icon={<AddIcon />}
-        >
+        <Button onClick={handleAddRow} className="mt-2" icon={<AddIcon />}>
           Мөр нэмэх
         </Button>
       </div>
@@ -174,24 +180,16 @@ const GridOptionsEditor: React.FC<GridOptionsEditorProps> = ({
           <div key={index} className="flex flex-row gap-2 items-center">
             <CustomInput
               value={col}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleColumnLabelChange(index, e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleColumnLabelChange(index, e.target.value)
+              }
               className={questionInputClass}
               placeholder={`Багана ${index + 1}`}
             />
-            <Button
-              onClick={() => handleRemoveColumn(index)}
-              className="mt-2"
-              danger
-            >
-              Устгах
-            </Button>
+            <DeleteOutlined onClick={() => handleRemoveColumn(index)} />
           </div>
         ))}
-        <Button
-          onClick={handleAddColumn}
-          className="mt-2"
-          icon={<AddIcon />}
-        >
+        <Button onClick={handleAddColumn} className="mt-2" icon={<AddIcon />}>
           Багана нэмэх
         </Button>
       </div>
@@ -213,7 +211,8 @@ const GridOptionsEditor: React.FC<GridOptionsEditorProps> = ({
               >
                 {currentQuestion?.gridColumns?.map((col, colIndex) => {
                   const optionIndex = currentQuestion?.options?.findIndex(
-                    (opt) => opt.rowIndex === rowIndex && opt.columnIndex === colIndex
+                    (opt) =>
+                      opt.rowIndex === rowIndex && opt.columnIndex === colIndex
                   );
                   return (
                     <Radio key={colIndex} value={optionIndex}>

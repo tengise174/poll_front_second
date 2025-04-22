@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { Input, InputNumber, Radio } from "antd";
 import { QuestionProps } from "@/utils/componentTypes";
 
+
 interface LinearScaleOptionsEditorProps {
   currentQuestion: QuestionProps;
   setCurrentQuestion: (question: QuestionProps) => void;
@@ -22,7 +23,10 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
   const handleMinValueChange = (value: number | null) => {
     if (value === null) return;
     const newMinValue = value;
-    const newMaxValue = Math.max(currentQuestion.maxValue || 5, newMinValue + 1);
+    const newMaxValue = Math.max(
+      currentQuestion.maxValue || 5,
+      newMinValue + 1
+    );
     const newOptions = Array.from(
       { length: newMaxValue - newMinValue + 1 },
       (_, i) => ({
@@ -31,7 +35,8 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
         poster: null,
         points: 0,
         isCorrect: currentQuestion.options?.[i]?.isCorrect || false,
-        nextQuestionOrder: currentQuestion.options?.[i]?.nextQuestionOrder || null,
+        nextQuestionOrder:
+          currentQuestion.options?.[i]?.nextQuestionOrder || null,
         rowIndex: null,
         columnIndex: null,
       })
@@ -61,7 +66,10 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
   const handleMaxValueChange = (value: number | null) => {
     if (value === null) return;
     const newMaxValue = value;
-    const newMinValue = Math.min(currentQuestion.minValue || 1, newMaxValue - 1);
+    const newMinValue = Math.min(
+      currentQuestion.minValue || 1,
+      newMaxValue - 1
+    );
     const newOptions = Array.from(
       { length: newMaxValue - newMinValue + 1 },
       (_, i) => ({
@@ -70,7 +78,8 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
         poster: null,
         points: 0,
         isCorrect: currentQuestion.options?.[i]?.isCorrect || false,
-        nextQuestionOrder: currentQuestion.options?.[i]?.nextQuestionOrder || null,
+        nextQuestionOrder:
+          currentQuestion.options?.[i]?.nextQuestionOrder || null,
         rowIndex: null,
         columnIndex: null,
       })
@@ -124,10 +133,11 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
   };
 
   const handleCorrectAnswerChange = (value: number) => {
-    const newOptions = currentQuestion.options?.map((opt, index) => ({
-      ...opt,
-      isCorrect: index === value - (currentQuestion.minValue || 1),
-    })) || [];
+    const newOptions =
+      currentQuestion.options?.map((opt, index) => ({
+        ...opt,
+        isCorrect: index === value - (currentQuestion.minValue || 1),
+      })) || [];
 
     setCurrentQuestion({
       ...currentQuestion,
@@ -152,14 +162,20 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
         currentQuestion.maxValue - currentQuestion.minValue + 1
     ) {
       const newOptions = Array.from(
-        { length: (currentQuestion.maxValue || 5) - (currentQuestion.minValue || 1) + 1 },
+        {
+          length:
+            (currentQuestion.maxValue || 5) -
+            (currentQuestion.minValue || 1) +
+            1,
+        },
         (_, i) => ({
           content: ((currentQuestion.minValue || 1) + i).toString(),
           order: i + 1,
           poster: null,
           points: 0,
           isCorrect: currentQuestion.options?.[i]?.isCorrect || false,
-          nextQuestionOrder: currentQuestion.options?.[i]?.nextQuestionOrder || null,
+          nextQuestionOrder:
+            currentQuestion.options?.[i]?.nextQuestionOrder || null,
           rowIndex: null,
           columnIndex: null,
         })
@@ -181,7 +197,7 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
   return (
     <div className="mt-4">
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Minimum Value</p>
+        <p className="text-[14px] font-medium mb-2">Доод утга</p>
         <InputNumber
           min={0}
           max={1}
@@ -191,7 +207,7 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
         />
       </div>
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Maximum Value</p>
+        <p className="text-[14px] font-medium mb-2">Дээд утга</p>
         <InputNumber
           min={2}
           max={10}
@@ -201,26 +217,26 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
         />
       </div>
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Minimum Label</p>
+        <p className="text-[14px] font-medium mb-2">Доод текст</p>
         <Input
           value={currentQuestion.minLabel}
           onChange={handleMinLabelChange}
-          placeholder="e.g., Low"
+          placeholder="Доод"
           className="w-full"
         />
       </div>
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Maximum Label</p>
+        <p className="text-[14px] font-medium mb-2">Дээд текст</p>
         <Input
           value={currentQuestion.maxLabel}
           onChange={handleMaxLabelChange}
-          placeholder="e.g., High"
+          placeholder="Дээд"
           className="w-full"
         />
       </div>
       {currentQuestion.hasCorrectAnswer && (
         <div className="mb-4">
-          <p className="text-[14px] font-medium mb-2">Correct Answer</p>
+          <p className="text-[14px] font-medium mb-2">Зөв хариулт</p>
           <Radio.Group
             value={
               currentQuestion.options?.find((opt) => opt.isCorrect)?.content ||

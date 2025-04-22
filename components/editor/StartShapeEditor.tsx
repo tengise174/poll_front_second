@@ -45,7 +45,7 @@ const StartShapeEditor = ({
   };
 
   return (
-    <div className="px-5">
+    <div className="px-5 h-full">
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between">
         <div className="flex items-center">
           <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">

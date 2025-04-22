@@ -13,7 +13,7 @@ const SettingsEditor = ({
   setSettingsPage,
 }: SettingsEditorProps) => {
   return (
-    <div className="py-4 px-5">
+    <div className="py-4 px-5 h-full">
       <div
         className={` 
                 ${

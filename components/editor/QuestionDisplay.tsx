@@ -89,8 +89,8 @@ const QuestionDisplay = ({
         <Switch
           checked={isCardView}
           onChange={(checked) => setIsCardView(checked)}
-          checkedChildren="All Together"
-          unCheckedChildren="Separately"
+          checkedChildren="Хамтад нь"
+          unCheckedChildren="Тусад нь"
         />
       </div>
       {isCardView ? (
@@ -114,15 +114,15 @@ const QuestionDisplay = ({
                       style={{ color: dualColors[themeId][1] }}
                       className="text-[14px] leading-[17px] font-semibold"
                     >
-                      {index + 1}. {question.content || "Question"}
+                      {index + 1}. {question.content || "Асуулт"}
                       {question.isPointBased && (
                         <span className="ml-2 text-[12px] italic">
-                          (Point-based)
+                          (Оноотой)
                         </span>
                       )}
                       {question.hasCorrectAnswer && (
                         <span className="ml-2 text-[12px] italic">
-                          (Has Correct Answer)
+                          (Зөв хариулттай)
                         </span>
                       )}
                     </p>
@@ -150,7 +150,7 @@ const QuestionDisplay = ({
                                     ? `${optIndex + 1}.`
                                     : String.fromCharCode(65 + optIndex) + "."}
                                 </span>
-                                {item.content || "Answer"}
+                                {item.content || "Хариулт"}
                                 {question.isPointBased && (
                                   <span className="ml-2 text-[12px]">
                                     ({item.points} pts)
@@ -224,12 +224,12 @@ const QuestionDisplay = ({
                         ))}
                       {question.questionType === "DROPDOWN" && (
                         <Select
-                          placeholder="Select an option"
+                          placeholder="Сонголтоо сонго"
                           style={{ width: "100%", height: 44 }}
                         >
                           {question.options?.map((item, optIndex) => (
                             <Select.Option key={optIndex} value={optIndex}>
-                              {item.content || "Answer"}
+                              {item.content || "Хариулт"}
                               {question.isPointBased && ` (${item.points} pts)`}
                               {item.isCorrect && (
                                 <CheckCircleOutlined
@@ -237,7 +237,7 @@ const QuestionDisplay = ({
                                 />
                               )}
                               {item.nextQuestionOrder != null &&
-                                ` (Next: Q${item.nextQuestionOrder})`}
+                                ` (Дараах: А${item.nextQuestionOrder})`}
                             </Select.Option>
                           ))}
                         </Select>
@@ -259,7 +259,7 @@ const QuestionDisplay = ({
                                 )}
                                 {item.nextQuestionOrder != null && (
                                   <span className="ml-2 text-[12px]">
-                                    (Next: Q{item.nextQuestionOrder})
+                                    (Дараах: А{item.nextQuestionOrder})
                                   </span>
                                 )}
                               </div>
@@ -279,20 +279,20 @@ const QuestionDisplay = ({
                         ))}
                       {question.questionType === "TEXT" && (
                         <div className="w-full h-[100px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5 flex items-center">
-                          Enter your answer
+                          Хариулт оруул
                         </div>
                       )}
                       {question.questionType === "DATE" && (
                         <DatePicker
                           style={{ width: "100%", height: 44 }}
-                          placeholder="Select a date"
+                          placeholder="Огноо сонгоно уу!"
                           disabled
                         />
                       )}
                       {question.questionType === "TIME" && (
                         <TimePicker
                           style={{ width: "100%", height: 44 }}
-                          placeholder="Select a time"
+                          placeholder="Цаг сонгоно уу!"
                           disabled
                         />
                       )}
@@ -306,7 +306,7 @@ const QuestionDisplay = ({
                         <div className="flex flex-col gap-2">
                           <div className="flex justify-between">
                             <span className="text-[14px]">
-                              {question.minLabel || "Low"}
+                              {question.minLabel || "Доод"}
                             </span>
                             <Radio.Group
                               disabled
@@ -331,7 +331,7 @@ const QuestionDisplay = ({
                               ))}
                             </Radio.Group>
                             <span className="text-[14px]">
-                              {question.maxLabel || "High"}
+                              {question.maxLabel || "Дээд"}
                             </span>
                           </div>
                         </div>
@@ -352,9 +352,7 @@ const QuestionDisplay = ({
                 </Card>
               ))
             ) : (
-              <p className="text-[14px] text-[#757575] italic">
-                No questions available.
-              </p>
+              <p className="text-[14px] text-[#757575] italic">Асуулт алга.</p>
             )}
           </div>
         </div>
@@ -374,15 +372,13 @@ const QuestionDisplay = ({
                   style={{ color: dualColors[themeId][1] }}
                   className="text-[14px] leading-[17px] font-semibold cursor-pointer"
                 >
-                  {currentPage + 1}. {currentQuestion?.content || "Question"}
+                  {currentPage + 1}. {currentQuestion?.content || "Асуулт"}
                   {currentQuestion?.isPointBased && (
-                    <span className="ml-2 text-[12px] italic">
-                      (Point-based)
-                    </span>
+                    <span className="ml-2 text-[12px] italic">(Оноотой)</span>
                   )}
                   {currentQuestion?.hasCorrectAnswer && (
                     <span className="ml-2 text-[12px] italic">
-                      (Has Correct Answer)
+                      (Зөв хариулттай)
                     </span>
                   )}
                 </p>
@@ -407,7 +403,7 @@ const QuestionDisplay = ({
                                 ? `${index + 1}.`
                                 : String.fromCharCode(65 + index) + "."}
                             </span>
-                            {item.content || "Answer"}
+                            {item.content || "Хариулт"}
                             {currentQuestion?.isPointBased && (
                               <span className="ml-2 text-[12px]">
                                 ({item.points} pts)
@@ -421,7 +417,7 @@ const QuestionDisplay = ({
                             )}
                             {item.nextQuestionOrder != null && (
                               <span className="ml-2 text-[12px]">
-                                (Next: Q{item.nextQuestionOrder})
+                                (Дараах: А{item.nextQuestionOrder})
                               </span>
                             )}
                           </div>
@@ -476,13 +472,13 @@ const QuestionDisplay = ({
                     ))}
                   {currentQuestion?.questionType === "DROPDOWN" && (
                     <Select
-                      placeholder="Select an option"
+                      placeholder="Сонголтоо сонгоно уу"
                       style={{ width: "100%", height: 44 }}
                       disabled
                     >
                       {currentQuestion?.options?.map((item, index) => (
                         <Select.Option key={index} value={index}>
-                          {item.content || "Answer"}
+                          {item.content || "Хариулт"}
                           {currentQuestion.isPointBased &&
                             ` (${item.points} pts)`}
                           {item.isCorrect && (
@@ -491,7 +487,7 @@ const QuestionDisplay = ({
                             />
                           )}
                           {item.nextQuestionOrder != null &&
-                            ` (Next: Q${item.nextQuestionOrder})`}
+                            ` (Дараах: А${item.nextQuestionOrder})`}
                         </Select.Option>
                       ))}
                     </Select>
@@ -510,7 +506,7 @@ const QuestionDisplay = ({
                             )}
                             {item.nextQuestionOrder != null && (
                               <span className="ml-2 text-[12px]">
-                                (Next: Q{item.nextQuestionOrder})
+                                (Дараах: А{item.nextQuestionOrder})
                               </span>
                             )}
                           </div>
@@ -530,20 +526,20 @@ const QuestionDisplay = ({
                     ))}
                   {currentQuestion?.questionType === "TEXT" && (
                     <div className="w-full h-[200px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5">
-                      Enter your answer
+                      Хариулт оруул
                     </div>
                   )}
                   {currentQuestion?.questionType === "DATE" && (
                     <DatePicker
                       style={{ width: "100%", height: 44 }}
-                      placeholder="Select a date"
+                      placeholder="Огноо сонгоно уу!"
                       disabled
                     />
                   )}
                   {currentQuestion?.questionType === "TIME" && (
                     <TimePicker
                       style={{ width: "100%", height: 44 }}
-                      placeholder="Select a time"
+                      placeholder="Цаг сонгоно уу!"
                       disabled
                     />
                   )}
@@ -557,10 +553,10 @@ const QuestionDisplay = ({
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-between">
                         <span className="text-[14px]">
-                          {currentQuestion.minLabel || "Low"}
+                          {currentQuestion.minLabel || "Доод"}
                         </span>
                         <span className="text-[14px]">
-                          {currentQuestion.maxLabel || "High"}
+                          {currentQuestion.maxLabel || "Дээд"}
                         </span>
                       </div>
                       <Radio.Group disabled className="flex justify-between">
@@ -594,7 +590,7 @@ const QuestionDisplay = ({
           ) : (
             <div className="max-w-[340px] w-full">
               <p className="text-[14px] leading-[14px] font-medium text-[#757575] italic mb-5">
-                Click the Add Question button to select a question type.
+                Асуулт нэмэх товч дарж асуултын төрөл сонгоно уу!
               </p>
             </div>
           )}

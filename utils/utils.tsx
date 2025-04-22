@@ -102,11 +102,6 @@ export const questionTypes: QuestionTypeProps[] = [
     title: questionTypeTranslations["TIME"],
     questionType: "TIME",
   },
-  {
-    icon: null,
-    title: questionTypeTranslations["RANKING"],
-    questionType: "RANKING",
-  },
 ];
 
 export const formatNumber = (num: number): string => {

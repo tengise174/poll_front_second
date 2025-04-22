@@ -27,7 +27,7 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
   return (
     <div
       id="question_edit"
-      className="px-5 py-2 flex-1 justify-between flex flex-col"
+      className="px-5 h-full justify-between flex flex-col"
     >
       <div>
         <QuestionTitleEditor
@@ -110,11 +110,6 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
           <div className="mt-4 flex items-center gap-4">
             <ClockCircleFilled className="text-xl"/>
             <p>Цаг сонгох асуулт</p>
-          </div>
-        )}
-        {currentQuestion?.questionType === "RANKING" && (
-          <div className="mt-4 flex items-center gap-4">
-            <OrderedListOutlined className="text-xl"/>
           </div>
         )}
       </div>
