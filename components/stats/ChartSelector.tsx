@@ -15,9 +15,9 @@ const ChartSelector = ({ chartType, onChange }: ChartSelectorProps) => {
         onChange={(e) => onChange(e.target.value as ChartType)}
         className="p-2 border rounded"
       >
-        <option value="pie">Pie Chart</option>
-        <option value="bar">Bar Chart</option>
-        <option value="line">Line Chart</option>
+        <option value="pie">Дугуй диаграм</option>
+        <option value="bar">Баганан диаграм</option>
+        <option value="line">Шугаман диаграм</option>
       </select>
     </div>
   );

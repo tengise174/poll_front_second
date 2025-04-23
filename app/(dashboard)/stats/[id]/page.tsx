@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Layout, Skeleton } from "antd";
+import { Layout, Skeleton, Radio } from "antd";
 import { getStatById } from "@/api/action";
 import StatsHeader from "@/components/stats/StatsHeader";
 import StatsDetails from "@/components/stats/StatsDetails";
@@ -14,10 +14,34 @@ import PollstersTable from "@/components/stats/PollstersTable";
 import QuestionCard from "@/components/stats/QuestionCard";
 import { Header, Content } from "antd/es/layout/layout";
 
+// Custom CSS to ensure radio button styling
+const radioStyle = `
+  .custom-radio .ant-radio-button-wrapper {
+    background-color: #f5f5f5;
+    color: #1f1f1f;
+    border-color: #d9d9d9;
+    transition: all 0.3s;
+  }
+  .custom-radio .ant-radio-button-wrapper:hover {
+    background-color: #888;
+    color: #ffffff;
+  }
+  .custom-radio .ant-radio-button-wrapper-checked {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #1677ff !important;
+  }
+  .custom-radio .ant-radio-button-wrapper-checked:hover {
+    background-color: #333 !important;
+    color: #ffffff !important;
+  }
+`;
+
 const StatsPage = () => {
   const { id } = useParams();
   const [data, setData] = useState<PollData | null>(null);
   const [chartTypes, setChartTypes] = useState<ChartType[]>([]);
+  const [viewMode, setViewMode] = useState<"summary" | "question">("summary");
 
   const {
     data: fetchedData,
@@ -57,32 +81,51 @@ const StatsPage = () => {
 
   return (
     <Layout>
+      <style>{radioStyle}</style>
       <Header className="!bg-white shadow-md border-l border-0.5 border-[#D9D9D9] !h-[120]">
-        {data && <StatsHeader data={data} />}
+        <div className="flex justify-between items-center h-full">
+          {data && <StatsHeader data={data} />}
+          <Radio.Group
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            className="mr-4 custom-radio !flex !flex-row !gap-2"
+          >
+            <Radio.Button className="!rounded" value="summary">
+              Ерөнхий
+            </Radio.Button>
+            <Radio.Button className="!rounded" value="question">
+              Асуултууд
+            </Radio.Button>
+          </Radio.Group>
+        </div>
       </Header>
       <Content className="overflow-y-auto">
         <div className="p-6">
           {data && (
             <div className="flex flex-col gap-2">
-              <div className="bg-second-bg rounded p-4">
-                <StatsDetails data={data} />
-                <StatsSummary data={data} />
-                <QuestionSummary data={data} />
-                <ParticipantsTable data={data} />
-                {data.isAccessLevel && <PollstersTable data={data} />}
-              </div>
-              <div className="space-y-6">
-                {data.questions.map((question, qIndex) => (
-                  <QuestionCard
-                    key={qIndex}
-                    question={question}
-                    chartType={chartTypes[qIndex]}
-                    onChartTypeChange={(type) =>
-                      handleChartTypeChange(qIndex, type)
-                    }
-                  />
-                ))}
-              </div>
+              {viewMode === "summary" && (
+                <div className="rounded p-4 flex flex-col gap-2">
+                  <StatsDetails data={data} />
+                  <StatsSummary data={data} />
+                  <QuestionSummary data={data} />
+                  <ParticipantsTable data={data} />
+                  {data.isAccessLevel && <PollstersTable data={data} />}
+                </div>
+              )}
+              {viewMode === "question" && (
+                <div className="flex flex-col gap-4 md:mx-20">
+                  {data.questions.map((question, qIndex) => (
+                    <QuestionCard
+                      key={qIndex}
+                      question={question}
+                      chartType={chartTypes[qIndex]}
+                      onChartTypeChange={(type) =>
+                        handleChartTypeChange(qIndex, type)
+                      }
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

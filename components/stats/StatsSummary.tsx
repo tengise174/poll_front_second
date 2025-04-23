@@ -23,7 +23,7 @@ const StatsSummary = ({ data }: StatsSummaryProps) => {
   );
 
   return (
-    <Collapse defaultActiveKey={["1"]} expandIconPosition="end">
+    <Collapse defaultActiveKey={[""]} expandIconPosition="end">
       <Panel header="Асуулгын тойм" key="1">
         <div className="flex flex-row gap-2 w-full flex-wrap">
           <Card title="Оролцсон" className="flex-1 min-w-[150px]">

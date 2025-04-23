@@ -1,15 +1,24 @@
 "use client";
-import { Table } from "antd";
+import { Table, Input, Button, Space, Modal } from "antd";
 import { PollOption, PollQuestion } from "./types";
+import { SearchOutlined } from "@ant-design/icons";
+import { useState } from "react";
 
 interface GridTableProps {
   question: PollQuestion;
 }
 
 const GridTable = ({ question }: GridTableProps) => {
+  const [searchText, setSearchText] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<string[]>([]);
+
+  const MAX_USERNAMES = 3; // Max usernames to display before truncation
+
   const prepareGridTableData = () => {
     if (
-      (question.questionType !== "MULTIPLE_CHOICE_GRID" && question.questionType !== "TICK_BOX_GRID") ||
+      (question.questionType !== "MULTIPLE_CHOICE_GRID" &&
+        question.questionType !== "TICK_BOX_GRID") ||
       !question.gridRows ||
       !question.gridColumns ||
       !question.options
@@ -39,9 +48,17 @@ const GridTable = ({ question }: GridTableProps) => {
         rowData[`col-${colIndex}`] = option
           ? {
               selectionCount: option.selectionCount,
-              answeredBy: option.answeredBy.map((user) => user.username).join(", ") || "No users",
+              answeredBy: option.answeredBy,
+              displayText:
+                option.answeredBy.length > MAX_USERNAMES
+                  ? `${option.answeredBy
+                      .slice(0, MAX_USERNAMES)
+                      .map((user) => user.username)
+                      .join(", ")} (...)`
+                  : option.answeredBy.map((user) => user.username).join(", ") ||
+                    "No users",
             }
-          : { selectionCount: 0, answeredBy: "No users" };
+          : { selectionCount: 0, answeredBy: [], displayText: "No users" };
       });
       return rowData;
     });
@@ -50,7 +67,7 @@ const GridTable = ({ question }: GridTableProps) => {
   const getGridTableColumns = (gridColumns: string[]) => {
     return [
       {
-        title: "Row",
+        title: "",
         dataIndex: "rowLabel",
         key: "rowLabel",
         fixed: "left" as const,
@@ -60,30 +77,108 @@ const GridTable = ({ question }: GridTableProps) => {
         title: colLabel,
         dataIndex: `col-${colIndex}`,
         key: `col-${colIndex}`,
-        render: (value: { selectionCount: number; answeredBy: string }) => (
-          <div>
-            <p>
-              <strong>Count:</strong> {value.selectionCount}
-            </p>
-            <p>
-              <strong>Users:</strong> {value.answeredBy}
-            </p>
-          </div>
-        ),
+        render: (value: {
+          selectionCount: number;
+          answeredBy: { username: string; timeTaken: number }[];
+          displayText: string;
+        }) => {
+          const isHighlighted =
+            searchText &&
+            value.answeredBy.some((user) =>
+              user.username.toLowerCase().includes(searchText.toLowerCase())
+            );
+          const hasMore = value.answeredBy.length > MAX_USERNAMES;
+          return (
+            <div
+              style={{
+                backgroundColor: isHighlighted ? "#e6f7ff" : "transparent",
+                padding: "8px",
+                borderRadius: "4px",
+                transition: "background-color 0.3s",
+                cursor: hasMore ? "pointer" : "default",
+              }}
+              onClick={() => {
+                if (hasMore) {
+                  setModalContent(value.answeredBy.map((user) => user.username));
+                  setIsModalVisible(true);
+                }
+              }}
+            >
+              <p>
+                <strong>Сонгосон тоо:</strong> {value.selectionCount}
+              </p>
+              <p>
+                <strong>Оролцогчид:</strong> {value.displayText}
+              </p>
+            </div>
+          );
+        },
       })),
     ];
   };
 
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+  };
+
+  const handleReset = () => {
+    setSearchText("");
+  };
+
   return (
-    <Table
-      columns={getGridTableColumns(question.gridColumns || [])}
-      dataSource={prepareGridTableData()}
-      rowKey="key"
-      pagination={false}
-      bordered
-      size="middle"
-      scroll={{ x: "max-content" }}
-    />
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <Space>
+          <Input
+            placeholder="Хэрэглэгчийн нэрээр хайх"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 200 }}
+            onPressEnter={() => handleSearch(searchText)}
+          />
+          <Button
+            type="primary"
+            icon={<SearchOutlined />}
+            onClick={() => handleSearch(searchText)}
+          >
+            Хайх
+          </Button>
+          <Button onClick={handleReset}>Цэвэрлэх</Button>
+        </Space>
+      </div>
+      <Table
+        columns={getGridTableColumns(question.gridColumns || [])}
+        dataSource={prepareGridTableData()}
+        rowKey="key"
+        pagination={false}
+        bordered
+        size="middle"
+        scroll={{ x: "max-content" }}
+      />
+      <Modal
+        title="Бүх Оролцогчид"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setIsModalVisible(false)}>
+            Хаах
+          </Button>,
+        ]}
+        width={400}
+      >
+        <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+          {modalContent.length > 0 ? (
+            <ul style={{ paddingLeft: "20px" }}>
+              {modalContent.map((username, index) => (
+                <li key={index}>{username}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>Оролцогч байхгүй</p>
+          )}
+        </div>
+      </Modal>
+    </div>
   );
 };
 

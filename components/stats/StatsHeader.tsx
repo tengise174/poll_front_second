@@ -15,25 +15,25 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
     const netPoints = calculateNetPoints(data);
 
     const generalInfo = [
-      ["Poll Title", data.title],
-      ["Created At", new Date(data.createdAt).toLocaleString()],
-      ["Status", statusConv[data.status]],
-      ["Submitted Users", data.submittedUserCount],
-      ["Average Poll Time (s)", data.avgPollTime.toFixed(2)],
-      ["Total Possible Points", netPoints],
+      ["Асуулга нэр", data.title],
+      ["Үүссэн огноо", new Date(data.createdAt).toLocaleString()],
+      ["Төлөв", statusConv[data.status]],
+      ["Оролцсон тоо", data.submittedUserCount],
+      ["Дундаж хариулах хугацаа", data.avgPollTime.toFixed(2)],
+      ["Авч болох нийт оноо", netPoints],
       [
-        "Start Date",
-        data.startDate ? new Date(data.startDate).toLocaleString() : "Not Set",
+        "Эхлэх хугацаа",
+        data.startDate ? new Date(data.startDate).toLocaleString() : "Байхгүй",
       ],
       [
-        "End Date",
-        data.endDate ? new Date(data.endDate).toLocaleString() : "Not Set",
+        "Дуусах хугацаа",
+        data.endDate ? new Date(data.endDate).toLocaleString() : "Байхгүй",
       ],
-      ["Access Level", data.isAccessLevel ? "Yes" : "No"],
-      ["Duration", data.isDuration ? data.duration : "Not Set"],
+      ["Хандалтын түвшин", data.isAccessLevel ? "Хаалттай" : "Нээлттэй"],
+      ["Хугацаа", data.isDuration ? data.duration : "Байхгүй"],
       [
-        "Pollster Number",
-        data.isPollsterNumber ? data.pollsterNumber : "Not Set",
+        "Оролцогчийн тоо",
+        data.isPollsterNumber ? data.pollsterNumber : "Байхгүй",
       ],
     ];
 
@@ -41,17 +41,16 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
     XLSX.utils.book_append_sheet(wb, wsGeneral, "Poll Info");
 
     const questionHeaders = [
-      "Order",
-      "Content",
-      "Type",
-      "Is Point Based",
-      "Has Correct Answer",
-      "Avg Time Taken (s)",
-      "Option/Answer",
-      "Points",
-      "Is Correct",
-      "Selection Count",
-      "Answered By",
+      "Асуулт",
+      "Төрөл",
+      "Оноотой асуулт?",
+      "Зөв хариутай?",
+      "Дундаж хугацаа",
+      "Хариулт",
+      "Оноо",
+      "Зөв эсэх",
+      "Хариулсан тоо",
+      "Хариулсан оролцогч",
     ];
 
     const questionData: any[] = [];
@@ -64,11 +63,10 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
       if (question.questionType === "TEXT" && question.answers) {
         question.answers.forEach((answer) => {
           questionData.push([
-            question.order,
             question.content,
             questionTypeTranslations[question.questionType],
-            question.isPointBased ? "Yes" : "No",
-            question.hasCorrectAnswer ? "Yes" : "No",
+            question.isPointBased ? "Тийм" : "Үгүй",
+            question.hasCorrectAnswer ? "Тийм" : "Үгүй",
             question.avgTimeTaken.toFixed(2),
             answer.textAnswer,
             "-",
@@ -81,15 +79,14 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
         const startRow = questionData.length + 1;
         question.options.forEach((option, idx) => {
           questionData.push([
-            idx === 0 ? question.order : "",
             idx === 0 ? question.content : "",
             idx === 0 ? questionTypeTranslations[question.questionType] : "",
-            idx === 0 ? (question.isPointBased ? "Yes" : "No") : "",
-            idx === 0 ? (question.hasCorrectAnswer ? "Yes" : "No") : "",
+            idx === 0 ? (question.isPointBased ? "Тийм" : "Үгүй") : "",
+            idx === 0 ? (question.hasCorrectAnswer ? "Тийм" : "Үгүй") : "",
             idx === 0 ? question.avgTimeTaken.toFixed(2) : "",
             option.content,
             option.points,
-            option.isCorrect ? "Yes" : "No",
+            option.isCorrect ? "Тийм" : "Үгүй",
             option.selectionCount,
             option.answeredBy.map((u) => u.username).join(", "),
           ]);
@@ -116,11 +113,11 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
     XLSX.utils.book_append_sheet(wb, wsQuestions, "Questions");
 
     const userHeaders = [
-      "Username",
-      "Total Time Taken (s)",
-      "Total Points",
-      "Percentage of Net Points (%)",
-      "Correct Answers",
+      "Хэрэглэгч нэр",
+      "Зарцуулсан хугацаа",
+      "Нийт оноо",
+      "Онооны хувь (%)",
+      "Зөв хариулсан тоо",
     ];
     const userData = data.submittedUsers.map((user) => {
       const { totalPoints, correctAnswers, percentage } = calculateUserStats(
@@ -139,14 +136,13 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
     XLSX.utils.book_append_sheet(wb, wsUsers, "Submitted Users");
 
     const userAnswerHeaders = [
-      "Username",
-      "Question Order",
-      "Question Content",
-      "Question Type",
-      "Selected Options/Answer",
-      "Points Earned",
-      "Is Correct",
-      "Time Taken (s)",
+      "Хэрэглэгч нэр",
+      "Асуулт",
+      "Асуултын төрөл",
+      "Хариулт",
+      "Авсан оноо",
+      "Зөв эсэх",
+      "Зарцуулсан хугацаа",
     ];
 
     const userAnswerData: any[] = [];
@@ -183,7 +179,7 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
               if (question.hasCorrectAnswer && option.isCorrect) {
                 isCorrect = "Yes";
               } else if (question.hasCorrectAnswer) {
-                isCorrect = isCorrect === "Yes" ? "Yes" : "No";
+                isCorrect = isCorrect === "Yes" ? "Тийм" : "Үгүй";
               }
             }
           });
@@ -191,10 +187,9 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
 
         userAnswerData.push([
           userAnswerData.length === startRow - 1 ? user.username : "",
-          question.order,
           question.content,
           questionTypeTranslations[question.questionType],
-          selectedOptions.length > 0 ? selectedOptions.join(", ") : "No Answer",
+          selectedOptions.length > 0 ? selectedOptions.join(", ") : "Хариу байхгүй",
           pointsEarned,
           isCorrect,
           timeTaken !== null ? timeTaken.toFixed(2) : "-",
