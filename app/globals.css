@@ -98,3 +98,21 @@ body {
 .custom-checkbox-wrapper .custom-checkbox-inner::after {
   border-radius: 50% !important;
 }
+
+.ant-radio-button-wrapper {
+  border: none !important;
+  margin-right: 0 !important;
+}
+
+.ant-radio-button-wrapper::before {
+  display: none !important; 
+}
+
+.ant-radio-button-wrapper-checked,
+.ant-radio-button-wrapper:hover {
+  border: none !important;
+}
+
+.ant-radio-button-wrapper {
+  padding: 0 16px;
+}

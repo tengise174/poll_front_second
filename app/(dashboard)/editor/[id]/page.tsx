@@ -843,7 +843,7 @@ export default function SurveyDetailPage() {
   }, [currentPage, chosenType]);
 
   return (
-    <div className="bg-[#F4F6F8] font-open h-full">
+    <div className="bg-[#F4F6F8] font-open h-full p-4 w-full">
       <div className="flex flex-col md:flex-row h-full">
         <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] max-h-full py-3 rounded">
           <div className="px-5">

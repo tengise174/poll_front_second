@@ -11,12 +11,10 @@ export default function DashboardLayout({
 }>) {
   return (
     <Layout className="h-screen bg-second-bg">
-        <CustomMenu />
-      <Layout className="h-full">
-        <Content className="p-4 h-full overflow-y-auto">
-          <Suspense fallback={<Skeleton />}>{children}</Suspense>
-        </Content>
-      </Layout>
+      <CustomMenu />
+      <Layout>
+        <Suspense fallback={<Skeleton />}>{children}</Suspense>
+        </Layout>
     </Layout>
   );
 }

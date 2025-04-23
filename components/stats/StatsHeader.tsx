@@ -55,7 +55,10 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
     ];
 
     const questionData: any[] = [];
-    const merges: { s: { r: number; c: number }; e: { r: number; c: number } }[] = [];
+    const merges: {
+      s: { r: number; c: number };
+      e: { r: number; c: number };
+    }[] = [];
 
     data.questions.forEach((question) => {
       if (question.questionType === "TEXT" && question.answers) {
@@ -105,7 +108,10 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
       }
     });
 
-    const wsQuestions = XLSX.utils.aoa_to_sheet([questionHeaders, ...questionData]);
+    const wsQuestions = XLSX.utils.aoa_to_sheet([
+      questionHeaders,
+      ...questionData,
+    ]);
     wsQuestions["!merges"] = merges;
     XLSX.utils.book_append_sheet(wb, wsQuestions, "Questions");
 
@@ -117,7 +123,10 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
       "Correct Answers",
     ];
     const userData = data.submittedUsers.map((user) => {
-      const { totalPoints, correctAnswers, percentage } = calculateUserStats(data, user);
+      const { totalPoints, correctAnswers, percentage } = calculateUserStats(
+        data,
+        user
+      );
       return [
         user.username,
         user.totalTimeTaken,
@@ -141,7 +150,10 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
     ];
 
     const userAnswerData: any[] = [];
-    const userAnswerMerges: { s: { r: number; c: number }; e: { r: number; c: number } }[] = [];
+    const userAnswerMerges: {
+      s: { r: number; c: number };
+      e: { r: number; c: number };
+    }[] = [];
 
     data.submittedUsers.forEach((user) => {
       const startRow = userAnswerData.length + 1;
@@ -197,7 +209,10 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
       }
     });
 
-    const wsUserAnswers = XLSX.utils.aoa_to_sheet([userAnswerHeaders, ...userAnswerData]);
+    const wsUserAnswers = XLSX.utils.aoa_to_sheet([
+      userAnswerHeaders,
+      ...userAnswerData,
+    ]);
     wsUserAnswers["!merges"] = userAnswerMerges;
     XLSX.utils.book_append_sheet(wb, wsUserAnswers, "User Answers");
 
@@ -205,15 +220,17 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
   };
 
   return (
-    <div className="flex flex-row gap-4 items-center">
+    <div className="flex flex-row gap-4 items-center pt-2">
       <Image
         src={
           data.poster ||
           "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
         }
         alt="poster"
-        width={200}
-        height={200}
+        style={{
+          width: "auto",
+        }}
+        height={100}
       />
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold text-gray-800">{data.title}</h1>

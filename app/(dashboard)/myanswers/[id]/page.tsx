@@ -288,7 +288,7 @@ const MyAnswersDetail = () => {
   };
 
   return (
-    <div className="w-200 flex flex-col items-center justify-center mx-auto">
+    <div className="w-200 flex flex-col items-center justify-center mx-auto p-4">
       <div className="w-full font-bold">
         <h1>Асуулгын нэр: {answerDetails.poll.title}</h1>
         <p>Тайлбар: {answerDetails.poll.greetingMessage}</p>

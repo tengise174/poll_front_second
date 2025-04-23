@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "antd";
+import { Layout, Skeleton } from "antd";
 import { getStatById } from "@/api/action";
 import StatsHeader from "@/components/stats/StatsHeader";
 import StatsDetails from "@/components/stats/StatsDetails";
@@ -12,6 +12,7 @@ import QuestionSummary from "@/components/stats/QuestionSummary";
 import ParticipantsTable from "@/components/stats/ParticipantsTable";
 import PollstersTable from "@/components/stats/PollstersTable";
 import QuestionCard from "@/components/stats/QuestionCard";
+import { Header, Content } from "antd/es/layout/layout";
 
 const StatsPage = () => {
   const { id } = useParams();
@@ -55,30 +56,38 @@ const StatsPage = () => {
   }
 
   return (
-    <div className="p-6">
-      {data && (
-        <div className="flex flex-col gap-2">
-          <div className="bg-second-bg rounded p-4">
-            <StatsHeader data={data} />
-            <StatsDetails data={data} />
-            <StatsSummary data={data} />
-            <QuestionSummary data={data} />
-            <ParticipantsTable data={data} />
-            {data.isAccessLevel && <PollstersTable data={data} />}
-          </div>
-          <div className="space-y-6">
-            {data.questions.map((question, qIndex) => (
-              <QuestionCard
-                key={qIndex}
-                question={question}
-                chartType={chartTypes[qIndex]}
-                onChartTypeChange={(type) => handleChartTypeChange(qIndex, type)}
-              />
-            ))}
-          </div>
+    <Layout>
+      <Header className="!bg-white shadow-md border-l border-0.5 border-[#D9D9D9] !h-[120]">
+        {data && <StatsHeader data={data} />}
+      </Header>
+      <Content className="overflow-y-auto">
+        <div className="p-6">
+          {data && (
+            <div className="flex flex-col gap-2">
+              <div className="bg-second-bg rounded p-4">
+                <StatsDetails data={data} />
+                <StatsSummary data={data} />
+                <QuestionSummary data={data} />
+                <ParticipantsTable data={data} />
+                {data.isAccessLevel && <PollstersTable data={data} />}
+              </div>
+              <div className="space-y-6">
+                {data.questions.map((question, qIndex) => (
+                  <QuestionCard
+                    key={qIndex}
+                    question={question}
+                    chartType={chartTypes[qIndex]}
+                    onChartTypeChange={(type) =>
+                      handleChartTypeChange(qIndex, type)
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </Content>
+    </Layout>
   );
 };
 

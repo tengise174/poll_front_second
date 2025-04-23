@@ -6,13 +6,22 @@ export interface PollCardType {
   id: string;
   title: string;
   greetingMessage: string;
-  poster?: string | null;
+  poster?: string;
   cardType: "POLL" | "ANSWER";
+  setIsModalOpen?: (open: boolean) => void;
+  setCurrentId?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  pushToId?: (id: string) => void;
+  setReqUrl?: (id: string) => void;
   hasAnswers?: boolean;
-  setIsModalOpen?: Dispatch<SetStateAction<boolean>>;
-  setCurrentId?: Function;
-  onDelete?: Function;
-  pushToId?: Function;
+  published?: boolean;
+  endDate?: string | null;
+  pollsterNumber?: number | null;
+  submittedUserNumber?: number;
+  pollstersLength?: number;
+  createdAt?: string;
+  answeredAt?: string;
+  questionLength?: number;
 }
 
 export interface FormItemProps {
