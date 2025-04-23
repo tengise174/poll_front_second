@@ -98,7 +98,6 @@ export const changePassword = async (data: any) => {
   }
 };
 
-
 export const updateProfile = async (data: any) => {
   try {
     const response = await instance.post("/auth/update-profile", data);
@@ -140,6 +139,15 @@ export const createPoll = async (data: any) => {
 export const updatePoll = async (id: string, data: any) => {
   try {
     const response = await instance.put(`/polls/${id}`, data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const togglePublish = async (id: string) => {
+  try {
+    const response = await instance.patch(`/polls/publish/${id}`);
     return response.data;
   } catch (error: any) {
     throw error;

@@ -115,6 +115,7 @@ interface SettingsPageProps {
   pollsterNumber: number | null;
   pollsters: Array<{ username: string }>;
   selectedSettingItem: "ACCESS_LEVEL" | "POLLSTER_NUMBER" | "";
+  published: boolean;
 }
 
 interface StartPageProps {
@@ -125,6 +126,8 @@ interface StartPageProps {
 }
 
 export interface SettingsEditorProps {
+  id: string;
+  showUrlModal: Function;
   settingsPage: SettingsPageProps;
   setSettingsPage: Dispatch<SetStateAction<SettingsPageProps>>;
 }

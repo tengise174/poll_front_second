@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Modal, QRCode } from "antd";
@@ -19,10 +19,10 @@ import { dualColors, questionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { QuestionProps, QuestionTypes } from "@/utils/componentTypes";
-import { OrderedListOutlined } from "@ant-design/icons";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
+  const router = useRouter();
   const { showAlert } = useAlert();
   const [reqUrl, setReqUrl] = useState<string>("");
   const [themeId, setThemeId] = useState<number>(0);
@@ -54,6 +54,7 @@ export default function SurveyDetailPage() {
     pollsterNumber: number | null;
     pollsters: Array<{ username: string }>;
     selectedSettingItem: "ACCESS_LEVEL" | "POLLSTER_NUMBER" | "";
+    published: boolean;
   }>({
     isAccessLevel: false,
     isTimeSelected: false,
@@ -65,6 +66,7 @@ export default function SurveyDetailPage() {
     pollsterNumber: null,
     pollsters: [],
     selectedSettingItem: "",
+    published: false,
   });
 
   const [startPage, setStartPage] = useState<{
@@ -152,6 +154,7 @@ export default function SurveyDetailPage() {
         isDuration: data.isDuration,
         isPollsterNumber: data.isPollsterNumber,
         pollsters: data.pollsters,
+        published: data.published,
       }));
 
       setStartPage((prev) => ({
@@ -535,9 +538,8 @@ export default function SurveyDetailPage() {
       try {
         const result = await createPoll(pollData);
         if (result) {
-          showAlert("Successfully created", "success", "", true);
-          setReqUrl(`http://localhost:3000/test/${result.id}`);
-          setIsModalOpen(true);
+          showAlert("Амжилттай үүслээ", "success", "", true);
+          router.push(`/editor/${result.id}`);
         }
       } catch (e) {
         showAlert("Failed", "warning", "", true);
@@ -547,15 +549,18 @@ export default function SurveyDetailPage() {
       try {
         const result = await updatePoll(id as string, pollData);
         if (result) {
-          showAlert("Successfully updated", "success", "", true);
-          setReqUrl(`http://localhost:3000/test/${result.id}`);
-          setIsModalOpen(true);
+          showAlert("Амжилттай өөрчлөгдлөө", "success", "", true);
         }
       } catch (e) {
         showAlert("Failed", "warning", "", true);
         console.log(e);
       }
     }
+  };
+
+  const showUrlModal = () => {
+    setReqUrl(`http://localhost:3000/test/${id}`);
+    setIsModalOpen(true);
   };
 
   const handleAdd = () => {
@@ -843,26 +848,30 @@ export default function SurveyDetailPage() {
         <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] max-h-full py-3 rounded">
           <div className="px-5">
             <div className="rounded-full w-full flex items-center h-[34px] bg-[#D9D9D9]">
-              {["Тохиргоо", "Нүүр", "Асуултууд", "Төгсгөл"].map((text, index) => (
-                <p
-                  onClick={() => {
-                    setActiveSection(index);
-                  }}
-                  key={index}
-                  className={`text-[13px] w-1/3 cursor-pointer flex items-center justify-center h-full ${
-                    activeSection === index
-                      ? "bg-black text-[#FDFDFD] rounded-full font-semibold"
-                      : "text-[#757575] font-medium"
-                  }`}
-                >
-                  {text}
-                </p>
-              ))}
+              {["Тохиргоо", "Нүүр", "Асуултууд", "Төгсгөл"].map(
+                (text, index) => (
+                  <p
+                    onClick={() => {
+                      setActiveSection(index);
+                    }}
+                    key={index}
+                    className={`text-[13px] w-1/3 cursor-pointer flex items-center justify-center h-full ${
+                      activeSection === index
+                        ? "bg-black text-[#FDFDFD] rounded-full font-semibold"
+                        : "text-[#757575] font-medium"
+                    }`}
+                  >
+                    {text}
+                  </p>
+                )
+              )}
             </div>
           </div>
           <div className="flex-1">
             {activeSection === 0 && (
               <SettingsEditor
+                id={id?.toString() || "new"}
+                showUrlModal={showUrlModal}
                 settingsPage={settingsPage}
                 setSettingsPage={setSettingsPage}
               />
@@ -976,10 +985,15 @@ export default function SurveyDetailPage() {
           ))}
         </div>
       </Modal>
-      <Modal open={isModalOpen} onCancel={() => setIsModalOpen(false)}>
+      <Modal
+        open={isModalOpen}
+        onOk={() => setIsModalOpen(false)}
+        onCancel={() => setIsModalOpen(false)}
+        cancelButtonProps={{ style: { display: "none" } }}
+      >
         <div className="flex flex-col gap-4">
           <div>
-            <p>Request URL</p>
+            <p>Оролцох URL</p>
             <div className="flex flex-row gap-2">
               <Link href={reqUrl}>{reqUrl}</Link>
               <Button
