@@ -11,7 +11,7 @@ import AnswerOptionsEditor from "./AnswerOptionsEditor";
 import RankingOptionsEditor from "./RankingOptionsEditor";
 import DeleteQuestionButton from "./DeleteQuestionButton";
 import { QuestionTextEditorProps } from "@/utils/componentTypes";
-import { CalendarOutlined, OrderedListOutlined } from "@ant-design/icons";
+import { CalendarOutlined } from "@ant-design/icons";
 import { ClockCircleFilled } from "@ant-design/icons";
 
 const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
@@ -27,7 +27,7 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
   return (
     <div
       id="question_edit"
-      className="px-5 h-full justify-between flex flex-col"
+      className="px-5 h-full justify-between flex flex-col gap-2"
     >
       <div>
         <QuestionTitleEditor
@@ -102,13 +102,13 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
         )}
         {currentQuestion?.questionType === "DATE" && (
           <div className="mt-4 flex items-center gap-4">
-            <CalendarOutlined className="text-xl"/>
+            <CalendarOutlined className="text-xl" />
             <p>Огноо сонгох асуулт</p>
           </div>
         )}
         {currentQuestion?.questionType === "TIME" && (
           <div className="mt-4 flex items-center gap-4">
-            <ClockCircleFilled className="text-xl"/>
+            <ClockCircleFilled className="text-xl" />
             <p>Цаг сонгох асуулт</p>
           </div>
         )}

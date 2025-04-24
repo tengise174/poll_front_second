@@ -125,6 +125,11 @@ const QuestionDisplay = ({
                           (Зөв хариулттай)
                         </span>
                       )}
+                      {question.required && (
+                        <span className="ml-2 text-[16px] italic text-red-600">
+                          *
+                        </span>
+                      )}
                     </p>
                     {question.poster && (
                       <Image
@@ -379,6 +384,11 @@ const QuestionDisplay = ({
                   {currentQuestion?.hasCorrectAnswer && (
                     <span className="ml-2 text-[12px] italic">
                       (Зөв хариулттай)
+                    </span>
+                  )}
+                  {currentQuestion.required && (
+                    <span className="ml-2 text-[12px] italic text-red-600">
+                      *
                     </span>
                   )}
                 </p>

@@ -2,7 +2,7 @@
 
 import { QuestionTypes } from "@/utils/componentTypes";
 
-export type ChartType = "pie" | "bar" | "line";
+export type ChartType = "pie" | "bar" | "line" | "donut" | "area";
 
 export interface AnsweredByProp {
   username: string;

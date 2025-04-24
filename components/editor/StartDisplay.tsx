@@ -1,6 +1,7 @@
 import React from "react";
 import { Image } from "antd";
 import { StartDisplayProps } from "@/utils/componentTypes";
+import BoxIcon from "@/public/icons/box_icon";
 
 const StartDisplay = ({
   startPage,
@@ -17,7 +18,7 @@ const StartDisplay = ({
       className={`border border-[#303030] rounded-[10px] w-full h-full flex flex-col justify-between pt-10 px-5 pb-5`}
     >
       <div className="w-full flex flex-col items-center">
-        {startPage?.poster && (
+        {startPage?.poster ? (
           <Image
             src={startPage?.poster}
             height={200}
@@ -25,19 +26,21 @@ const StartDisplay = ({
               width: "auto",
             }}
             alt="poster"
-          />
+          /> 
+        ): (
+          <BoxIcon />
         )}
         <p
           style={{ color: dualColors[themeId][1] }}
-          className="text-[14px] leading-[17px] font-semibold mt-[100px]"
+          className="text-[18px] leading-[17px] font-semibold mt-[100px]"
         >
-          {startPage?.title}
+          {startPage?.title || "Гарчиг"}
         </p>
         <p
           style={{ color: dualColors[themeId][1] }}
-          className="text-[14px] leading-[17px] font-semibold mt-5 text-center"
+          className="text-[14px] leading-[17px] font-normal mt-5 text-center"
         >
-          {startPage?.greetingMessage}
+          {startPage?.greetingMessage || "Тайлбар"}
         </p>
         <p
           style={{

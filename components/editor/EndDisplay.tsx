@@ -1,11 +1,7 @@
 import React from "react";
 import { EndDisplayProps } from "@/utils/componentTypes";
 
-const EndDisplay = ({
-  endPage,
-  dualColors,
-  themeId,
-}: EndDisplayProps) => {
+const EndDisplay = ({ endPage, dualColors, themeId }: EndDisplayProps) => {
   return (
     <div
       style={{
@@ -17,15 +13,15 @@ const EndDisplay = ({
       <div className="w-full flex flex-col items-center">
         <p
           style={{ color: dualColors[themeId][1] }}
-          className="text-[14px] leading-[17px] font-semibold mt-[100px]"
+          className="text-[18px] leading-[17px] font-semibold mt-[100px]"
         >
-          {endPage?.endTitle}
+          {endPage?.endTitle || "Талархлын үг"}
         </p>
         <p
           style={{ color: dualColors[themeId][1] }}
-          className="text-[14px] leading-[17px] font-semibold mt-5 text-center"
+          className="text-[14px] leading-[17px] font-normal mt-5 text-center"
         >
-          {endPage?.thankYouMessage}
+          {endPage?.thankYouMessage || "Асуулгын тухай тайлбар"}
         </p>
       </div>
     </div>

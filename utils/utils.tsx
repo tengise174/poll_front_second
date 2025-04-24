@@ -78,27 +78,27 @@ export const questionTypes: QuestionTypeProps[] = [
     questionType: "DROPDOWN",
   },
   {
-    icon: null,
+    icon: <div>📊</div>,
     title: questionTypeTranslations["MULTIPLE_CHOICE_GRID"],
     questionType: "MULTIPLE_CHOICE_GRID",
   },
   {
-    icon: null,
+    icon: <div>☑️</div>,
     title: questionTypeTranslations["TICK_BOX_GRID"],
     questionType: "TICK_BOX_GRID",
   },
   {
-    icon: null,
+    icon: <div>📏</div>,
     title: questionTypeTranslations["LINEAR_SCALE"],
     questionType: "LINEAR_SCALE",
   },
   {
-    icon: null,
+    icon: <div>📅</div>,
     title: questionTypeTranslations["DATE"],
     questionType: "DATE",
   },
   {
-    icon: null,
+    icon: <div>🕒</div>,
     title: questionTypeTranslations["TIME"],
     questionType: "TIME",
   },

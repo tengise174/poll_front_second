@@ -18,6 +18,8 @@ const ChartSelector = ({ chartType, onChange }: ChartSelectorProps) => {
         <option value="pie">Дугуй диаграм</option>
         <option value="bar">Баганан диаграм</option>
         <option value="line">Шугаман диаграм</option>
+        <option value="donut">Цагираг диаграм</option>
+        <option value="area">Талбайн диаграм</option>
       </select>
     </div>
   );

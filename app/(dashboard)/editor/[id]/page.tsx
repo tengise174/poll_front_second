@@ -888,8 +888,8 @@ export default function SurveyDetailPage() {
             {activeSection === 2 && (
               <div className="flex flex-col h-full justify-between">
                 <div
-                  className="overflow-y-auto"
-                  style={{ maxHeight: "calc(100vh - 140px)" }}
+                  className="overflow-y-auto h-full"
+                  style={{ maxHeight: "calc(100vh - 130px)" }}
                 >
                   {chosenType ? (
                     <QuestionTextEditor
@@ -903,7 +903,7 @@ export default function SurveyDetailPage() {
                       setCurrentQuestion={setCurrentQuestion}
                     />
                   ) : (
-                    <p className="p-5">Асуултын төрлөө сонгоно уу!</p>
+                    <p className="p-5 text-black">Асуултын төрлөө сонгоно уу!</p>
                   )}
                 </div>
                 <div

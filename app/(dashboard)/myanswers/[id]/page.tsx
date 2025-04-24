@@ -12,11 +12,13 @@ import {
   Image,
   Table,
   Radio,
+  Layout,
 } from "antd";
 import { getAnsweredPollDetail } from "@/api/action";
 import { dualColors } from "@/utils/utils";
 import { questionTypeTranslations } from "@/utils/utils";
 import { QuestionTypes } from "@/utils/componentTypes";
+import { Content, Header } from "antd/es/layout/layout";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -288,219 +290,235 @@ const MyAnswersDetail = () => {
   };
 
   return (
-    <div className="w-200 flex flex-col items-center justify-center mx-auto p-4">
-      <div className="w-full font-bold">
-        <h1>Асуулгын нэр: {answerDetails.poll.title}</h1>
-        <p>Тайлбар: {answerDetails.poll.greetingMessage}</p>
-        {answerDetails.poll.poster && (
-          <Image
-            src={
-              answerDetails.poll.poster ||
-              "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-            }
-            alt="poster"
-            width={200}
-            height={200}
-          />
-        )}
-      </div>
-      <div className="flex flex-col gap-4 w-full">
-        {answerDetails.questions.map((question, index) => (
-          <Card
-            key={question.questionId}
-            title={
-              <div>
-                <h2 className="mb-2">
-                  {index + 1}. {question.content}
-                </h2>
-                <Text type="secondary">
-                  Асуулгын төрөл:{" "}
-                  {questionTypeTranslations[question.questionType] ||
-                    question.questionType}
-                </Text>
-              </div>
-            }
-          >
-            {question.poster && (
+    <Layout>
+      <Header className="!bg-white shadow-md border-l border-0.5 border-[#D9D9D9] !h-[120]">
+        <div className="w-full font-bold flex flex-row gap-2 mt-2">
+          <div className="flex flex-col gap-2 mt-6">
+            <h1 className="text-xl font-semibold text-black">
+              Асуулгын нэр: {answerDetails.poll.title}
+            </h1>
+            <p className="text-black leading-none">
+              Тайлбар: {answerDetails.poll.greetingMessage}
+            </p>
+          </div>
+          <div>
+            {answerDetails.poll.poster && (
               <Image
-                src={question.poster}
-                height={150}
+                src={
+                  answerDetails.poll.poster ||
+                  "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                }
+                alt="poster"
                 style={{
                   width: "auto",
                 }}
+                height={100}
               />
             )}
-            {question.questionType === "RATING" ? (
-              <Rate
-                defaultValue={
-                  question.selectedOptions?.[0]?.content
-                    ? Number(question.selectedOptions[0].content)
-                    : 0
-                }
-                count={question.rateNumber || 5}
-                disabled
-                character={
-                  question.rateType === "NUMBER"
-                    ? ({ index = 0 }) => index + 1
-                    : undefined
-                }
-              />
-            ) : question.questionType === "TEXT" ? (
-              <TextArea
-                value={question.textAnswer || ""}
-                readOnly
-                rows={4}
-                style={{ marginTop: 8 }}
-              />
-            ) : question.questionType === "DATE" ? (
-              <div>
-                {new Date(question.textAnswer ?? "").toLocaleDateString(
-                  "mn-MN",
-                  {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  }
-                )}
-              </div>
-            ) : question.questionType === "TIME" ? (
-              <div>
-                {new Date(
-                  `2000-01-01T${question.textAnswer}:00`
-                ).toLocaleTimeString("mn-MN", {
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: false,
-                })}
-              </div>
-            ) : question.questionType === "MULTIPLE_CHOICE_GRID" ||
-              question.questionType === "TICK_BOX_GRID" ? (
-              <div className="flex flex-col">
-                {renderGridQuestion(question)}
-                {question.hasCorrectAnswer && (
-                  <div className="mt-4">
-                    <Text strong>
-                      Зөв хариулт: {getCorrectAnswers(question.allOptions)}
+          </div>
+        </div>
+      </Header>
+      <Content className="overflow-y-auto">
+        <div className="w-200 flex flex-col items-center justify-center mx-auto gap-6 p-4">
+          <div className="flex flex-col gap-4 w-full">
+            {answerDetails.questions.map((question, index) => (
+              <Card
+                key={question.questionId}
+                title={
+                  <div>
+                    <h2 className="mb-2">
+                      {index + 1}. {question.content}
+                    </h2>
+                    <Text type="secondary">
+                      Асуулгын төрөл:{" "}
+                      {questionTypeTranslations[question.questionType] ||
+                        question.questionType}
                     </Text>
-                    <br />
-                    <Text
-                      type={
-                        isUserAnswerCorrect(
-                          question.selectedOptions,
-                          question.allOptions
-                        )
-                          ? "success"
-                          : "danger"
+                  </div>
+                }
+              >
+                {question.poster && (
+                  <Image
+                    src={question.poster}
+                    height={150}
+                    style={{
+                      width: "auto",
+                    }}
+                  />
+                )}
+                {question.questionType === "RATING" ? (
+                  <Rate
+                    defaultValue={
+                      question.selectedOptions?.[0]?.content
+                        ? Number(question.selectedOptions[0].content)
+                        : 0
+                    }
+                    count={question.rateNumber || 5}
+                    disabled
+                    character={
+                      question.rateType === "NUMBER"
+                        ? ({ index = 0 }) => index + 1
+                        : undefined
+                    }
+                  />
+                ) : question.questionType === "TEXT" ? (
+                  <TextArea
+                    value={question.textAnswer || ""}
+                    readOnly
+                    rows={4}
+                    style={{ marginTop: 8 }}
+                  />
+                ) : question.questionType === "DATE" ? (
+                  <div>
+                    {new Date(question.textAnswer ?? "").toLocaleDateString(
+                      "mn-MN",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
                       }
-                    >
-                      Таны хариулт:{" "}
-                      {isUserAnswerCorrect(
-                        question.selectedOptions,
-                        question.allOptions
-                      )
-                        ? "Зөв"
-                        : "Буруу"}
-                    </Text>
+                    )}
                   </div>
-                )}
-                {question.isPointBased && (
-                  <div className="mt-2">
-                    <Text strong>
-                      Нийт оноо:{" "}
-                      {calculateTotalPoints(
-                        question.selectedOptions,
-                        question.allOptions
-                      )}
-                    </Text>
+                ) : question.questionType === "TIME" ? (
+                  <div>
+                    {new Date(
+                      `2000-01-01T${question.textAnswer}:00`
+                    ).toLocaleTimeString("mn-MN", {
+                      hour: "numeric",
+                      minute: "numeric",
+                      hour12: false,
+                    })}
                   </div>
-                )}
-              </div>
-            ) : question.questionType === "LINEAR_SCALE" ? (
-              renderLinearScaleQuestion(question)
-            ) : (
-              <div className="flex flex-col">
-                {question.allOptions?.map((option) => {
-                  const isChecked = question.selectedOptions?.some(
-                    (selected) => selected.id === option.id
-                  );
-                  const isCorrectOption = option.isCorrect;
-                  return (
-                    <div key={option.id} className="flex flex-col">
-                      <Checkbox
-                        checked={isChecked}
-                        disabled
-                        style={{ marginBottom: 8 }}
-                        className="custom-checkbox"
-                      >
-                        <div className="flex flex-row items-center gap-2">
-                          <p
-                            className={`font-bold text-md ${
-                              isCorrectOption ? "text-green-600" : ""
-                            }`}
-                          >
-                            {option.content}
-                            {question.isPointBased &&
-                            option.points !== undefined
-                              ? ` (${option.points} оноо)`
-                              : ""}
-                          </p>
-                          {option.poster && (
-                            <Image
-                              src={option.poster}
-                              height={100}
-                              style={{
-                                width: "auto",
-                              }}
-                            />
+                ) : question.questionType === "MULTIPLE_CHOICE_GRID" ||
+                  question.questionType === "TICK_BOX_GRID" ? (
+                  <div className="flex flex-col">
+                    {renderGridQuestion(question)}
+                    {question.hasCorrectAnswer && (
+                      <div className="mt-4">
+                        <Text strong>
+                          Зөв хариулт: {getCorrectAnswers(question.allOptions)}
+                        </Text>
+                        <br />
+                        <Text
+                          type={
+                            isUserAnswerCorrect(
+                              question.selectedOptions,
+                              question.allOptions
+                            )
+                              ? "success"
+                              : "danger"
+                          }
+                        >
+                          Таны хариулт:{" "}
+                          {isUserAnswerCorrect(
+                            question.selectedOptions,
+                            question.allOptions
+                          )
+                            ? "Зөв"
+                            : "Буруу"}
+                        </Text>
+                      </div>
+                    )}
+                    {question.isPointBased && (
+                      <div className="mt-2">
+                        <Text strong>
+                          Нийт оноо:{" "}
+                          {calculateTotalPoints(
+                            question.selectedOptions,
+                            question.allOptions
                           )}
+                        </Text>
+                      </div>
+                    )}
+                  </div>
+                ) : question.questionType === "LINEAR_SCALE" ? (
+                  renderLinearScaleQuestion(question)
+                ) : (
+                  <div className="flex flex-col">
+                    {question.allOptions?.map((option) => {
+                      const isChecked = question.selectedOptions?.some(
+                        (selected) => selected.id === option.id
+                      );
+                      const isCorrectOption = option.isCorrect;
+                      return (
+                        <div key={option.id} className="flex flex-col">
+                          <Checkbox
+                            checked={isChecked}
+                            disabled
+                            style={{ marginBottom: 8 }}
+                            className="custom-checkbox"
+                          >
+                            <div className="flex flex-row items-center gap-2">
+                              <p
+                                className={`font-bold text-md ${
+                                  isCorrectOption ? "text-green-600" : ""
+                                }`}
+                              >
+                                {option.content}
+                                {question.isPointBased &&
+                                option.points !== undefined
+                                  ? ` (${option.points} оноо)`
+                                  : ""}
+                              </p>
+                              {option.poster && (
+                                <Image
+                                  src={option.poster}
+                                  height={100}
+                                  style={{
+                                    width: "auto",
+                                  }}
+                                />
+                              )}
+                            </div>
+                          </Checkbox>
                         </div>
-                      </Checkbox>
-                    </div>
-                  );
-                })}
-                {question.hasCorrectAnswer && (
-                  <div className="mt-4">
-                    <Text strong>
-                      Зөв хариулт: {getCorrectAnswers(question.allOptions)}
-                    </Text>
-                    <br />
-                    <Text
-                      type={
-                        isUserAnswerCorrect(
-                          question.selectedOptions,
-                          question.allOptions
-                        )
-                          ? "success"
-                          : "danger"
-                      }
-                    >
-                      Таны хариулт:{" "}
-                      {isUserAnswerCorrect(
-                        question.selectedOptions,
-                        question.allOptions
-                      )
-                        ? "Зөв"
-                        : "Буруу"}
-                    </Text>
+                      );
+                    })}
+                    {question.hasCorrectAnswer && (
+                      <div className="mt-4">
+                        <Text strong>
+                          Зөв хариулт: {getCorrectAnswers(question.allOptions)}
+                        </Text>
+                        <br />
+                        <Text
+                          type={
+                            isUserAnswerCorrect(
+                              question.selectedOptions,
+                              question.allOptions
+                            )
+                              ? "success"
+                              : "danger"
+                          }
+                        >
+                          Таны хариулт:{" "}
+                          {isUserAnswerCorrect(
+                            question.selectedOptions,
+                            question.allOptions
+                          )
+                            ? "Зөв"
+                            : "Буруу"}
+                        </Text>
+                      </div>
+                    )}
+                    {question.isPointBased && (
+                      <div className="mt-2">
+                        <Text strong>
+                          Нийт оноо:{" "}
+                          {calculateTotalPoints(
+                            question.selectedOptions,
+                            question.allOptions
+                          )}
+                        </Text>
+                      </div>
+                    )}
                   </div>
                 )}
-                {question.isPointBased && (
-                  <div className="mt-2">
-                    <Text strong>
-                      Нийт оноо:{" "}
-                      {calculateTotalPoints(
-                        question.selectedOptions,
-                        question.allOptions
-                      )}
-                    </Text>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-        ))}
-      </div>
-    </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </Content>
+    </Layout>
   );
 };
 
