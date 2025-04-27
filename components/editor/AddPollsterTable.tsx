@@ -1,10 +1,15 @@
 import { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import { Button, Input, Space, Table } from "antd";
-import { SearchOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Input, Space, Table, Alert, Upload } from "antd";
+import {
+  SearchOutlined,
+  DeleteOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import CustomButton from "../CustomButton";
 import { checkUserExists } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
+import * as XLSX from "xlsx";
 
 const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
   const searchInput = useRef(null);
@@ -12,6 +17,8 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
   const [value, setValue] = useState<string>("");
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [nonExistentUsers, setNonExistentUsers] = useState<string[]>([]);
+  const [showNonExistentAlert, setShowNonExistentAlert] = useState(false);
 
   const pollsterTableData = settingsPage.pollsters.map((pollster: any) => ({
     key: pollster.username,
@@ -111,7 +118,7 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Эрх",
+      title: "Үйлдэл",
       key: "action",
       render: (_: any, record: any) => (
         <Space size={"middle"}>
@@ -137,7 +144,7 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
 
   const searchUsername = async (username: string) => {
     if (!username.trim()) {
-      showAlert("Please enter a username", "warning", "", true);
+      showAlert("Хэрэглэгчийн нэр оруул", "warning", "", true);
       return;
     }
 
@@ -173,32 +180,153 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
       }
     } catch (error: any) {
       console.error("Error checking username:", error);
-      showAlert(
-        "An error occurred while checking the username",
-        "error",
-        "",
-        true
-      );
+      showAlert("Хэрэглэгчийн нэр хайхад алдаа гарлаа", "error", "", true);
     }
   };
 
+  const handleExcelUpload = async (file: any) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData: any[] = XLSX.utils.sheet_to_json(firstSheet, {
+          header: 1,
+        });
+
+        // Assuming usernames are in the first column
+        const usernames = jsonData
+          .map((row) => row[0]?.toString().trim())
+          .filter((username) => username); // Remove empty or undefined entries
+
+        if (usernames.length === 0) {
+          showAlert("Excel дээр хэрэглэгчийн нэр байхгүй", "warning", "", true);
+          return;
+        }
+
+        const existingUsers: string[] = [];
+        const nonExistingUsers: string[] = [];
+        const alreadyAddedUsers: string[] = [];
+
+        for (const username of usernames) {
+          const isAlreadyAdded = settingsPage.pollsters.some(
+            (pollster: any) => pollster.username === username
+          );
+          if (isAlreadyAdded) {
+            alreadyAddedUsers.push(username);
+            continue;
+          }
+
+          const result = await checkUserExists(username);
+          if (result.exists) {
+            existingUsers.push(username);
+          } else {
+            nonExistingUsers.push(username);
+          }
+        }
+
+        if (existingUsers.length > 0) {
+          setSettingsPage((prev: any) => ({
+            ...prev,
+            pollsters: [
+              ...prev.pollsters,
+              ...existingUsers.map((username) => ({ username })),
+            ],
+          }));
+          showAlert(
+            `${existingUsers.length} хэрэглэгчид амжилттай нэмэгдлээ`,
+            "success",
+            "",
+            true
+          );
+        }
+
+        if (alreadyAddedUsers.length > 0) {
+          showAlert(
+            `${
+              alreadyAddedUsers.length
+            } хэрэглэгчид аль хэдийн нэмэгдсэн: ${alreadyAddedUsers.join(
+              ", "
+            )}`,
+            "warning",
+            "",
+            true
+          );
+        }
+
+        if (nonExistingUsers.length > 0) {
+          setNonExistentUsers(nonExistingUsers);
+          setShowNonExistentAlert(true);
+        }
+      } catch (error) {
+        showAlert("Excel файлд алдаа гарлаа", "error", "", true);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    return false; // Prevent default upload behavior
+  };
+
   return (
-    <div className="w-full h-full">
-      <div className="flex flex-row items-center gap-5 !h-9 mb-5">
+    <div className="w-full h-full relative">
+      {showNonExistentAlert && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            zIndex: 1000,
+            maxWidth: 400,
+          }}
+        >
+          <Alert
+            message="Бүртгэлгүй оролцогчид"
+            description={
+              <div>
+                <ul style={{ paddingLeft: 20, marginTop: 8 }}>
+                  {nonExistentUsers.map((username) => (
+                    <li key={username}>{username}</li>
+                  ))}
+                </ul>
+              </div>
+            }
+            type="error"
+            closable
+            onClose={() => setShowNonExistentAlert(false)}
+            closeText={
+              <Button size="small" type="primary">
+                Болсон
+              </Button>
+            }
+          />
+        </div>
+      )}
+      <div className="flex flex-row items-end gap-5 mb-5 !h-9">
         <Input
           placeholder="Оролцогчийн нэр оруул"
           value={value}
-          className=""
+          className="flex-1"
           onChange={(e: any) => setValue(e.target.value)}
           onPressEnter={() => searchUsername(value)}
         />
         <CustomButton
           title={"Нэмэх"}
-          className="bg-main-purple px-3 rounded-2xl text-white cursor-pointer h-full"
+          className="bg-main-purple px-3 rounded-2xl text-white cursor-pointer h-full !text-xs"
           onClick={() => {
             searchUsername(value);
           }}
         />
+        <Upload
+          accept=".xlsx, .xls"
+          showUploadList={false}
+          beforeUpload={handleExcelUpload}
+          className=""
+        >
+          <CustomButton
+            title={"Upload Excel"}
+            className="bg-blue-600 px-3 rounded-xl text-white cursor-pointer !h-9 !text-xs"
+          />
+        </Upload>
       </div>
       <Table
         className="w-full h-full"
