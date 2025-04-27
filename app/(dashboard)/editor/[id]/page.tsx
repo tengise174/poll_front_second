@@ -45,10 +45,12 @@ export default function SurveyDetailPage() {
 
   const [settingsPage, setSettingsPage] = useState<{
     isShowUser: boolean;
+    isHasEnterCode: boolean;
     isAccessLevel: boolean;
     isTimeSelected: boolean;
     isDuration: boolean;
     isPollsterNumber: boolean;
+    enterCode: number | null;
     startDate: string;
     endDate: string;
     duration: number | null;
@@ -58,10 +60,12 @@ export default function SurveyDetailPage() {
     published: boolean;
   }>({
     isShowUser: false,
+    isHasEnterCode: false,
     isAccessLevel: false,
     isTimeSelected: false,
     isDuration: false,
     isPollsterNumber: false,
+    enterCode: null,
     startDate: "",
     endDate: "",
     duration: null,
@@ -148,6 +152,7 @@ export default function SurveyDetailPage() {
       setSettingsPage((prev) => ({
         ...prev,
         isShowUser: data.isShowUser,
+        isHasEnterCode: data.isHasEnterCode,
         startDate: data.startDate,
         endDate: data.endDate,
         duration: data.duration,
@@ -156,6 +161,7 @@ export default function SurveyDetailPage() {
         isTimeSelected: data.isTimeSelected,
         isDuration: data.isDuration,
         isPollsterNumber: data.isPollsterNumber,
+        enterCode: data.enterCode,
         pollsters: data.pollsters,
         published: data.published,
       }));
@@ -222,6 +228,7 @@ export default function SurveyDetailPage() {
     themeId: themeId,
     poster: startPage.poster,
     isShowUser: settingsPage.isShowUser,
+    isHasEnterCode: settingsPage.isHasEnterCode,
     startDate: settingsPage.startDate,
     endDate: settingsPage.endDate,
     duration: settingsPage.duration,
@@ -244,6 +251,7 @@ export default function SurveyDetailPage() {
     isTimeSelected: settingsPage.isTimeSelected,
     isDuration: settingsPage.isDuration,
     isPollsterNumber: settingsPage.isPollsterNumber,
+    enterCode: settingsPage.enterCode,
     pollsters: settingsPage.pollsters,
   };
 

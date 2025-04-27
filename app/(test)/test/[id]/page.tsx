@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ConfigProvider, Skeleton } from "antd";
+import { ConfigProvider, Input, InputNumber, Skeleton } from "antd";
 import {
   createAnswer,
   getPollForTest,
@@ -59,6 +59,7 @@ export default function TestPage() {
   const [data, setData] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [enterCode, setEnterCode] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [questionNo, setQuestionNo] = useState<number>(0);
   const [requiredError, setRequiredError] = useState<string[]>([]);
@@ -87,8 +88,8 @@ export default function TestPage() {
     isFetching,
     error,
   } = useQuery({
-    queryKey: [id, "test"],
-    queryFn: () => getPollForTest(id as string),
+    queryKey: [id, "test", enterCode],
+    queryFn: () => getPollForTest(id as string, enterCode),
     enabled: !!id && id !== "new",
     refetchOnWindowFocus: false,
     retry: false,
@@ -97,6 +98,14 @@ export default function TestPage() {
   useEffect(() => {
     if (fetchedData && !fetchedData.message) {
       setData(fetchedData);
+    }
+
+    if (
+      fetchedData &&
+      fetchedData.message &&
+      fetchedData.message === "Invalid enter code"
+    ) {
+      showAlert("Код буруу байна", "error", "", true);
     }
   }, [fetchedData]);
 
@@ -202,6 +211,30 @@ export default function TestPage() {
         return [...prevAnswers, { questionId, option: value, textAnswer }];
       }
     });
+  };
+
+  const EnterCode = () => {
+    const [enterCodeInput, setEnterCodeInput] = useState<string | null>(null);
+
+    return (
+      <div className="flex flex-col items-center gap-2 mb-8">
+        <p>Асуулгад оролцох кодоо оруулна уу!</p>
+        <Input
+          value={enterCodeInput || ""}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const value = event.target.value;
+            setEnterCodeInput(value ? String(value) : null);
+          }}
+          placeholder="Оролцох код"
+        />
+        <CustomButton
+          title="Дуусгах"
+          onClick={() => setEnterCode(enterCodeInput)}
+          className="bg-main-purple px-4 rounded-xl hover:cursor-pointer hover:bg-main-purple/80 !text-white disabled:!text-black !text-xs"
+          disabled={!enterCodeInput}
+        />
+      </div>
+    );
   };
 
   const hasAnswered = (id: string, minAnswerCount: number, type: string) => {
@@ -381,27 +414,32 @@ export default function TestPage() {
   if (fetchedData?.message) {
     return (
       <div className="items-center justify-center flex flex-col h-screen">
-        <p>
-          {fetchedData?.message === "Poll has not started yet"
-            ? "Асуулга эхлээгүй байна"
-            : fetchedData?.message === "Poll has already ended"
-            ? "Асуулга дууссан байна"
-            : fetchedData?.message === "User has already answered"
-            ? "Аль хэдийн хариулсан байна"
-            : fetchedData?.message === "Poll not found"
-            ? "Энэ асуулга байхгүй байна"
-            : fetchedData?.message === "Don't have access"
-            ? "Та энэ санал асуулгад оролцох эрхгүй байна"
-            : fetchedData?.message === "User has already attended"
-            ? "Та асуулгад оролцсон боловч амжаагүй"
-            : fetchedData?.message === "Poll is full"
-            ? "Санал асуулга дүүрсэн байна"
-            : "Алдаа гарлаа"}
-        </p>
+        <div>
+          {fetchedData?.message === "Poll has not started yet" ? (
+            <p>Асуулга эхлээгүй байна</p>
+          ) : fetchedData?.message === "Poll has already ended" ? (
+            <p>Асуулга дууссан байна</p>
+          ) : fetchedData?.message === "User has already answered" ? (
+            <p>Аль хэдийн хариулсан байна</p>
+          ) : fetchedData?.message === "Poll not found" ? (
+            <p>Энэ асуулга байхгүй байна</p>
+          ) : fetchedData?.message === "Don't have access" ? (
+            <p>Та энэ санал асуулгад оролцох эрхгүй байна</p>
+          ) : fetchedData?.message === "User has already attended" ? (
+            <p>Та асуулгад оролцсон боловч амжаагүй</p>
+          ) : fetchedData?.message === "Poll is full" ? (
+            <p>Санал асуулга дүүрсэн байна</p>
+          ) : fetchedData?.message === "Enter code is required" ||
+            fetchedData?.message === "Invalid enter code" ? (
+            <EnterCode />
+          ) : (
+            <p>Алдаа гарлаа</p>
+          )}
+        </div>
         <CustomButton
           title={"Миний асуулга"}
           onClick={() => router.push("/mypolls")}
-          className="bg-second-bg text-black !text-xs px-4 rounded-2xl cursor-pointer"
+          className="bg-blue-400 text-white !text-xs px-4 rounded-2xl cursor-pointer"
         />
       </div>
     );

@@ -64,7 +64,9 @@ export interface PollData {
   isAccessLevel: boolean;
   isDuration: boolean;
   duration: number | null;
+  enterCode: number | null;
   isPollsterNumber: boolean;
+  isHasEnterCode: boolean;
   isShowUser: boolean;
   startDate: string | null;
   endDate: string | null;

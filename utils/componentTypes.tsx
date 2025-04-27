@@ -115,10 +115,12 @@ export interface QuestionTypeProps {
 }
 interface SettingsPageProps {
   isShowUser: boolean;
+  isHasEnterCode: boolean;
   isAccessLevel: boolean;
   isTimeSelected: boolean;
   isDuration: boolean;
   isPollsterNumber: boolean;
+  enterCode: number | null;
   startDate: string;
   endDate: string;
   duration: number | null;

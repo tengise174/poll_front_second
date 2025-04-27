@@ -94,6 +94,52 @@ const SettingsEditor = ({
             />
           </div>
         </div>
+
+        <div className="rounded-[10px] bg-second-bg w-full h-auto mt-[10px] p-[10px] flex flex-col justify-between gap-2">
+          <div className="flex items-center">
+            <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
+              Код
+            </p>
+          </div>
+          <div className="flex flex-row items-center">
+            <CustomInput
+              value="Зөвхөн кодтой хэрэглэгч оролцох"
+              disabled={true}
+              className={`${startPageInputClass} ${
+                settingsPage.isHasEnterCode
+                  ? "!bg-not-clicked !border-main-purple !text-main-purple"
+                  : ""
+              }`}
+              suffix={
+                <Switch
+                  value={settingsPage.isHasEnterCode}
+                  onChange={(checked) =>
+                    setSettingsPage((prev) => ({
+                      ...prev,
+                      isHasEnterCode: checked,
+                    }))
+                  }
+                />
+              }
+            />
+          </div>
+          {settingsPage.isHasEnterCode && (
+            <div className="w-full flex flex-row justify-between items-center">
+              <p className="text-xs">Код</p>
+              <InputNumber
+                value={settingsPage.enterCode}
+                onChange={(value) =>
+                  setSettingsPage((prev) => ({
+                    ...prev,
+                    enterCode: Number(value),
+                  }))
+                }
+                className="!w-[50%] !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] !text-main-purple"
+              />
+            </div>
+          )}
+        </div>
+
         <div
           className={` 
                 ${

@@ -60,6 +60,13 @@ const StatsDetails = ({ data }: StatsDetailsProps) => {
             <Tag color="red">Үгүй</Tag>
           )}
         </Descriptions.Item>
+        <Descriptions.Item label="Оролцох код">
+          {data.isHasEnterCode ? (
+            data.enterCode
+          ) : (
+            <Tag color="red">Байхгүй</Tag>
+          )}
+        </Descriptions.Item>
       </Descriptions>
     </Card>
   );

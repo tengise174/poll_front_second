@@ -49,6 +49,19 @@ instance.interceptors.response.use(
   }
 );
 
+export const getPollForTest = async (id: string, enterCode?: string | null) => {
+  try {
+    const response = await instance.get(`/polls/test/${id}`, {
+      params: {
+        enterCode,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const signin = async (body: any) => {
   try {
     const response = await instance.post("/auth/signin", body);
@@ -63,15 +76,6 @@ export const signup = async (body: any) => {
     const response = await instance.post("/auth/signup", body);
     const { accessToken } = response.data;
     localStorage.setItem("token", accessToken);
-    return response.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-export const getPollForTest = async (id: string) => {
-  try {
-    const response = await instance.get(`/polls/test/${id}`);
     return response.data;
   } catch (error: any) {
     throw error;
