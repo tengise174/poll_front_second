@@ -52,7 +52,6 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
     });
   };
 
-  // Filter data based on search and status
   const dataSource = getPollsterData();
   const filteredData = dataSource.filter((item) => {
     const matchesSearch = item.username

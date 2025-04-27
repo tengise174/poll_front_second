@@ -70,7 +70,6 @@ export default function PollQuestion({
 }: PollQuestionProps) {
   const isError = requiredError.includes(question.id);
 
-  // Helper function to get valid Dayjs value or null
   const getValidDayjsValue = (
     textAnswer: string | undefined,
     format: string
@@ -79,7 +78,7 @@ export default function PollQuestion({
       console.warn("No textAnswer provided for TimePicker");
       return null;
     }
-    const parsed = dayjs(textAnswer, format, true); // Strict parsing
+    const parsed = dayjs(textAnswer, format, true);
     if (!parsed.isValid()) {
       console.warn(
         `Invalid time format for textAnswer: "${textAnswer}", expected format: ${format}`

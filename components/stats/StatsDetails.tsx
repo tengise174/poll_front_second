@@ -53,6 +53,13 @@ const StatsDetails = ({ data }: StatsDetailsProps) => {
         <Descriptions.Item label="Оролцогчийн тоо">
           {data.isPollsterNumber ? data.pollsterNumber : "Сонгоогүй"}
         </Descriptions.Item>
+        <Descriptions.Item label="Оролцогчдын нэр харах">
+          {data.isShowUser ? (
+            <Tag color="green">Тийм</Tag>
+          ) : (
+            <Tag color="red">Үгүй</Tag>
+          )}
+        </Descriptions.Item>
       </Descriptions>
     </Card>
   );

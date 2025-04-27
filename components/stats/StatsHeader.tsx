@@ -50,7 +50,7 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
       "Оноо",
       "Зөв эсэх",
       "Хариулсан тоо",
-      "Хариулсан оролцогч",
+      ...(data.isShowUser ? ["Хариулсан оролцогч"] : []),
     ];
 
     const questionData: any[] = [];
@@ -72,7 +72,7 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
             "-",
             "-",
             "-",
-            answer.answeredBy,
+            ...(data.isShowUser ? [answer.answeredBy] : []),
           ]);
         });
       } else if (question.options) {
@@ -88,7 +88,9 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
             option.points,
             option.isCorrect ? "Тийм" : "Үгүй",
             option.selectionCount,
-            option.answeredBy.map((u) => u.username).join(", "),
+            ...(data.isShowUser
+              ? [option.answeredBy.map((u) => u.username).join(", ")]
+              : []),
           ]);
         });
         const endRow = questionData.length;
@@ -112,104 +114,106 @@ const StatsHeader = ({ data }: StatsHeaderProps) => {
     wsQuestions["!merges"] = merges;
     XLSX.utils.book_append_sheet(wb, wsQuestions, "Questions");
 
-    const userHeaders = [
-      "Хэрэглэгч нэр",
-      "Зарцуулсан хугацаа",
-      "Нийт оноо",
-      "Онооны хувь (%)",
-      "Зөв хариулсан тоо",
-    ];
-    const userData = data.submittedUsers.map((user) => {
-      const { totalPoints, correctAnswers, percentage } = calculateUserStats(
-        data,
-        user
-      );
-      return [
-        user.username,
-        user.totalTimeTaken,
-        totalPoints,
-        percentage.toFixed(2),
-        correctAnswers,
+    if (data.isShowUser) {
+      const userHeaders = [
+        "Хэрэглэгч нэр",
+        "Зарцуулсан хугацаа",
+        "Нийт оноо",
+        "Онооны хувь (%)",
+        "Зөв хариулсан тоо",
       ];
-    });
-    const wsUsers = XLSX.utils.aoa_to_sheet([userHeaders, ...userData]);
-    XLSX.utils.book_append_sheet(wb, wsUsers, "Submitted Users");
+      const userData = data.submittedUsers.map((user) => {
+        const { totalPoints, correctAnswers, percentage } = calculateUserStats(
+          data,
+          user
+        );
+        return [
+          user.username,
+          user.totalTimeTaken,
+          totalPoints,
+          percentage.toFixed(2),
+          correctAnswers,
+        ];
+      });
+      const wsUsers = XLSX.utils.aoa_to_sheet([userHeaders, ...userData]);
+      XLSX.utils.book_append_sheet(wb, wsUsers, "Submitted Users");
 
-    const userAnswerHeaders = [
-      "Хэрэглэгч нэр",
-      "Асуулт",
-      "Асуултын төрөл",
-      "Хариулт",
-      "Авсан оноо",
-      "Зөв эсэх",
-      "Зарцуулсан хугацаа",
-    ];
+      const userAnswerHeaders = [
+        "Хэрэглэгч нэр",
+        "Асуулт",
+        "Асуултын төрөл",
+        "Хариулт",
+        "Авсан оноо",
+        "Зөв эсэх",
+        "Зарцуулсан хугацаа",
+      ];
 
-    const userAnswerData: any[] = [];
-    const userAnswerMerges: {
-      s: { r: number; c: number };
-      e: { r: number; c: number };
-    }[] = [];
+      const userAnswerData: any[] = [];
+      const userAnswerMerges: {
+        s: { r: number; c: number };
+        e: { r: number; c: number };
+      }[] = [];
 
-    data.submittedUsers.forEach((user) => {
-      const startRow = userAnswerData.length + 1;
-      data.questions.forEach((question) => {
-        let selectedOptions: string[] = [];
-        let pointsEarned = 0;
-        let isCorrect = "-";
-        let timeTaken: number | null = null;
+      data.submittedUsers.forEach((user) => {
+        const startRow = userAnswerData.length + 1;
+        data.questions.forEach((question) => {
+          let selectedOptions: string[] = [];
+          let pointsEarned = 0;
+          let isCorrect = "-";
+          let timeTaken: number | null = null;
 
-        if (question.questionType === "TEXT" && question.answers) {
-          const userAnswer = question.answers.find(
-            (answer) => answer.answeredBy === user.username
-          );
-          if (userAnswer) {
-            selectedOptions = [userAnswer.textAnswer];
-            timeTaken = parseFloat(userAnswer.timeTaken) || null;
-          }
-        } else if (question.options) {
-          question.options.forEach((option) => {
-            const userResponse = option.answeredBy.find(
-              (ans) => ans.username === user.username
+          if (question.questionType === "TEXT" && question.answers) {
+            const userAnswer = question.answers.find(
+              (answer) => answer.answeredBy === user.username
             );
-            if (userResponse) {
-              selectedOptions.push(option.content);
-              pointsEarned += option.points;
-              timeTaken = timeTaken || userResponse.timeTaken;
-              if (question.hasCorrectAnswer && option.isCorrect) {
-                isCorrect = "Yes";
-              } else if (question.hasCorrectAnswer) {
-                isCorrect = isCorrect === "Yes" ? "Тийм" : "Үгүй";
-              }
+            if (userAnswer) {
+              selectedOptions = [userAnswer.textAnswer];
+              timeTaken = parseFloat(userAnswer.timeTaken) || null;
             }
+          } else if (question.options) {
+            question.options.forEach((option) => {
+              const userResponse = option.answeredBy.find(
+                (ans) => ans.username === user.username
+              );
+              if (userResponse) {
+                selectedOptions.push(option.content);
+                pointsEarned += option.points;
+                timeTaken = timeTaken || userResponse.timeTaken;
+                if (question.hasCorrectAnswer && option.isCorrect) {
+                  isCorrect = "Yes";
+                } else if (question.hasCorrectAnswer) {
+                  isCorrect = isCorrect === "Yes" ? "Тийм" : "Үгүй";
+                }
+              }
+            });
+          }
+
+          userAnswerData.push([
+            userAnswerData.length === startRow - 1 ? user.username : "",
+            question.content,
+            questionTypeTranslations[question.questionType],
+            selectedOptions.length > 0 ? selectedOptions.join(", ") : "Хариу байхгүй",
+            pointsEarned,
+            isCorrect,
+            timeTaken !== null ? timeTaken.toFixed(2) : "-",
+          ]);
+        });
+        const endRow = userAnswerData.length;
+        if (data.questions.length > 0) {
+          userAnswerMerges.push({
+            s: { r: startRow, c: 0 },
+            e: { r: endRow, c: 0 },
           });
         }
-
-        userAnswerData.push([
-          userAnswerData.length === startRow - 1 ? user.username : "",
-          question.content,
-          questionTypeTranslations[question.questionType],
-          selectedOptions.length > 0 ? selectedOptions.join(", ") : "Хариу байхгүй",
-          pointsEarned,
-          isCorrect,
-          timeTaken !== null ? timeTaken.toFixed(2) : "-",
-        ]);
       });
-      const endRow = userAnswerData.length;
-      if (data.questions.length > 0) {
-        userAnswerMerges.push({
-          s: { r: startRow, c: 0 },
-          e: { r: endRow, c: 0 },
-        });
-      }
-    });
 
-    const wsUserAnswers = XLSX.utils.aoa_to_sheet([
-      userAnswerHeaders,
-      ...userAnswerData,
-    ]);
-    wsUserAnswers["!merges"] = userAnswerMerges;
-    XLSX.utils.book_append_sheet(wb, wsUserAnswers, "User Answers");
+      const wsUserAnswers = XLSX.utils.aoa_to_sheet([
+        userAnswerHeaders,
+        ...userAnswerData,
+      ]);
+      wsUserAnswers["!merges"] = userAnswerMerges;
+      XLSX.utils.book_append_sheet(wb, wsUserAnswers, "User Answers");
+    }
 
     XLSX.writeFile(wb, `${data.title}_stats.xlsx`);
   };

@@ -148,7 +148,6 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
     );
   };
 
-  // Generate options for the next question dropdown
   const nextQuestionOptions = newQuestions
     .filter((q) => q.order > currentQuestion.order)
     .map((q) => ({

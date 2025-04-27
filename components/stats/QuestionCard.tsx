@@ -24,6 +24,7 @@ interface QuestionCardProps {
   question: PollQuestion;
   chartType: ChartType;
   onChartTypeChange: (type: ChartType) => void;
+  isShowUser: boolean;
 }
 
 const { Panel } = Collapse;
@@ -33,6 +34,7 @@ const QuestionCard = ({
   question,
   chartType,
   onChartTypeChange,
+  isShowUser,
 }: QuestionCardProps) => {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -43,7 +45,7 @@ const QuestionCard = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<string[]>([]);
 
-  const MAX_USERNAMES = 3; // Max usernames to display before truncation
+  const MAX_USERNAMES = 3;
 
   const optionColumns: ColumnsType<PollOption> = [
     {
@@ -77,255 +79,340 @@ const QuestionCard = ({
       sorter: (a: PollOption, b: PollOption) =>
         (a.selectionCount ?? 0) - (b.selectionCount ?? 0),
     },
-    {
-      title: "Хэрэглэгчид",
-      dataIndex: "answeredBy",
-      key: "answeredBy",
-      render: (answeredBy: { username: string; timeTaken: number }[]) => {
-        const displayText =
-          answeredBy.length > MAX_USERNAMES
-            ? `${answeredBy
-                .slice(0, MAX_USERNAMES)
-                .map((user) => user.username)
-                .join(", ")} (...)`
-            : answeredBy.map((user) => user.username).join(", ") || "No users";
-        const isHighlighted =
-          searchText &&
-          answeredBy.some((user) =>
-            user.username.toLowerCase().includes(searchText.toLowerCase())
-          );
-        const hasMore = answeredBy.length > MAX_USERNAMES;
-        return (
-          <div
-            style={{
-              backgroundColor: isHighlighted ? "#e6f7ff" : "transparent",
-              padding: "8px",
-              borderRadius: "4px",
-              transition: "background-color 0.3s",
-              cursor: hasMore ? "pointer" : "default",
-            }}
-            onClick={() => {
-              if (hasMore) {
-                setModalContent(answeredBy.map((user) => user.username));
-                setIsModalVisible(true);
-              }
-            }}
-          >
-            {displayText}
-          </div>
-        );
-      },
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }: {
-        setSelectedKeys: (keys: React.Key[]) => void;
-        selectedKeys: React.Key[];
-        confirm: () => void;
-        clearFilters?: () => void;
-      }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Хэрэглэгчийн нэрээр хайх"
-            value={selectedKeys[0]}
-            onChange={(e) =>
-              setSelectedKeys(e.target.value ? [e.target.value] : [])
-            }
-            onPressEnter={() => {
-              setSearchText((selectedKeys[0] as string) || "");
-              confirm();
-            }}
-            style={{ marginBottom: 8, display: "block" }}
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => {
-                setSearchText((selectedKeys[0] as string) || "");
-                confirm();
-              }}
-              icon={<SearchOutlined />}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Хайх
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedKeys([]);
-                setSearchText("");
-                clearFilters && clearFilters();
-                confirm();
-              }}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Цэвэрлэх
-            </Button>
-          </Space>
-        </div>
-      ),
-      filterIcon: () => <SearchOutlined />,
-      onFilter: (value: boolean | Key, record: PollOption) =>
-        record.answeredBy.some((user) =>
-          user.username.toLowerCase().includes(String(value).toLowerCase())
-        ),
-    },
+    ...(isShowUser
+      ? [
+          {
+            title: "Хэрэглэгчид",
+            dataIndex: "answeredBy",
+            key: "answeredBy",
+            render: (answeredBy: { username: string; timeTaken: number }[]) => {
+              const displayText =
+                answeredBy.length > MAX_USERNAMES
+                  ? `${answeredBy
+                      .slice(0, MAX_USERNAMES)
+                      .map((user) => user.username)
+                      .join(", ")} (...)`
+                  : answeredBy.map((user) => user.username).join(", ") ||
+                    "No users";
+              const isHighlighted =
+                searchText &&
+                answeredBy.some((user) =>
+                  user.username.toLowerCase().includes(searchText.toLowerCase())
+                );
+              const hasMore = answeredBy.length > MAX_USERNAMES;
+              return (
+                <div
+                  style={{
+                    backgroundColor: isHighlighted ? "#e6f7ff" : "transparent",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    transition: "background-color 0.3s",
+                    cursor: hasMore ? "pointer" : "default",
+                  }}
+                  onClick={() => {
+                    if (hasMore) {
+                      setModalContent(answeredBy.map((user) => user.username));
+                      setIsModalVisible(true);
+                    }
+                  }}
+                >
+                  {displayText}
+                </div>
+              );
+            },
+            filterDropdown: ({
+              setSelectedKeys,
+              selectedKeys,
+              confirm,
+              clearFilters,
+            }: {
+              setSelectedKeys: (keys: React.Key[]) => void;
+              selectedKeys: React.Key[];
+              confirm: () => void;
+              clearFilters?: () => void;
+            }) => (
+              <div style={{ padding: 8 }}>
+                <Input
+                  placeholder="Хэрэглэгчийн нэрээр хайх"
+                  value={selectedKeys[0]}
+                  onChange={(e) =>
+                    setSelectedKeys(e.target.value ? [e.target.value] : [])
+                  }
+                  onPressEnter={() => {
+                    setSearchText((selectedKeys[0] as string) || "");
+                    confirm();
+                  }}
+                  style={{ marginBottom: 8, display: "block" }}
+                />
+                <Space>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      setSearchText((selectedKeys[0] as string) || "");
+                      confirm();
+                    }}
+                    icon={<SearchOutlined />}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Хайх
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedKeys([]);
+                      setSearchText("");
+                      clearFilters && clearFilters();
+                      confirm();
+                    }}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Цэвэрлэх
+                  </Button>
+                </Space>
+              </div>
+            ),
+            filterIcon: () => <SearchOutlined />,
+            onFilter: (value: boolean | Key, record: PollOption) =>
+              record.answeredBy.some((user) =>
+                user.username.toLowerCase().includes(String(value).toLowerCase())
+              ),
+          },
+        ]
+      : []),
   ];
 
-  // Columns for text/date/time answers
   const answerColumns: ColumnsType<{ answeredBy: string; textAnswer: string }> =
-    [
-      {
-        title: "Хэрэглэгч",
-        dataIndex: "answeredBy",
-        key: "answeredBy",
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }: {
-          setSelectedKeys: (keys: React.Key[]) => void;
-          selectedKeys: React.Key[];
-          confirm: () => void;
-          clearFilters?: () => void;
-        }) => (
-          <div style={{ padding: 8 }}>
-            <Input
-              placeholder="Хэрэглэгчийн нэрээр хайх"
-              value={selectedKeys[0]}
-              onChange={(e) =>
-                setSelectedKeys(e.target.value ? [e.target.value] : [])
+    isShowUser
+      ? [
+          {
+            title: "Хэрэглэгч",
+            dataIndex: "answeredBy",
+            key: "answeredBy",
+            filterDropdown: ({
+              setSelectedKeys,
+              selectedKeys,
+              confirm,
+              clearFilters,
+            }: {
+              setSelectedKeys: (keys: React.Key[]) => void;
+              selectedKeys: React.Key[];
+              confirm: () => void;
+              clearFilters?: () => void;
+            }) => (
+              <div style={{ padding: 8 }}>
+                <Input
+                  placeholder="Хэрэглэгчийн нэрээр хайх"
+                  value={selectedKeys[0]}
+                  onChange={(e) =>
+                    setSelectedKeys(e.target.value ? [e.target.value] : [])
+                  }
+                  onPressEnter={() => {
+                    setAnswerSearchText((selectedKeys[0] as string) || "");
+                    confirm();
+                  }}
+                  style={{ marginBottom: 8, display: "block" }}
+                />
+                <Space>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      setAnswerSearchText((selectedKeys[0] as string) || "");
+                      confirm();
+                    }}
+                    icon={<SearchOutlined />}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Хайх
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedKeys([]);
+                      setAnswerSearchText("");
+                      clearFilters && clearFilters();
+                      confirm();
+                    }}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Цэвэрлэх
+                  </Button>
+                </Space>
+              </div>
+            ),
+            filterIcon: () => <SearchOutlined />,
+            onFilter: (value: boolean | Key, record: { answeredBy: string }) =>
+              record.answeredBy.toLowerCase().includes(String(value).toLowerCase()),
+          },
+          {
+            title: "Хариулт",
+            dataIndex: "textAnswer",
+            key: "textAnswer",
+            render: (text: string) => {
+              if (question.questionType === "DATE") {
+                return new Date(text).toLocaleDateString("mn-MN", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                });
               }
-              onPressEnter={() => {
-                setAnswerSearchText((selectedKeys[0] as string) || "");
-                confirm();
-              }}
-              style={{ marginBottom: 8, display: "block" }}
-            />
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => {
-                  setAnswerSearchText((selectedKeys[0] as string) || "");
-                  confirm();
-                }}
-                icon={<SearchOutlined />}
-                size="small"
-                style={{ width: 90 }}
-              >
-                Хайх
-              </Button>
-              <Button
-                onClick={() => {
-                  setSelectedKeys([]);
-                  setAnswerSearchText("");
-                  clearFilters && clearFilters();
-                  confirm();
-                }}
-                size="small"
-                style={{ width: 90 }}
-              >
-                Цэвэрлэх
-              </Button>
-            </Space>
-          </div>
-        ),
-        filterIcon: () => <SearchOutlined />,
-        onFilter: (value: boolean | Key, record: { answeredBy: string }) =>
-          record.answeredBy.toLowerCase().includes(String(value).toLowerCase()),
-      },
-      {
-        title: "Хариулт",
-        dataIndex: "textAnswer",
-        key: "textAnswer",
-        render: (text: string) => {
-          if (question.questionType === "DATE") {
-            return new Date(text).toLocaleDateString("mn-MN", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            });
-          }
-          if (question.questionType === "TIME") {
-            return new Date(`2000-01-01T${text}:00`).toLocaleTimeString(
-              "mn-MN",
-              {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: false,
+              if (question.questionType === "TIME") {
+                return new Date(`2000-01-01T${text}:00`).toLocaleTimeString(
+                  "mn-MN",
+                  {
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: false,
+                  }
+                );
               }
-            );
-          }
-          return text;
-        },
-        filterDropdown: ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }: {
-          setSelectedKeys: (keys: React.Key[]) => void;
-          selectedKeys: React.Key[];
-          confirm: () => void;
-          clearFilters?: () => void;
-        }) => (
-          <div style={{ padding: 8 }}>
-            <Input
-              placeholder="Хариултаар хайх"
-              value={selectedKeys[0]}
-              onChange={(e) =>
-                setSelectedKeys(e.target.value ? [e.target.value] : [])
+              return text;
+            },
+            filterDropdown: ({
+              setSelectedKeys,
+              selectedKeys,
+              confirm,
+              clearFilters,
+            }: {
+              setSelectedKeys: (keys: React.Key[]) => void;
+              selectedKeys: React.Key[];
+              confirm: () => void;
+              clearFilters?: () => void;
+            }) => (
+              <div style={{ padding: 8 }}>
+                <Input
+                  placeholder="Хариултаар хайх"
+                  value={selectedKeys[0]}
+                  onChange={(e) =>
+                    setSelectedKeys(e.target.value ? [e.target.value] : [])
+                  }
+                  onPressEnter={() => {
+                    setAnswerSearchText((selectedKeys[0] as string) || "");
+                    confirm();
+                  }}
+                  style={{ marginBottom: 8, display: "block" }}
+                />
+                <Space>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      setAnswerSearchText((selectedKeys[0] as string) || "");
+                      confirm();
+                    }}
+                    icon={<SearchOutlined />}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Хайх
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedKeys([]);
+                      setAnswerSearchText("");
+                      clearFilters && clearFilters();
+                      confirm();
+                    }}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Цэвэрлэх
+                  </Button>
+                </Space>
+              </div>
+            ),
+            filterIcon: () => <SearchOutlined />,
+            onFilter: (value: boolean | Key, record: { textAnswer: string }) =>
+              record.textAnswer.toLowerCase().includes(String(value).toLowerCase()),
+          },
+        ]
+      : [
+          {
+            title: "Хариулт",
+            dataIndex: "textAnswer",
+            key: "textAnswer",
+            render: (text: string) => {
+              if (question.questionType === "DATE") {
+                return new Date(text).toLocaleDateString("mn-MN", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                });
               }
-              onPressEnter={() => {
-                setAnswerSearchText((selectedKeys[0] as string) || "");
-                confirm();
-              }}
-              style={{ marginBottom: 8, display: "block" }}
-            />
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => {
-                  setAnswerSearchText((selectedKeys[0] as string) || "");
-                  confirm();
-                }}
-                icon={<SearchOutlined />}
-                size="small"
-                style={{ width: 90 }}
-              >
-                Хайх
-              </Button>
-              <Button
-                onClick={() => {
-                  setSelectedKeys([]);
-                  setAnswerSearchText("");
-                  clearFilters && clearFilters();
-                  confirm();
-                }}
-                size="small"
-                style={{ width: 90 }}
-              >
-                Цэвэрлэх
-              </Button>
-            </Space>
-          </div>
-        ),
-        filterIcon: () => <SearchOutlined />,
-        onFilter: (value: boolean | Key, record: { textAnswer: string }) =>
-          record.textAnswer.toLowerCase().includes(String(value).toLowerCase()),
-      },
-    ];
+              if (question.questionType === "TIME") {
+                return new Date(`2000-01-01T${text}:00`).toLocaleTimeString(
+                  "mn-MN",
+                  {
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: false,
+                  }
+                );
+              }
+              return text;
+            },
+            filterDropdown: ({
+              setSelectedKeys,
+              selectedKeys,
+              confirm,
+              clearFilters,
+            }: {
+              setSelectedKeys: (keys: React.Key[]) => void;
+              selectedKeys: React.Key[];
+              confirm: () => void;
+              clearFilters?: () => void;
+            }) => (
+              <div style={{ padding: 8 }}>
+                <Input
+                  placeholder="Хариултаар хайх"
+                  value={selectedKeys[0]}
+                  onChange={(e) =>
+                    setSelectedKeys(e.target.value ? [e.target.value] : [])
+                  }
+                  onPressEnter={() => {
+                    setAnswerSearchText((selectedKeys[0] as string) || "");
+                    confirm();
+                  }}
+                  style={{ marginBottom: 8, display: "block" }}
+                />
+                <Space>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      setAnswerSearchText((selectedKeys[0] as string) || "");
+                      confirm();
+                    }}
+                    icon={<SearchOutlined />}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Хайх
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedKeys([]);
+                      setAnswerSearchText("");
+                      clearFilters && clearFilters();
+                      confirm();
+                    }}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Цэвэрлэх
+                  </Button>
+                </Space>
+              </div>
+            ),
+            filterIcon: () => <SearchOutlined />,
+            onFilter: (value: boolean | Key, record: { textAnswer: string }) =>
+              record.textAnswer.toLowerCase().includes(String(value).toLowerCase()),
+          },
+        ];
 
-  // Prepare data source
   const dataSource = [...(question.options || [])].sort(
     (a, b) => a.order - b.order
   );
 
-  // Filter data based on search and status
   const filteredData = dataSource.filter((option) => {
     const matchesSearch = searchText
       ? option.answeredBy.some((user) =>
@@ -380,7 +467,7 @@ const QuestionCard = ({
         <h3 className="text-lg font-medium text-gray-600 mb-2">
           Оролцогчдын хариулт
         </h3>
-        <GridTable question={question} />
+        <GridTable question={question} isShowUser={isShowUser} />
       </div>
     </div>
   );
@@ -457,29 +544,31 @@ const QuestionCard = ({
             </div>
           )}
         </div>
-        <Modal
-          title="Бүх Оролцогчид"
-          open={isModalVisible}
-          onCancel={() => setIsModalVisible(false)}
-          footer={[
-            <Button key="close" onClick={() => setIsModalVisible(false)}>
-              Хаах
-            </Button>,
-          ]}
-          width={400}
-        >
-          <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-            {modalContent.length > 0 ? (
-              <ul style={{ paddingLeft: "20px" }}>
-                {modalContent.map((username, index) => (
-                  <li key={index}>{username}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>Оролцогч байхгүй</p>
-            )}
-          </div>
-        </Modal>
+        {isShowUser && (
+          <Modal
+            title="Бүх Оролцогчид"
+            open={isModalVisible}
+            onCancel={() => setIsModalVisible(false)}
+            footer={[
+              <Button key="close" onClick={() => setIsModalVisible(false)}>
+                Хаах
+              </Button>,
+            ]}
+            width={400}
+          >
+            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+              {modalContent.length > 0 ? (
+                <ul style={{ paddingLeft: "20px" }}>
+                  {modalContent.map((username, index) => (
+                    <li key={index}>{username}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Оролцогч байхгүй</p>
+              )}
+            </div>
+          </Modal>
+        )}
       </div>
     );
   };

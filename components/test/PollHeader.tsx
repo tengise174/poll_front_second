@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import BoxIcon from "@/public/icons/box_icon";
-import { Switch } from "antd";
+import { Switch, Checkbox } from "antd";
 
 interface PollHeaderProps {
   title: string;
@@ -13,6 +13,7 @@ interface PollHeaderProps {
   custStyle: { backgroundColor: string; primaryColor: string };
   btnLabel: string;
   onStart: () => void;
+  isShowUser: boolean;
 }
 
 export default function PollHeader({
@@ -25,10 +26,13 @@ export default function PollHeader({
   custStyle,
   btnLabel,
   onStart,
+  isShowUser,
 }: PollHeaderProps) {
+  const [isNameShown, setIsNameShown] = useState(false);
+
   return (
     <div className="flex flex-col gap-20 items-center max-w-[630px]">
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 items-center">
         <h1
           style={{ color: custStyle.primaryColor }}
           className="text-center text-5xl font-semibold"
@@ -68,6 +72,19 @@ export default function PollHeader({
             />
           </div>
         )}
+        {isShowUser && (
+          <div className="flex items-center gap-4">
+            <Checkbox
+              checked={isNameShown}
+              onChange={(e) => setIsNameShown(e.target.checked)}
+              style={{ color: custStyle.primaryColor }}
+            >
+              <span style={{ color: custStyle.primaryColor }}>
+                Санал асуулга үүсгэгч таны хариултыг харж чадна.
+              </span>
+            </Checkbox>
+          </div>
+        )}
       </div>
       <CustomButton
         titleClassname="text-base font-medium"
@@ -75,9 +92,12 @@ export default function PollHeader({
         style={{
           backgroundColor: custStyle.primaryColor,
           color: custStyle.backgroundColor,
+          opacity: isShowUser && !isNameShown ? 0.5 : 1,
+          cursor: isShowUser && !isNameShown ? "not-allowed" : "pointer",
         }}
         title={btnLabel || "Эхлэх"}
         onClick={onStart}
+        disabled={isShowUser && !isNameShown}
       />
     </div>
   );

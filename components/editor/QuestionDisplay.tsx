@@ -37,7 +37,6 @@ const QuestionDisplay = ({
     setChosenType(question.questionType);
   };
 
-  // Define table columns for MULTIPLE_CHOICE_GRID and TICK_BOX_GRID
   const gridColumns = (question: any) => [
     {
       title: "",
@@ -75,7 +74,6 @@ const QuestionDisplay = ({
     })) || []),
   ];
 
-  // Define table data for MULTIPLE_CHOICE_GRID and TICK_BOX_GRID
   const gridData = (question: any) =>
     question.gridRows?.map((row: string, index: number) => ({
       key: index,

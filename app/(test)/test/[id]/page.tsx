@@ -4,7 +4,11 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { ConfigProvider, Skeleton } from "antd";
-import { createAnswer, getPollForTest, recordFailedAttendance } from "@/api/action";
+import {
+  createAnswer,
+  getPollForTest,
+  recordFailedAttendance,
+} from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 import { dualColors } from "@/utils/utils";
 import PollHeader from "@/components/test/PollHeader";
@@ -74,7 +78,8 @@ export default function TestPage() {
     Date.now()
   );
   const [displayMode, setDisplayMode] = useState<"single" | "all">("single");
-  const [hasNextQuestionOrder, setHasNextQuestionOrder] = useState<boolean>(false);
+  const [hasNextQuestionOrder, setHasNextQuestionOrder] =
+    useState<boolean>(false);
   const [history, setHistory] = useState<number[]>([]);
 
   const {
@@ -101,14 +106,15 @@ export default function TestPage() {
         .sort((a: any, b: any) => a.order - b.order)
         .map((question: any) => ({
           ...question,
-          options: question.options.sort(
-            (a: any, b: any) => a.order - b.order
-          ),
+          options: question.options.sort((a: any, b: any) => a.order - b.order),
         }));
       setOrderedQuestions(sortedQuestions);
 
-      const hasNonNullNextQuestionOrder = sortedQuestions.some((question: Question) =>
-        question.options.some((option: Option) => option.nextQuestionOrder !== null)
+      const hasNonNullNextQuestionOrder = sortedQuestions.some(
+        (question: Question) =>
+          question.options.some(
+            (option: Option) => option.nextQuestionOrder !== null
+          )
       );
       setHasNextQuestionOrder(hasNonNullNextQuestionOrder);
       if (hasNonNullNextQuestionOrder) {
@@ -206,7 +212,13 @@ export default function TestPage() {
       return answer.option.length >= minAnswerCount;
     }
 
-    if (type === "SINGLE_CHOICE" || type === "RATING" || type === "YES_NO" || type === "DROPDOWN" || type === "LINEAR_SCALE") {
+    if (
+      type === "SINGLE_CHOICE" ||
+      type === "RATING" ||
+      type === "YES_NO" ||
+      type === "DROPDOWN" ||
+      type === "LINEAR_SCALE"
+    ) {
       return answer !== undefined && answer.option?.length > 0;
     }
 
@@ -216,7 +228,8 @@ export default function TestPage() {
 
     if (type === "MULTIPLE_CHOICE_GRID") {
       if (!answer || !answer.option) return false;
-      const rowCount = orderedQuestions.find((q) => q.id === id)?.gridRows?.length || 0;
+      const rowCount =
+        orderedQuestions.find((q) => q.id === id)?.gridRows?.length || 0;
       return answer.option.length >= rowCount;
     }
 
@@ -457,6 +470,7 @@ export default function TestPage() {
                 setStep("questions");
                 setHistory([]);
               }}
+              isShowUser={data?.isShowUser || false}
             />
           )}
           {step === "questions" && displayMode === "single" && (
@@ -492,7 +506,9 @@ export default function TestPage() {
               <PollNavigation
                 questionNo={questionNo}
                 totalQuestions={orderedQuestions.length}
-                isButtonDisabled={isButtonDisabled(orderedQuestions[questionNo])}
+                isButtonDisabled={isButtonDisabled(
+                  orderedQuestions[questionNo]
+                )}
                 custStyle={custStyle}
                 onBack={handleBack}
                 onNext={handleNext}

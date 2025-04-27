@@ -168,7 +168,6 @@ const MyAnswersDetail = () => {
 
     if (!gridRows || !gridColumns || !allOptions) return null;
 
-    // Create table columns
     const columns = [
       {
         title: "",
@@ -186,7 +185,6 @@ const MyAnswersDetail = () => {
       })),
     ];
 
-    // Create table data
     const dataSource = gridRows.map((row, rowIndex) => {
       const rowData: any = { rowLabel: row, key: rowIndex };
       gridColumns.forEach((_, colIndex) => {

@@ -65,6 +65,7 @@ export interface PollData {
   isDuration: boolean;
   duration: number | null;
   isPollsterNumber: boolean;
+  isShowUser: boolean;
   startDate: string | null;
   endDate: string | null;
   status: "YET_OPEN" | "CLOSED" | "PULL" | "OPEN";

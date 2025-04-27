@@ -32,26 +32,23 @@ const MyAnswersPage = () => {
     if (fetchedAnsweredPolls) {
       let filteredPolls = [...fetchedAnsweredPolls];
 
-      // Apply search filter
       if (searchTerm) {
         filteredPolls = filteredPolls.filter((poll) =>
           poll.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
-      // Apply status filter
       if (filter === "answered") {
         filteredPolls = filteredPolls.filter((poll) => poll.hasAnswers);
       } else if (filter === "notAnswered") {
         filteredPolls = filteredPolls.filter((poll) => !poll.hasAnswers);
       }
 
-      // Apply sorting for recent
       if (filter === "recent") {
         filteredPolls = filteredPolls.sort((a, b) => {
           const dateA = a.answeredAt ? new Date(a.answeredAt).getTime() : 0;
           const dateB = b.answeredAt ? new Date(b.answeredAt).getTime() : 0;
-          return dateB - dateA; // Sort descending (most recent first)
+          return dateB - dateA;
         });
       }
 

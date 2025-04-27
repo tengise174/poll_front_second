@@ -44,6 +44,7 @@ export default function SurveyDetailPage() {
   };
 
   const [settingsPage, setSettingsPage] = useState<{
+    isShowUser: boolean;
     isAccessLevel: boolean;
     isTimeSelected: boolean;
     isDuration: boolean;
@@ -56,6 +57,7 @@ export default function SurveyDetailPage() {
     selectedSettingItem: "ACCESS_LEVEL" | "POLLSTER_NUMBER" | "";
     published: boolean;
   }>({
+    isShowUser: false,
     isAccessLevel: false,
     isTimeSelected: false,
     isDuration: false,
@@ -145,6 +147,7 @@ export default function SurveyDetailPage() {
 
       setSettingsPage((prev) => ({
         ...prev,
+        isShowUser: data.isShowUser,
         startDate: data.startDate,
         endDate: data.endDate,
         duration: data.duration,
@@ -218,6 +221,7 @@ export default function SurveyDetailPage() {
     thankYouMessage: endPage.thankYouMessage,
     themeId: themeId,
     poster: startPage.poster,
+    isShowUser: settingsPage.isShowUser,
     startDate: settingsPage.startDate,
     endDate: settingsPage.endDate,
     duration: settingsPage.duration,
@@ -747,7 +751,7 @@ export default function SurveyDetailPage() {
         })),
       }),
       ...(questionType === "DATE" && {
-        options: [], // No options needed for DATE
+        options: [], 
       }),
       ...(questionType === "RANKING" && {
         options: [
@@ -903,7 +907,9 @@ export default function SurveyDetailPage() {
                       setCurrentQuestion={setCurrentQuestion}
                     />
                   ) : (
-                    <p className="p-5 text-black">Асуултын төрлөө сонгоно уу!</p>
+                    <p className="p-5 text-black">
+                      Асуултын төрлөө сонгоно уу!
+                    </p>
                   )}
                 </div>
                 <div

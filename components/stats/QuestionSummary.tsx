@@ -43,13 +43,11 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
     })
   );
 
-  // Prepare data for Recharts
   const chartData = questionTypeList.map((item) => ({
     name: item.type,
     value: item.count,
   }));
 
-  // Table columns
   const columns = [
     {
       title: "Асуултын төрөл",
@@ -69,8 +67,7 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
       }),
     },
   ];
-
-  // Sort table data based on sortOrder
+  
   const sortedData = [...questionTypeList].sort((a, b) => {
     if (sortOrder === "ascend") return a.count - b.count;
     if (sortOrder === "descend") return b.count - a.count;

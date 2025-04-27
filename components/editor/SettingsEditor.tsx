@@ -1,6 +1,6 @@
 "use client";
 
-import { DatePicker, InputNumber, Switch, Modal } from "antd"; // Import Modal
+import { DatePicker, InputNumber, Switch, Modal } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import CustomInput from "../CustomInput";
 import { SettingsEditorProps } from "@/utils/componentTypes";
@@ -8,7 +8,7 @@ import CustomButton from "../CustomButton";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { togglePublish } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
-import { useState } from "react"; // Import useState for modal state
+import { useState } from "react";
 
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -21,7 +21,7 @@ const SettingsEditor = ({
 }: SettingsEditorProps) => {
   const { showAlert } = useAlert();
   const queryClient = useQueryClient();
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleMutation = useMutation({
     mutationFn: togglePublish,
@@ -43,25 +43,57 @@ const SettingsEditor = ({
     },
   });
 
-  // Show the confirmation modal
   const showConfirmModal = () => {
     setIsModalOpen(true);
   };
 
-  // Handle modal confirm
   const handleModalOk = () => {
     setIsModalOpen(false);
-    toggleMutation.mutate(id); // Proceed with toggle mutation
+    toggleMutation.mutate(id);
   };
 
-  // Handle modal cancel
   const handleModalCancel = () => {
-    setIsModalOpen(false); // Close the modal without action
+    setIsModalOpen(false);
   };
 
   return (
     <div className="px-4 h-full flex flex-col justify-between items-center">
       <div className="w-full">
+        <div
+          className={`bg-second-bg rounded-[10px] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between`}
+        >
+          <div
+            className={`${
+              settingsPage.isShowUser ? "cursor-pointer" : ""
+            } flex items-center`}
+          >
+            <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
+              Оролцогчид харах
+            </p>
+          </div>
+          <div className="flex flex-row items-center">
+            <CustomInput
+              value="Оролцогчдын нэр харах"
+              disabled={true}
+              className={`${startPageInputClass} ${
+                settingsPage.isShowUser
+                  ? "!bg-not-clicked !border-main-purple !text-main-purple"
+                  : ""
+              }`}
+              suffix={
+                <Switch
+                  value={settingsPage.isShowUser}
+                  onChange={(checked) =>
+                    setSettingsPage((prev) => ({
+                      ...prev,
+                      isShowUser: checked,
+                    }))
+                  }
+                />
+              }
+            />
+          </div>
+        </div>
         <div
           className={` 
                 ${
@@ -291,7 +323,7 @@ const SettingsEditor = ({
             <CustomButton
               title={settingsPage.published ? "Нийтлэх болих" : "Нийтлэх"}
               className="!bg-clicked text-white !h-10 !text-xs px-4 rounded-xl hover:cursor-pointer hover:!bg-[#333]"
-              onClick={showConfirmModal} // Trigger modal instead of direct toggle
+              onClick={showConfirmModal}
             />
           </div>
         )}

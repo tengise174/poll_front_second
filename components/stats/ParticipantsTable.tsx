@@ -16,7 +16,6 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  // Prepare data source
   const dataSource = [
     ...data.submittedUsers.map((user) => {
       const { totalPoints, correctAnswers, percentage } = calculateUserStats(
@@ -44,7 +43,6 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
     })),
   ];
 
-  // Filter data based on search and status
   const filteredData = dataSource.filter((item) => {
     const matchesSearch = item.username
       .toLowerCase()

@@ -12,8 +12,8 @@ import { CalendarOutlined } from "@ant-design/icons";
 
 const formatDate = (createdAt: string) => {
   const date = new Date(createdAt);
-  const year = date.getFullYear().toString().slice(-2); // Get last 2 digits of year
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const year = date.getFullYear().toString().slice(-2);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
@@ -109,7 +109,6 @@ const PollCard = ({
         ]
       : [];
 
-  // Determine poll status for cardType === "POLL"
   const getPollStatus = () => {
     if (cardType !== "POLL") return null;
 

@@ -114,6 +114,7 @@ export interface QuestionTypeProps {
   questionType: QuestionTypes;
 }
 interface SettingsPageProps {
+  isShowUser: boolean;
   isAccessLevel: boolean;
   isTimeSelected: boolean;
   isDuration: boolean;
@@ -257,10 +258,5 @@ export interface DeleteQuestionButtonProps {
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   setCurrentQuestion: React.Dispatch<React.SetStateAction<QuestionProps>>;
-  setChosenType: React.Dispatch<
-    React.SetStateAction<
-      QuestionTypes
-      | null
-    >
-  >;
+  setChosenType: React.Dispatch<React.SetStateAction<QuestionTypes | null>>;
 }

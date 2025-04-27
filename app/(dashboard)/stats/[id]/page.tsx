@@ -14,7 +14,6 @@ import PollstersTable from "@/components/stats/PollstersTable";
 import QuestionCard from "@/components/stats/QuestionCard";
 import { Header, Content } from "antd/es/layout/layout";
 
-// Custom CSS to ensure radio button styling
 const radioStyle = `
   .custom-radio .ant-radio-button-wrapper {
     background-color: #f5f5f5;
@@ -108,7 +107,7 @@ const StatsPage = () => {
                   <StatsDetails data={data} />
                   <StatsSummary data={data} />
                   <QuestionSummary data={data} />
-                  <ParticipantsTable data={data} />
+                  {data.isShowUser && <ParticipantsTable data={data} />}
                   {data.isAccessLevel && <PollstersTable data={data} />}
                 </div>
               )}
@@ -122,6 +121,7 @@ const StatsPage = () => {
                       onChartTypeChange={(type) =>
                         handleChartTypeChange(qIndex, type)
                       }
+                      isShowUser={data.isShowUser}
                     />
                   ))}
                 </div>

@@ -6,14 +6,15 @@ import { useState } from "react";
 
 interface GridTableProps {
   question: PollQuestion;
+  isShowUser: boolean;
 }
 
-const GridTable = ({ question }: GridTableProps) => {
+const GridTable = ({ question, isShowUser }: GridTableProps) => {
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<string[]>([]);
 
-  const MAX_USERNAMES = 3; // Max usernames to display before truncation
+  const MAX_USERNAMES = 3;
 
   const prepareGridTableData = () => {
     if (
@@ -49,16 +50,17 @@ const GridTable = ({ question }: GridTableProps) => {
           ? {
               selectionCount: option.selectionCount,
               answeredBy: option.answeredBy,
-              displayText:
-                option.answeredBy.length > MAX_USERNAMES
+              displayText: isShowUser
+                ? option.answeredBy.length > MAX_USERNAMES
                   ? `${option.answeredBy
                       .slice(0, MAX_USERNAMES)
                       .map((user) => user.username)
                       .join(", ")} (...)`
                   : option.answeredBy.map((user) => user.username).join(", ") ||
-                    "No users",
+                    "No users"
+                : "",
             }
-          : { selectionCount: 0, answeredBy: [], displayText: "No users" };
+          : { selectionCount: 0, answeredBy: [], displayText: "" };
       });
       return rowData;
     });
@@ -83,11 +85,12 @@ const GridTable = ({ question }: GridTableProps) => {
           displayText: string;
         }) => {
           const isHighlighted =
+            isShowUser &&
             searchText &&
             value.answeredBy.some((user) =>
               user.username.toLowerCase().includes(searchText.toLowerCase())
             );
-          const hasMore = value.answeredBy.length > MAX_USERNAMES;
+          const hasMore = isShowUser && value.answeredBy.length > MAX_USERNAMES;
           return (
             <div
               style={{
@@ -107,9 +110,11 @@ const GridTable = ({ question }: GridTableProps) => {
               <p>
                 <strong>Сонгосон тоо:</strong> {value.selectionCount}
               </p>
-              <p>
-                <strong>Оролцогчид:</strong> {value.displayText}
-              </p>
+              {isShowUser && (
+                <p>
+                  <strong>Оролцогчид:</strong> {value.displayText}
+                </p>
+              )}
             </div>
           );
         },
@@ -127,25 +132,27 @@ const GridTable = ({ question }: GridTableProps) => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
-        <Space>
-          <Input
-            placeholder="Хэрэглэгчийн нэрээр хайх"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 200 }}
-            onPressEnter={() => handleSearch(searchText)}
-          />
-          <Button
-            type="primary"
-            icon={<SearchOutlined />}
-            onClick={() => handleSearch(searchText)}
-          >
-            Хайх
-          </Button>
-          <Button onClick={handleReset}>Цэвэрлэх</Button>
-        </Space>
-      </div>
+      {isShowUser && (
+        <div style={{ marginBottom: 16 }}>
+          <Space>
+            <Input
+              placeholder="Хэрэглэгчийн нэрээр хайх"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ width: 200 }}
+              onPressEnter={() => handleSearch(searchText)}
+            />
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              onClick={() => handleSearch(searchText)}
+            >
+              Хайх
+            </Button>
+            <Button onClick={handleReset}>Цэвэрлэх</Button>
+          </Space>
+        </div>
+      )}
       <Table
         columns={getGridTableColumns(question.gridColumns || [])}
         dataSource={prepareGridTableData()}
@@ -155,29 +162,31 @@ const GridTable = ({ question }: GridTableProps) => {
         size="middle"
         scroll={{ x: "max-content" }}
       />
-      <Modal
-        title="Бүх Оролцогчид"
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setIsModalVisible(false)}>
-            Хаах
-          </Button>,
-        ]}
-        width={400}
-      >
-        <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-          {modalContent.length > 0 ? (
-            <ul style={{ paddingLeft: "20px" }}>
-              {modalContent.map((username, index) => (
-                <li key={index}>{username}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>Оролцогч байхгүй</p>
-          )}
-        </div>
-      </Modal>
+      {isShowUser && (
+        <Modal
+          title="Бүх Оролцогчид"
+          open={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setIsModalVisible(false)}>
+              Хаах
+            </Button>,
+          ]}
+          width={400}
+        >
+          <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+            {modalContent.length > 0 ? (
+              <ul style={{ paddingLeft: "20px" }}>
+                {modalContent.map((username, index) => (
+                  <li key={index}>{username}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>Оролцогч байхгүй</p>
+            )}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
