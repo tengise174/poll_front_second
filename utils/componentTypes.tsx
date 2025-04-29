@@ -6,6 +6,7 @@ export interface PollCardType {
   id: string;
   title: string;
   greetingMessage: string;
+  category?: Category;
   poster?: string;
   cardType: "POLL" | "ANSWER";
   setIsModalOpen?: (open: boolean) => void;
@@ -130,11 +131,38 @@ interface SettingsPageProps {
   published: boolean;
 }
 
+export const categoryTrans: { [key in Category as string]: string } = {
+  EDUCATION: "Боловсрол",
+  HEALTH: "Эрүүл мэнд",
+  POLITICS: "Улс төр",
+  ECONOMY: "Эдийн засаг",
+  SOCIETY: "Нийгэм",
+  TECHNOLOGY: "Технологи",
+  ENVIRONMENT: "Байгаль орчин",
+  CULTURE: "Соёл",
+  SPORTS: "Спорт",
+  OTHER: "Бусад",
+};
+
+export type Category =
+  | "EDUCATION"
+  | "HEALTH"
+  | "POLITICS"
+  | "ECONOMY"
+  | "SOCIETY"
+  | "TECHNOLOGY"
+  | "ENVIRONMENT"
+  | "CULTURE"
+  | "SPORTS"
+  | "OTHER"
+  | null;
+
 interface StartPageProps {
   title: string;
   greetingMessage: string;
   btnLabel: string;
   poster?: string | null;
+  category?: Category;
 }
 
 export interface SettingsEditorProps {

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Button, Upload, message } from "antd";
+import { Button, Select, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import CustomInput from "../CustomInput";
 import { StartShapeEditorProps } from "@/utils/componentTypes";
@@ -44,6 +44,19 @@ const StartShapeEditor = ({
     setThemeId(index);
   };
 
+  const categoryOptions = [
+    { value: "EDUCATION", label: "Боловсрол" },
+    { value: "HEALTH", label: "Эрүүл мэнд" },
+    { value: "POLITICS", label: "Улс төр" },
+    { value: "ECONOMY", label: "Эдийн засаг" },
+    { value: "SOCIETY", label: "Нийгэм" },
+    { value: "TECHNOLOGY", label: "Технологи" },
+    { value: "ENVIRONMENT", label: "Байгаль орчин" },
+    { value: "CULTURE", label: "Соёл" },
+    { value: "SPORTS", label: "Спорт" },
+    { value: "OTHER", label: "Бусад" },
+  ];
+
   return (
     <div className="px-5 h-full">
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between">
@@ -83,6 +96,28 @@ const StartShapeEditor = ({
           itemType="textarea"
         />
       </div>
+
+      <div className="rounded-[10px] bg-[#F5F5F5] w-full mt-[10px] h-[80px] p-[10px] flex flex-col justify-between">
+        <div className="flex items-center">
+          <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
+            Ангилал
+          </p>
+        </div>
+        <Select
+          value={startPage?.category}
+          onChange={(value) =>
+            setStartPage((prev) => ({
+              ...prev,
+              category: value,
+            }))
+          }
+          className="w-full mt-[14px]"
+          placeholder="Ангилал сонгоно уу"
+          options={categoryOptions}
+          allowClear
+        />
+      </div>
+
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between">
         <div className="flex items-center">
           <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
@@ -109,7 +144,7 @@ const StartShapeEditor = ({
           fileList={fileList}
           onChange={handleFileChange}
           beforeUpload={(file) => {
-            const isLt1M = file.size / 1024 / 1024 < 1; 
+            const isLt1M = file.size / 1024 / 1024 < 1;
             const isImage = file.type.startsWith("image/");
             if (!isImage) {
               message.error("Зөвхөн зураг оруулна уу!");
@@ -119,7 +154,7 @@ const StartShapeEditor = ({
               message.error("Зураг 1MB-аас хэтэрч болохгүй!");
               return Upload.LIST_IGNORE;
             }
-            return true; 
+            return true;
           }}
           accept="image/*"
           listType="picture"

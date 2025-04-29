@@ -67,6 +67,13 @@ const StatsDetails = ({ data }: StatsDetailsProps) => {
             <Tag color="red">Байхгүй</Tag>
           )}
         </Descriptions.Item>
+        <Descriptions.Item label="Ангилал">
+          {data.category ? (
+            <Tag color="pink">{data.category}</Tag>
+          ) : (
+            <Tag color="red">Бусад</Tag>
+          )}
+        </Descriptions.Item>
       </Descriptions>
     </Card>
   );

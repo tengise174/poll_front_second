@@ -18,7 +18,7 @@ import SettingsDisplay from "@/components/editor/SettingsDisplay";
 import { dualColors, questionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
-import { QuestionProps, QuestionTypes } from "@/utils/componentTypes";
+import { Category, QuestionProps, QuestionTypes } from "@/utils/componentTypes";
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
@@ -80,11 +80,13 @@ export default function SurveyDetailPage() {
     greetingMessage: string;
     btnLabel: string;
     poster?: string | null;
+    category?: Category;
   }>({
     title: "",
     greetingMessage: "",
     btnLabel: "",
     poster: null,
+    category: null,
   });
 
   const [endPage, setEndPage] = useState<{
@@ -172,6 +174,7 @@ export default function SurveyDetailPage() {
         greetingMessage: data.greetingMessage,
         btnLabel: data.btnLabel,
         poster: data.poster || null,
+        category: data.category,
       }));
 
       setEndPage((prev) => ({
@@ -225,6 +228,7 @@ export default function SurveyDetailPage() {
     btnLabel: startPage.btnLabel,
     endTitle: endPage.endTitle,
     thankYouMessage: endPage.thankYouMessage,
+    category: startPage.category,
     themeId: themeId,
     poster: startPage.poster,
     isShowUser: settingsPage.isShowUser,
@@ -759,7 +763,7 @@ export default function SurveyDetailPage() {
         })),
       }),
       ...(questionType === "DATE" && {
-        options: [], 
+        options: [],
       }),
       ...(questionType === "RANKING" && {
         options: [

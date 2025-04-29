@@ -1,6 +1,6 @@
 "use client";
 
-import { QuestionTypes } from "@/utils/componentTypes";
+import { Category, QuestionTypes } from "@/utils/componentTypes";
 
 export type ChartType = "pie" | "bar" | "line" | "donut" | "area";
 
@@ -60,6 +60,7 @@ export interface SubmittedUserProp {
 export interface PollData {
   pollId: string;
   title: string;
+  category: Category;
   createdAt: string;
   isAccessLevel: boolean;
   isDuration: boolean;

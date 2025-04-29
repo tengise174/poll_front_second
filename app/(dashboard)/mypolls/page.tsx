@@ -9,6 +9,7 @@ import {
   Button,
   QRCode,
   Layout,
+  Select,
 } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Meta from "antd/es/card/Meta";
@@ -19,6 +20,7 @@ import { useAlert } from "@/context/AlertProvider";
 import { Content, Header } from "antd/es/layout/layout";
 import Link from "next/link";
 import { CopyOutlined } from "@ant-design/icons";
+import { categoryTrans, Category } from "@/utils/componentTypes";
 
 const MyPollsPage = () => {
   const { showAlert } = useAlert();
@@ -31,6 +33,9 @@ const MyPollsPage = () => {
   const [currentPoll, setCurrentPoll] = useState<any>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<Category | "all">(
+    "all"
+  );
 
   const handleCopyUrl = (reqUrl: string) => {
     navigator.clipboard
@@ -128,6 +133,12 @@ const MyPollsPage = () => {
       );
     }
 
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (poll: any) => poll.category === selectedCategory
+      );
+    }
+
     if (filterStatus === "recentlyCreated") {
       filtered = filtered.sort((a: any, b: any) => {
         return (
@@ -137,7 +148,7 @@ const MyPollsPage = () => {
     }
 
     setFilteredData(filtered);
-  }, [filterStatus, searchTerm, data]);
+  }, [filterStatus, searchTerm, selectedCategory, data]);
 
   if (isFetching) {
     return (
@@ -155,29 +166,43 @@ const MyPollsPage = () => {
     <Layout>
       <Header className="!bg-white shadow-md border-l border-0.5 border-[#D9D9D9]">
         <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4">
-          <Radio.Group
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            buttonStyle="solid"
-            className="!flex !flex-row !gap-2"
-          >
-            <Radio.Button className="!rounded" value="all">
-              Бүгд
-            </Radio.Button>
-            <Radio.Button className="!rounded" value="created">
-              Үүссэн
-            </Radio.Button>
-            <Radio.Button className="!rounded" value="published">
-              Нийтлэгдсэн
-            </Radio.Button>
-            <Radio.Button className="!rounded" value="ended">
-              Дууссан
-            </Radio.Button>
-            <Radio.Button className="!rounded" value="recentlyCreated">
-              Сүүлд үүссэн
-            </Radio.Button>
-          </Radio.Group>
-
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Radio.Group
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              buttonStyle="solid"
+              className="!flex !flex-row !gap-2"
+            >
+              <Radio.Button className="!rounded" value="all">
+                Бүгд
+              </Radio.Button>
+              <Radio.Button className="!rounded" value="created">
+                Үүссэн
+              </Radio.Button>
+              <Radio.Button className="!rounded" value="published">
+                Нийтлэгдсэн
+              </Radio.Button>
+              <Radio.Button className="!rounded" value="ended">
+                Дууссан
+              </Radio.Button>
+              <Radio.Button className="!rounded" value="recentlyCreated">
+                Сүүлд үүссэн
+              </Radio.Button>
+            </Radio.Group>
+            <Select
+              value={selectedCategory}
+              onChange={(value) => setSelectedCategory(value)}
+              style={{ width: 200 }}
+              placeholder="Ангилал сонгох"
+            >
+              <Select.Option value="all">Бүх ангилал</Select.Option>
+              {Object.entries(categoryTrans).map(([key, value]) => (
+                <Select.Option key={key} value={key}>
+                  {value}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
           <Input.Search
             placeholder="Асуулгын гарчиг"
             value={searchTerm}
@@ -187,7 +212,7 @@ const MyPollsPage = () => {
           />
         </div>
       </Header>
-      <Content className="overflow-y-auto">  
+      <Content className="overflow-y-auto">
         <div className="p-4">
           {!filteredData?.length ? (
             <div>Танд үүсгэсэн асуулга байхгүй байна</div>

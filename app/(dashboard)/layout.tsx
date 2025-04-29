@@ -14,7 +14,7 @@ export default function DashboardLayout({
       <CustomMenu />
       <Layout>
         <Suspense fallback={<Skeleton />}>{children}</Suspense>
-        </Layout>
+      </Layout>
     </Layout>
   );
 }

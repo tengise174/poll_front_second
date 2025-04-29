@@ -7,7 +7,7 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { PollCardType } from "@/utils/componentTypes";
+import { categoryTrans, PollCardType } from "@/utils/componentTypes";
 import { CalendarOutlined } from "@ant-design/icons";
 
 const formatDate = (createdAt: string) => {
@@ -24,6 +24,7 @@ const PollCard = ({
   id,
   title,
   greetingMessage,
+  category,
   poster,
   cardType,
   createdAt,
@@ -164,13 +165,11 @@ const PollCard = ({
             <CalendarOutlined />
             {cardType === "POLL" ? (
               <div>
-                <Tag>
-                {createdAt ? formatDate(createdAt) : "Unknown Date"}</Tag></div>
+                <Tag>{createdAt ? formatDate(createdAt) : "Unknown Date"}</Tag>
+              </div>
             ) : (
               <div>
-                <Tag>
-                  {answeredAt ? formatDate(answeredAt) : "Unknown Date"}
-                </Tag>
+                <Tag>{answeredAt ? formatDate(answeredAt) : "Бусад"}</Tag>
               </div>
             )}
           </div>
@@ -178,7 +177,12 @@ const PollCard = ({
         <div>
           {cardType === "POLL" && status && (
             <div className=" flex flex-col gap-2">
-              <Tag color={status.color}>{status.label}</Tag>
+              <div>
+                <Tag color={status.color}>{status.label}</Tag>
+                <Tag color="pink">
+                  {category ? categoryTrans[category] : "Бусад"}
+                </Tag>
+              </div>
               <p className="text-xs text-[#555]">{questionLength} асуулттай</p>
             </div>
           )}
