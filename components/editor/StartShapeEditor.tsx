@@ -5,6 +5,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import CustomInput from "../CustomInput";
 import { StartShapeEditorProps } from "@/utils/componentTypes";
 import { dualColors } from "@/utils/utils";
+import { useTranslation } from "react-i18next";
 
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -16,6 +17,7 @@ const StartShapeEditor = ({
   startPage,
   setStartPage,
 }: StartShapeEditorProps) => {
+  const { t } = useTranslation();
   const [fileList, setFileList] = useState<any[]>([]);
 
   const handleFileChange = ({ fileList }: { fileList: any[] }) => {
@@ -62,7 +64,7 @@ const StartShapeEditor = ({
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between">
         <div className="flex items-center">
           <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-            Гарчиг
+            {t("edit_start.title")}
           </p>
         </div>
         <CustomInput
@@ -74,13 +76,13 @@ const StartShapeEditor = ({
           }
           value={startPage?.title}
           className={startPageInputClass}
-          placeholder="Судалгааны нэр"
+          placeholder={t("edit_start.pollTitle")}
         />
       </div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full mt-[10px] h-[80px] p-[10px] flex flex-col justify-between">
         <div className="flex items-center">
           <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-            Тайлбар
+            {t("edit_start.description")}
           </p>
         </div>
         <CustomInput
@@ -92,7 +94,7 @@ const StartShapeEditor = ({
             }))
           }
           className="w-full bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal"
-          placeholder="Судалгааны тайлбар"
+          placeholder={t("edit_start.pollDescription")}
           itemType="textarea"
         />
       </div>
@@ -100,7 +102,7 @@ const StartShapeEditor = ({
       <div className="rounded-[10px] bg-[#F5F5F5] w-full mt-[10px] h-[80px] p-[10px] flex flex-col justify-between">
         <div className="flex items-center">
           <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-            Ангилал
+            {t("edit_start.category")}
           </p>
         </div>
         <Select
@@ -112,7 +114,7 @@ const StartShapeEditor = ({
             }))
           }
           className="w-full mt-[14px]"
-          placeholder="Ангилал сонгоно уу"
+          placeholder={t("edit_start.pollCategory")}
           options={categoryOptions}
           allowClear
         />
@@ -121,7 +123,7 @@ const StartShapeEditor = ({
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-[80px] mt-[10px] p-[10px] flex flex-col justify-between">
         <div className="flex items-center">
           <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-            Товч
+            {t("edit_start.button")}
           </p>
         </div>
         <CustomInput
@@ -133,12 +135,12 @@ const StartShapeEditor = ({
             }))
           }
           className={`${startPageInputClass} px-4`}
-          placeholder="Товч"
+          placeholder={t("edit_start.button")}
         />
       </div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto mt-5 p-[10px] flex flex-col gap-2">
         <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-          Зураг
+          {t("edit_start.poster")}
         </p>
         <Upload
           fileList={fileList}
@@ -160,13 +162,13 @@ const StartShapeEditor = ({
           listType="picture"
           maxCount={1}
         >
-          <Button icon={<UploadOutlined />}>Зураг оруулах</Button>
+          <Button icon={<UploadOutlined />}>{t("edit_start.enterPoster")}</Button>
         </Upload>
       </div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-[90px] mt-5 p-[10px]">
         <div className="flex items-center">
           <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-            Өнгө
+            {t("edit_start.color")}
           </p>
         </div>
         <div className="flex justify-between mt-[14px]">

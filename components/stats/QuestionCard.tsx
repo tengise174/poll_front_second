@@ -19,6 +19,7 @@ import { renderChart } from "./utils";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState, Key } from "react";
 import type { ColumnsType } from "antd/es/table";
+import { useTranslation } from "react-i18next";
 
 interface QuestionCardProps {
   question: PollQuestion;
@@ -36,6 +37,7 @@ const QuestionCard = ({
   onChartTypeChange,
   isShowUser,
 }: QuestionCardProps) => {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [displayMode, setDisplayMode] = useState<"table" | "chart" | "both">(
@@ -49,7 +51,7 @@ const QuestionCard = ({
 
   const optionColumns: ColumnsType<PollOption> = [
     {
-      title: "Сонголт",
+      title: `${t("stat.option")}`,
       dataIndex: "content",
       key: "content",
       render: (text: string, record: PollOption) => (
@@ -72,7 +74,7 @@ const QuestionCard = ({
       ),
     },
     {
-      title: "Сонгосон тоо",
+      title: `${t("stat.optionCount")}`,
       dataIndex: "selectionCount",
       key: "selectionCount",
       render: (selectionCount: number) => <span>{selectionCount ?? 0}</span>,
@@ -82,7 +84,7 @@ const QuestionCard = ({
     ...(isShowUser
       ? [
           {
-            title: "Хэрэглэгчид",
+            title: `${t("stat.pollsters")}`,
             dataIndex: "answeredBy",
             key: "answeredBy",
             render: (answeredBy: { username: string; timeTaken: number }[]) => {
@@ -133,7 +135,7 @@ const QuestionCard = ({
             }) => (
               <div style={{ padding: 8 }}>
                 <Input
-                  placeholder="Хэрэглэгчийн нэрээр хайх"
+                  placeholder={t("stat.searchUsername")}
                   value={selectedKeys[0]}
                   onChange={(e) =>
                     setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -155,7 +157,7 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Хайх
+                    {t("table.search")}
                   </Button>
                   <Button
                     onClick={() => {
@@ -167,7 +169,7 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Цэвэрлэх
+                    {t("table.clear")}
                   </Button>
                 </Space>
               </div>
@@ -175,7 +177,9 @@ const QuestionCard = ({
             filterIcon: () => <SearchOutlined />,
             onFilter: (value: boolean | Key, record: PollOption) =>
               record.answeredBy.some((user) =>
-                user.username.toLowerCase().includes(String(value).toLowerCase())
+                user.username
+                  .toLowerCase()
+                  .includes(String(value).toLowerCase())
               ),
           },
         ]
@@ -186,7 +190,7 @@ const QuestionCard = ({
     isShowUser
       ? [
           {
-            title: "Хэрэглэгч",
+            title: `${t("stat.pollsters")}`,
             dataIndex: "answeredBy",
             key: "answeredBy",
             filterDropdown: ({
@@ -202,7 +206,7 @@ const QuestionCard = ({
             }) => (
               <div style={{ padding: 8 }}>
                 <Input
-                  placeholder="Хэрэглэгчийн нэрээр хайх"
+                  placeholder={t("stat.seachUsername")}
                   value={selectedKeys[0]}
                   onChange={(e) =>
                     setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -224,7 +228,7 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Хайх
+                    {t("table.search")}
                   </Button>
                   <Button
                     onClick={() => {
@@ -236,17 +240,19 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Цэвэрлэх
+                    {t("table.clear")}
                   </Button>
                 </Space>
               </div>
             ),
             filterIcon: () => <SearchOutlined />,
             onFilter: (value: boolean | Key, record: { answeredBy: string }) =>
-              record.answeredBy.toLowerCase().includes(String(value).toLowerCase()),
+              record.answeredBy
+                .toLowerCase()
+                .includes(String(value).toLowerCase()),
           },
           {
-            title: "Хариулт",
+            title: `${t("stat.answer")}`,
             dataIndex: "textAnswer",
             key: "textAnswer",
             render: (text: string) => {
@@ -282,7 +288,7 @@ const QuestionCard = ({
             }) => (
               <div style={{ padding: 8 }}>
                 <Input
-                  placeholder="Хариултаар хайх"
+                  placeholder={t("stat.seachAnswer")}
                   value={selectedKeys[0]}
                   onChange={(e) =>
                     setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -304,7 +310,7 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Хайх
+                    {t("table.search")}
                   </Button>
                   <Button
                     onClick={() => {
@@ -316,19 +322,21 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Цэвэрлэх
+                    {t("table.clear")}
                   </Button>
                 </Space>
               </div>
             ),
             filterIcon: () => <SearchOutlined />,
             onFilter: (value: boolean | Key, record: { textAnswer: string }) =>
-              record.textAnswer.toLowerCase().includes(String(value).toLowerCase()),
+              record.textAnswer
+                .toLowerCase()
+                .includes(String(value).toLowerCase()),
           },
         ]
       : [
           {
-            title: "Хариулт",
+            title: `${t("stat.answer")}`,
             dataIndex: "textAnswer",
             key: "textAnswer",
             render: (text: string) => {
@@ -364,7 +372,7 @@ const QuestionCard = ({
             }) => (
               <div style={{ padding: 8 }}>
                 <Input
-                  placeholder="Хариултаар хайх"
+                  placeholder={t("stat.seachAnswer")}
                   value={selectedKeys[0]}
                   onChange={(e) =>
                     setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -386,7 +394,7 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Хайх
+                    {t("table.search")}
                   </Button>
                   <Button
                     onClick={() => {
@@ -398,14 +406,16 @@ const QuestionCard = ({
                     size="small"
                     style={{ width: 90 }}
                   >
-                    Цэвэрлэх
+                    {t("table.clear")}
                   </Button>
                 </Space>
               </div>
             ),
             filterIcon: () => <SearchOutlined />,
             onFilter: (value: boolean | Key, record: { textAnswer: string }) =>
-              record.textAnswer.toLowerCase().includes(String(value).toLowerCase()),
+              record.textAnswer
+                .toLowerCase()
+                .includes(String(value).toLowerCase()),
           },
         ];
 
@@ -430,12 +440,12 @@ const QuestionCard = ({
     <div className="p-6 rounded-lg">
       <div className="mb-4">
         <p className="text-gray-600">
-          <span className="font-medium">Дундаж хариулах хугацаа: </span>
-          {question.avgTimeTaken.toFixed(2)} секунд
+          <span className="font-medium">{t("stat.avgTimeTaken")}: </span>
+          {question.avgTimeTaken.toFixed(2)} {t("stat.second")}
         </p>
       </div>
       <h3 className="text-lg font-medium text-gray-600 mb-2">
-        Оролцогчдын хариулт
+        {t("stat.pollstersAnswer")}
       </h3>
       {question.answers && question.answers.length > 0 ? (
         <Table
@@ -447,7 +457,7 @@ const QuestionCard = ({
           size="middle"
         />
       ) : (
-        <p className="text-gray-600">Хариулт алга</p>
+        <p className="text-gray-600">{t("stat.noAnswer")}</p>
       )}
     </div>
   );
@@ -456,8 +466,8 @@ const QuestionCard = ({
     <div className="p-6 rounded-lg">
       <div className="mb-4">
         <p className="text-gray-600">
-          <span className="font-medium">Дундаж хариулах хугацаа: </span>
-          {question.avgTimeTaken.toFixed(2)} секунд
+          <span className="font-medium">{t("stat.avgTimeTaken")}: </span>
+          {question.avgTimeTaken.toFixed(2)} {t("stat.second")}
         </p>
       </div>
       {question.poster && (
@@ -465,7 +475,7 @@ const QuestionCard = ({
       )}
       <div className="mt-4">
         <h3 className="text-lg font-medium text-gray-600 mb-2">
-          Оролцогчдын хариулт
+          {t("stat.pollstersAnswer")}
         </h3>
         <GridTable question={question} isShowUser={isShowUser} />
       </div>
@@ -482,8 +492,8 @@ const QuestionCard = ({
       <div className="p-6 rounded-lg">
         <div className="mb-4">
           <p className="text-gray-600">
-            <span className="font-medium">Дундаж хариулах хугацаа: </span>
-            {question.avgTimeTaken.toFixed(2)} секунд
+            <span className="font-medium">{t("stat.avgTimeTaken")}: </span>
+            {question.avgTimeTaken.toFixed(2)} {t("stat.second")}
           </p>
           {question.questionType === "MULTI_CHOICE" &&
             question.minAnswerCount !== null && (
@@ -505,9 +515,9 @@ const QuestionCard = ({
             style={{ width: 200 }}
             placeholder="Харагдац сонгох"
           >
-            <Option value="table">Хүснэгт</Option>
-            <Option value="chart">График</Option>
-            <Option value="both">Хоёулаа</Option>
+            <Option value="table">{t("stat.table")}</Option>
+            <Option value="chart">{t("stat.chart")}</Option>
+            <Option value="both">{t("stat.both")}</Option>
           </Select>
         </div>
         {(displayMode === "chart" || displayMode === "both") && (
@@ -518,7 +528,9 @@ const QuestionCard = ({
         <div className="flex flex-row gap-4">
           {(displayMode === "chart" || displayMode === "both") && (
             <div className={displayMode === "both" ? "w-1/2" : "w-full"}>
-              <h3 className="text-lg font-medium text-gray-600 mb-2">График</h3>
+              <h3 className="text-lg font-medium text-gray-600 mb-2">
+                {t("stat.chart")}
+              </h3>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   {renderChart(chartType, chartData) ?? (
@@ -531,7 +543,7 @@ const QuestionCard = ({
           {(displayMode === "table" || displayMode === "both") && (
             <div className={displayMode === "both" ? "w-1/2" : "w-full"}>
               <h3 className="text-lg font-medium text-gray-600 mb-2">
-                Оролцогчдын хариулт
+                {t("stat.pollstersAnswer")}
               </h3>
               <Table
                 columns={optionColumns}
@@ -564,7 +576,7 @@ const QuestionCard = ({
                   ))}
                 </ul>
               ) : (
-                <p>Оролцогч байхгүй</p>
+                <p>{t("stat.noPollster")}</p>
               )}
             </div>
           </Modal>
@@ -598,8 +610,10 @@ const QuestionCard = ({
       <Tag color="geekblue">
         {questionTypeTranslations[question.questionType]}
       </Tag>
-      {question.isPointBased && <Tag color="blue">Оноотой</Tag>}
-      {question.hasCorrectAnswer && <Tag color="green">Зөв хариулттай</Tag>}
+      {question.isPointBased && <Tag color="blue">{t("edit_q.hasPoint")}</Tag>}
+      {question.hasCorrectAnswer && (
+        <Tag color="green">{t("stat.hasCorrect")}</Tag>
+      )}
       {question.questionType === "TICK_BOX_GRID" && (
         <Tag color="purple">Олон сонголттой</Tag>
       )}

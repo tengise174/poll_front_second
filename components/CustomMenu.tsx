@@ -6,40 +6,44 @@ import { Button, ConfigProvider, Menu, MenuProps } from "antd";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import Sider from "antd/es/layout/Sider";
 import CustomButton from "./CustomButton";
+import LanguageToggle from "./LanguageToggle";
+import { useTranslation } from "react-i18next";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-const baseItems: MenuItem[] = [
-  {
-    key: "1",
-    label: "Миний асуулгууд",
-  },
-  {
-    key: "2",
-    label: "Шинэ асуулга",
-  },
-  {
-    type: "divider",
-    className: "custom-divider-1",
-  },
-  {
-    key: "3",
-    label: "Миний оролцсон",
-  },
-  {
-    key: "4",
-    label: "Хувийн тохиргоо",
-  },
-];
-
 const CustomMenu = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const [hydration, setHydration] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [items, setItems] = useState<MenuItem[]>(baseItems);
   const [selectedKey, setSelectedKey] = useState<string>("1");
   const [collapsed, setCollapsed] = useState<boolean>(false);
+
+  const baseItems: MenuItem[] = [
+    {
+      key: "1",
+      label: t("menu.my_polls"), 
+    },
+    {
+      key: "2",
+      label: t("menu.new_poll"),
+    },
+    {
+      type: "divider",
+      className: "custom-divider-1",
+    },
+    {
+      key: "3",
+      label: t("menu.my_answers"),
+    },
+    {
+      key: "4",
+      label: t("menu.profile"),
+    },
+  ];
+
+  const [items, setItems] = useState<MenuItem[]>(baseItems);
 
   useEffect(() => {
     setHydration(true);
@@ -101,39 +105,42 @@ const CustomMenu = () => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        className="!bg-main-bg h-full" 
+        className="!bg-main-bg h-full"
       >
         <div className="h-full flex flex-col justify-between">
-        <div>
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: "16px",
-              width: 64,
-              height: 64,
-            }}
-          />
-          <Menu
-            onClick={onClick}
-            className="bg-transparent border-none font-medium font-monts mt-[10px]"
-            selectedKeys={[selectedKey]}
-            mode="inline"
-            items={items}
-            style={{ borderInlineEnd: "none" }}
-          />
-        </div>
-        <CustomButton
-          title={"Гарах"}
-          className="bg-main-purple hover:cursor-pointer hover:bg-clicked"
-          onClick={() => {
-            localStorage.removeItem("profile");
-            localStorage.removeItem("token");
-            setUserProfile(null);
-            router.push("/login");
-          }}
-        />
+          <div>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: "16px",
+                width: 64,
+                height: 64,
+              }}
+            />
+            <Menu
+              onClick={onClick}
+              className="bg-transparent border-none font-medium font-monts mt-[10px]"
+              selectedKeys={[selectedKey]}
+              mode="inline"
+              items={items}
+              style={{ borderInlineEnd: "none" }}
+            />
+          </div>
+          <div className="w-full flex flex-col gap-2 items-center">
+            <LanguageToggle />
+            <CustomButton
+              title={t("menu.logout")}
+              className="bg-main-purple hover:cursor-pointer hover:bg-clicked w-full"
+              onClick={() => {
+                localStorage.removeItem("profile");
+                localStorage.removeItem("token");
+                setUserProfile(null);
+                router.push("/login");
+              }}
+            />
+          </div>
         </div>
       </Sider>
     </ConfigProvider>

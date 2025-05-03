@@ -3,6 +3,7 @@ import { Card, Collapse, Table, Tag, Input, Select, Button, Space } from "antd";
 import { useState } from "react";
 import { PollData } from "./types";
 import { SearchOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -12,6 +13,7 @@ interface PollstersTableProps {
 }
 
 const PollstersTable = ({ data }: PollstersTableProps) => {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -67,7 +69,7 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
 
   const pollsterColumns = [
     {
-      title: "Хэрэглэгчийн нэр",
+      title: `${t("stat.username")}`,
       dataIndex: "username",
       key: "username",
       filterDropdown: ({
@@ -105,7 +107,7 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
               size="small"
               style={{ width: 90 }}
             >
-              Хайх
+              {t("table.search")}
             </Button>
             <Button
               onClick={() => {
@@ -117,7 +119,7 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
               size="small"
               style={{ width: 90 }}
             >
-              Цэвэрлэх
+              {t("table.clear")}
             </Button>
           </Space>
         </div>
@@ -127,19 +129,19 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
         record.username.toLowerCase().includes((value as string).toLowerCase()),
     },
     {
-      title: "Төлөв",
+      title: `${t("stat.status")}`,
       dataIndex: "status",
       key: "status",
       render: (status: string) => {
         switch (status) {
           case "submitted":
-            return <Tag color="green">Хариулсан</Tag>;
+            return <Tag color="green">{t("filter.answered")}</Tag>;
           case "failed":
-            return <Tag color="yellow">Амжаагүй</Tag>;
+            return <Tag color="yellow">{t("filter.cantAnswered")}</Tag>;
           case "not_attended":
-            return <Tag color="red">Оролцоогүй</Tag>;
+            return <Tag color="red">{t("stat.notParticipated")}</Tag>;
           default:
-            return <Tag color="gray">Тодорхойгүй</Tag>;
+            return <Tag color="gray">{t("filter.unknown")}</Tag>;
         }
       },
       filterDropdown: ({
@@ -158,10 +160,10 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
             }}
             style={{ width: 150, marginBottom: 8, display: "block" }}
           >
-            <Option value="all">Бүгд</Option>
-            <Option value="submitted">Хариулсан</Option>
-            <Option value="failed">Амжаагүй</Option>
-            <Option value="not_attended">Оролцоогүй</Option>
+            <Option value="all">{t("filter.all")}</Option>
+            <Option value="submitted">{t("filter.answered")}</Option>
+            <Option value="failed">{t("filter.cantAnswered")}</Option>
+            <Option value="not_attended">{t("stat.notParticipated")}</Option>
           </Select>
           <Button
             onClick={() => {
@@ -172,14 +174,14 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
             size="small"
             style={{ width: 90 }}
           >
-            Цэвэрлэх
+            {t("table.clear")}
           </Button>
         </div>
       ),
       filterIcon: () => <SearchOutlined />,
     },
     {
-      title: "Зарцуулсан хугацаа (с)",
+      title: `${t("stat.takenTime")}`,
       dataIndex: "takenTime",
       key: "takenTime",
       render: (text: number | null) => (text ? text.toFixed(2) : "-"),
@@ -189,7 +191,7 @@ const PollstersTable = ({ data }: PollstersTableProps) => {
 
   return (
     <Collapse defaultActiveKey={[""]} expandIconPosition="end">
-      <Panel header="Уригдсан Оролцогчид" key="1">
+      <Panel header={t("stat.invitedUser")} key="1">
         <Card>
           <Table
             columns={pollsterColumns}

@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { togglePublish } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !font-normal !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -19,6 +20,7 @@ const SettingsEditor = ({
   showUrlModal,
   setSettingsPage,
 }: SettingsEditorProps) => {
+  const { t } = useTranslation();
   const { showAlert } = useAlert();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,12 +70,12 @@ const SettingsEditor = ({
             } flex items-center`}
           >
             <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-              Оролцогчид харах
+              {t("edit_set.showUser")}
             </p>
           </div>
           <div className="flex flex-row items-center">
             <CustomInput
-              value="Оролцогчдын нэр харах"
+              value={t("edit_set.seeUsername")}
               disabled={true}
               className={`${startPageInputClass} ${
                 settingsPage.isShowUser
@@ -98,12 +100,12 @@ const SettingsEditor = ({
         <div className="rounded-[10px] bg-second-bg w-full h-auto mt-[10px] p-[10px] flex flex-col justify-between gap-2">
           <div className="flex items-center">
             <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-              Код
+              {t("edit_set.Code")}
             </p>
           </div>
           <div className="flex flex-row items-center">
             <CustomInput
-              value="Зөвхөн кодтой хэрэглэгч оролцох"
+              value={t("edit_set.onlyCodedUser")}
               disabled={true}
               className={`${startPageInputClass} ${
                 settingsPage.isHasEnterCode
@@ -125,7 +127,7 @@ const SettingsEditor = ({
           </div>
           {settingsPage.isHasEnterCode && (
             <div className="w-full flex flex-row justify-between items-center">
-              <p className="text-xs">Код</p>
+              <p className="text-xs">{t("edit_set.Code")}</p>
               <InputNumber
                 value={settingsPage.enterCode}
                 onChange={(value) =>
@@ -168,12 +170,12 @@ const SettingsEditor = ({
             } flex items-center`}
           >
             <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-              Хандалт түвшин
+              {t("edit_set.accLevel")}
             </p>
           </div>
           <div className="flex flex-row items-center">
             <CustomInput
-              value="Сонгосон хэрэглэгчид оролцох"
+              value={t("edit_set.selectedUsers")}
               disabled={true}
               className={`${startPageInputClass} ${
                 settingsPage.isAccessLevel
@@ -201,12 +203,12 @@ const SettingsEditor = ({
         <div className="rounded-[10px] bg-second-bg w-full h-auto mt-[10px] p-[10px] flex flex-col justify-between gap-2">
           <div className="flex items-center">
             <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-              Цаг
+              {t("edit_set.setTime")}
             </p>
           </div>
           <div className="flex flex-row items-center">
             <CustomInput
-              value="Асуулга цаг тохируулах"
+              value={t("edit_set.setPollTime")}
               disabled={true}
               className={`${startPageInputClass} ${
                 settingsPage.isTimeSelected
@@ -233,7 +235,7 @@ const SettingsEditor = ({
                 <DatePicker
                   showTime
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="Эхлэх хугацаа сонгоно уу"
+                  placeholder={t("edit_set.start_time")}
                   value={
                     settingsPage.startDate
                       ? dayjs(settingsPage.startDate)
@@ -253,7 +255,7 @@ const SettingsEditor = ({
                 <DatePicker
                   showTime
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="Дуусах хугацаа сонгоно уу"
+                  placeholder={t("edit_set.end_time")}
                   value={
                     settingsPage.endDate ? dayjs(settingsPage.endDate) : null
                   }
@@ -272,12 +274,12 @@ const SettingsEditor = ({
         <div className="rounded-[10px] bg-second-bg w-full h-auto mt-[10px] p-[10px] flex flex-col justify-between gap-2">
           <div className="flex items-center">
             <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-              Хугацаа тохируулах
+              {t("edit_set.duration")}
             </p>
           </div>
           <div className="flex flex-row items-center">
             <CustomInput
-              value="Зарцуулах хугацаа тохируулах"
+              value={t("edit_set.setDuration")}
               disabled={true}
               className={`${startPageInputClass} ${
                 settingsPage.isDuration
@@ -316,12 +318,12 @@ const SettingsEditor = ({
         <div className="rounded-[10px] bg-second-bg w-full h-auto mt-[10px] p-[10px] flex flex-col justify-between gap-2">
           <div className="flex items-center">
             <p className="text-[13px] text-[#1E1E1E] font-medium leading-[14px] ml-[10px]">
-              Оролцогч тоо
+              {t("edit_set.pollsterNumber")}
             </p>
           </div>
           <div className="flex flex-row items-center">
             <CustomInput
-              value="Оролцогч тоо тохируулах"
+              value={t("edit_set.setPollsterNumber")}
               disabled={true}
               className={`${startPageInputClass} ${
                 settingsPage.isPollsterNumber

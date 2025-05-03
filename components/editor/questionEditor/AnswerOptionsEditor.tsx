@@ -7,6 +7,7 @@ import CustomInput from "../../CustomInput";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { QuestionProps } from "@/utils/componentTypes";
+import { useTranslation } from "react-i18next";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -26,6 +27,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
   setNewQuestions,
   currentPage,
 }) => {
+  const { t } = useTranslation();
   const { showAlert } = useAlert();
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [optionFileLists, setOptionFileLists] = useState<any[][]>(
@@ -160,7 +162,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
       {currentQuestion?.questionType === "MULTI_CHOICE" && (
         <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
           <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-            Доод сонгох хариултын тоо
+            {t("edit_q.minSelect")}
           </p>
           <InputNumber
             onChange={(value: any) => {
@@ -189,7 +191,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
         currentQuestion?.questionType !== "MULTIPLE_CHOICE_GRID" && (
           <div className="rounded-[10px] bg-[#F5F5F5] w-full mt-5 p-[10px] h-auto flex flex-col gap-2">
             <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-              Хариулт
+              {t("edit_q.Option")}
             </p>
             {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
               currentQuestion?.questionType ?? ""
@@ -197,7 +199,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
               currentQuestion?.hasCorrectAnswer && (
                 <div className="mt-2">
                   <p className="text-[13px] text-[#1E1E1E] font-semibold">
-                    Зөв хариулт
+                    {t("edit_q.correctOption")}
                   </p>
                   {currentQuestion?.questionType === "MULTI_CHOICE" ? (
                     <Checkbox.Group
@@ -236,7 +238,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
               currentQuestion.hasCorrectAnswer && (
                 <div className="mt-2">
                   <p className="text-[13px] text-[#1E1E1E] font-semibold">
-                    Зөв хариулт
+                    {t("edit_q.correctOption")}
                   </p>
                   <Radio.Group
                     value={currentQuestion.options.findIndex(
@@ -296,7 +298,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                           }}
                           onFocus={() => setFocusedIndex(answerIndex)}
                           onBlur={() => setFocusedIndex(null)}
-                          placeholder="Хариулт"
+                          placeholder={t("edit_q.Option")}
                         />
                       ) : (
                         <div
@@ -306,7 +308,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                           <span className="text-[#1E1E1E]">
                             {String.fromCharCode(65 + answerIndex)}.
                           </span>
-                          {item.content || "Хариулт"}
+                          {item.content || `${t("edit_q.Option")}`}
                         </div>
                       )
                     ) : (
@@ -356,7 +358,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                           );
                         }}
                         className={`${questionInputClass} w-20 mt-2`}
-                        placeholder="Оноо"
+                        placeholder={t("edit_q.point")}
                       />
                     )}
                   </div>
@@ -386,7 +388,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                         );
                       }}
                       className="w-24"
-                      placeholder="Дараах А"
+                      placeholder={t("edit_q.nextQ")}
                       allowClear
                       options={nextQuestionOptions}
                     />
@@ -473,7 +475,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                 className="bg-clicked w-full h-9 rounded-full flex items-center justify-between px-4 mt-[14px] cursor-pointer"
               >
                 <p className="text-[#FDFDFD] text-[13px] font-medium">
-                  Сонголт нэмэх
+                  {t("edit_q.addOption")}
                 </p>
                 <AddIcon className="text-[#FDFDFD]" />
               </div>

@@ -13,6 +13,7 @@ import DeleteQuestionButton from "./DeleteQuestionButton";
 import { QuestionTextEditorProps } from "@/utils/componentTypes";
 import { CalendarOutlined } from "@ant-design/icons";
 import { ClockCircleFilled } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
   id,
@@ -24,10 +25,11 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
   currentQuestion,
   setCurrentQuestion,
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       id="question_edit"
-      className="px-5 h-full justify-between flex flex-col gap-2"
+      className="px-5 h-full justify-between flex flex-col gap-2 text-black"
     >
       <div>
         <QuestionTitleEditor
@@ -103,13 +105,13 @@ const QuestionTextEditor: React.FC<QuestionTextEditorProps> = ({
         {currentQuestion?.questionType === "DATE" && (
           <div className="mt-4 flex items-center gap-4">
             <CalendarOutlined className="text-xl" />
-            <p>Огноо сонгох асуулт</p>
+            <p className="text-xs">{t("edit_q.dateQuestion")}</p>
           </div>
         )}
         {currentQuestion?.questionType === "TIME" && (
           <div className="mt-4 flex items-center gap-4">
             <ClockCircleFilled className="text-xl" />
-            <p>Цаг сонгох асуулт</p>
+            <p className="text-xs">{t("edit_q.timeQuestion")}</p>
           </div>
         )}
       </div>

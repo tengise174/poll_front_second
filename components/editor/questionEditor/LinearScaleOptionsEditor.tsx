@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { Input, InputNumber, Radio } from "antd";
 import { QuestionProps } from "@/utils/componentTypes";
-
+import { useTranslation } from "react-i18next";
 
 interface LinearScaleOptionsEditorProps {
   currentQuestion: QuestionProps;
@@ -20,6 +20,8 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
   setNewQuestions,
   currentPage,
 }) => {
+  const { t } = useTranslation();
+
   const handleMinValueChange = (value: number | null) => {
     if (value === null) return;
     const newMinValue = value;
@@ -195,9 +197,9 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
   }, [currentQuestion.minValue, currentQuestion.maxValue]);
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 text-black">
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Доод утга</p>
+        <p className="text-xs mb-2">{t("edit_q.minValue")}</p>
         <InputNumber
           min={0}
           max={1}
@@ -207,7 +209,7 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
         />
       </div>
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Дээд утга</p>
+        <p className="text-xs mb-2">{t("edit_q.maxValue")}</p>
         <InputNumber
           min={2}
           max={10}
@@ -217,26 +219,26 @@ const LinearScaleOptionsEditor: React.FC<LinearScaleOptionsEditorProps> = ({
         />
       </div>
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Доод текст</p>
+        <p className="text-xs mb-2">{t("edit_q.minLabel")}</p>
         <Input
           value={currentQuestion.minLabel}
           onChange={handleMinLabelChange}
-          placeholder="Доод"
+          placeholder={t("edit_q.minLabel")}
           className="w-full"
         />
       </div>
       <div className="mb-4">
-        <p className="text-[14px] font-medium mb-2">Дээд текст</p>
+        <p className="text-xs mb-2">{t("edit_q.maxValue")}</p>
         <Input
           value={currentQuestion.maxLabel}
           onChange={handleMaxLabelChange}
-          placeholder="Дээд"
+          placeholder={t("edit_q.maxLabel")}
           className="w-full"
         />
       </div>
       {currentQuestion.hasCorrectAnswer && (
         <div className="mb-4">
-          <p className="text-[14px] font-medium mb-2">Зөв хариулт</p>
+          <p className="text-xs mb-2">{t("edit_q.correctOption")}</p>
           <Radio.Group
             value={
               currentQuestion.options?.find((opt) => opt.isCorrect)?.content ||

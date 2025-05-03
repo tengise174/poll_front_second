@@ -5,10 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Input, Layout, Radio, Skeleton, Space } from "antd";
 import { getAnsweredPolls } from "@/api/action";
 import PollCard from "@/components/PollCard";
+import { useTranslation } from "react-i18next";
 
 const { Header, Content } = Layout;
 
 const MyAnswersPage = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [answeredPolls, setAnsweredPolls] = useState<any[]>([]);
   const [filter, setFilter] = useState<
@@ -94,20 +96,20 @@ const MyAnswersPage = () => {
             className="!flex !flex-row !gap-2"
           >
             <Radio.Button className="!rounded" value="all">
-              Бүгд
+              {t("filter.all")}
             </Radio.Button>
             <Radio.Button className="!rounded" value="answered">
-              Хариулсан
+              {t("filter.answered")}
             </Radio.Button>
             <Radio.Button className="!rounded" value="notAnswered">
-              Амжаагүй
+              {t("filter.cantAnswered")}
             </Radio.Button>
             <Radio.Button className="!rounded" value="recent">
-              Сүүлд хариулсан
+              {t("filter.recentAnswered")}
             </Radio.Button>
           </Radio.Group>
           <Input.Search
-            placeholder="Судалгааны гарчиг хайх"
+            placeholder={t("filter.pollTitle")}
             value={searchTerm}
             onChange={handleSearchChange}
             style={{ width: 200 }}
@@ -115,9 +117,7 @@ const MyAnswersPage = () => {
           />
         </div>
       </Header>
-      <Content
-        className="overflow-y-auto p-4"
-      >
+      <Content className="overflow-y-auto p-4">
         {answeredPolls.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-5 gap-y-4 justify-center">
             {answeredPolls.map((poll: any, index: number) => (

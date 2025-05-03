@@ -1,6 +1,7 @@
 import React from "react";
 import { Switch } from "antd";
 import { QuestionProps } from "@/utils/componentTypes";
+import { useTranslation } from "react-i18next";
 
 interface QuestionSettingsProps {
   currentQuestion: QuestionProps;
@@ -16,7 +17,8 @@ const QuestionSettings = ({
   newQuestions,
   setNewQuestions,
   currentPage,
-} : QuestionSettingsProps) => {
+}: QuestionSettingsProps) => {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-wrap gap-x-3 mt-2">
       <div className="flex items-center gap-2">
@@ -33,7 +35,7 @@ const QuestionSettings = ({
             });
           }}
         />
-        <p className="text-[13px] text-[#1E1E1E]">Заавал бөглөх</p>
+        <p className="text-[13px] text-[#1E1E1E]">{t("edit_q.mandatory")}</p>
       </div>
       {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
         currentQuestion?.questionType ?? ""
@@ -61,7 +63,9 @@ const QuestionSettings = ({
               setCurrentQuestion({
                 ...currentQuestion,
                 isPointBased: checked,
-                hasCorrectAnswer: checked ? false : currentQuestion.hasCorrectAnswer,
+                hasCorrectAnswer: checked
+                  ? false
+                  : currentQuestion.hasCorrectAnswer,
                 options: currentQuestion.options?.map((opt) => ({
                   ...opt,
                   points: checked ? 0 : 0,
@@ -70,12 +74,17 @@ const QuestionSettings = ({
               });
             }}
           />
-          <p className="text-[13px] text-[#1E1E1E]">Оноотой асуулт</p>
+          <p className="text-[13px] text-[#1E1E1E]">{t("edit_q.hasPoint")}</p>
         </div>
       )}
-      {["MULTI_CHOICE", "SINGLE_CHOICE", "YES_NO", "DROPDOWN", "MULTIPLE_CHOICE_GRID", "LINEAR_SCALE"].includes(
-        currentQuestion?.questionType ?? ""
-      ) && (
+      {[
+        "MULTI_CHOICE",
+        "SINGLE_CHOICE",
+        "YES_NO",
+        "DROPDOWN",
+        "MULTIPLE_CHOICE_GRID",
+        "LINEAR_SCALE",
+      ].includes(currentQuestion?.questionType ?? "") && (
         <div className="flex items-center gap-2">
           <Switch
             checked={currentQuestion?.hasCorrectAnswer || false}
@@ -112,7 +121,7 @@ const QuestionSettings = ({
               });
             }}
           />
-          <p className="text-[13px] text-[#1E1E1E]">Зөв хариулттай</p>
+          <p className="text-[13px] text-[#1E1E1E]">{t("edit_q.hasCorrect")}</p>
         </div>
       )}
     </div>

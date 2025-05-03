@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "react-i18next";
 import { ChartType } from "./types";
 
 interface ChartSelectorProps {
@@ -7,19 +8,20 @@ interface ChartSelectorProps {
 }
 
 const ChartSelector = ({ chartType, onChange }: ChartSelectorProps) => {
+  const { t } = useTranslation();
   return (
     <div className="mb-4">
-      <label className="mr-2 text-gray-600">График төрөл:</label>
+      <label className="mr-2 text-gray-600">{t("chart.chartType")}:</label>
       <select
         value={chartType}
         onChange={(e) => onChange(e.target.value as ChartType)}
         className="p-2 border rounded"
       >
-        <option value="pie">Дугуй диаграм</option>
-        <option value="bar">Баганан диаграм</option>
-        <option value="line">Шугаман диаграм</option>
-        <option value="donut">Цагираг диаграм</option>
-        <option value="area">Талбайн диаграм</option>
+        <option value="pie">{t("chart.pie")}</option>
+        <option value="bar">{t("chart.bar")}</option>
+        <option value="line">{t("chart.line")}</option>
+        <option value="donut">{t("chart.donut")}</option>
+        <option value="area">{t("chart.area")}</option>
       </select>
     </div>
   );

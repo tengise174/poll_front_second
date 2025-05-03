@@ -7,6 +7,7 @@ import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { QuestionProps } from "@/utils/componentTypes";
 import { DeleteOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -26,6 +27,7 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
   setNewQuestions,
   currentPage,
 }) => {
+  const { t } = useTranslation();
   const { showAlert } = useAlert();
 
   const updateGridOptions = (rows: string[], columns: string[]) => {
@@ -78,18 +80,12 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
   };
 
   const handleAddRow = () => {
-    const newRows = [
-      ...(currentQuestion?.gridRows || []),
-      `Мөр ${(currentQuestion?.gridRows?.length ?? 0) + 1}`,
-    ];
+    const newRows = [...(currentQuestion?.gridRows || []), ``];
     updateGridOptions(newRows, currentQuestion?.gridColumns || []);
   };
 
   const handleAddColumn = () => {
-    const newColumns = [
-      ...(currentQuestion?.gridColumns || []),
-      `Багана ${(currentQuestion?.gridColumns?.length ?? 0) + 1}`,
-    ];
+    const newColumns = [...(currentQuestion?.gridColumns || []), ``];
     updateGridOptions(currentQuestion?.gridRows || [], newColumns);
   };
 
@@ -155,7 +151,7 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
     <div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
         <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-          Мөрүүд
+          {t("edit_q.rows")}
         </p>
         {currentQuestion?.gridRows?.map((row, index) => (
           <div key={index} className="flex flex-row gap-2 items-center">
@@ -165,18 +161,18 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
                 handleRowLabelChange(index, e.target.value)
               }
               className={questionInputClass}
-              placeholder={`Row ${index + 1}`}
+              placeholder={`${t("edit_q.row")} ${index + 1}`}
             />
             <DeleteOutlined onClick={() => handleRemoveRow(index)} />
           </div>
         ))}
         <Button onClick={handleAddRow} className="mt-2" icon={<AddIcon />}>
-          Мөр нэмэх
+          {t("edit_q.addRow")}
         </Button>
       </div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
         <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-          Баганууд
+          {t("edit_q.columns")}
         </p>
         {currentQuestion?.gridColumns?.map((col, index) => (
           <div key={index} className="flex flex-row gap-2 items-center">
@@ -186,19 +182,19 @@ const TickBoxGridOptionsEditor: React.FC<TickBoxGridOptionsEditorProps> = ({
                 handleColumnLabelChange(index, e.target.value)
               }
               className={questionInputClass}
-              placeholder={`Column ${index + 1}`}
+              placeholder={`${t("edit_q.column")} ${index + 1}`}
             />
             <DeleteOutlined onClick={() => handleRemoveColumn(index)} />
           </div>
         ))}
         <Button onClick={handleAddColumn} className="mt-2" icon={<AddIcon />}>
-          Багана нэмэх
+          {t("edit_q.addColumn")}
         </Button>
       </div>
       {currentQuestion?.hasCorrectAnswer && (
         <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
           <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-            Зөв хариултууд
+            {t("edit_q.correctOption")}
           </p>
           {currentQuestion?.gridRows?.map((row, rowIndex) => (
             <div key={rowIndex} className="mt-2">

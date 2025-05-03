@@ -2,6 +2,7 @@ import React from "react";
 import { InputNumber, Radio } from "antd";
 import RateStarIcon from "@/public/icons/rate_star";
 import { QuestionProps } from "@/utils/componentTypes";
+import { useTranslation } from "react-i18next";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -21,28 +22,27 @@ const RatingOptionsEditor: React.FC<RatingOptionsEditorProps> = ({
   setNewQuestions,
   currentPage,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col gap-2 mt-5 p-[10px]">
         <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-          Үнэлгээний хамгийн их утга
+          {t("edit_q.rateNumber")}
         </p>
         <InputNumber
           onChange={(value: number | null) => {
             const newValue = value || 5;
-            const newOptions = Array.from(
-              { length: newValue },
-              (_, index) => ({
-                content: (index + 1).toString(),
-                order: index + 1,
-                poster: null,
-                points: 0,
-                isCorrect: false,
-                nextQuestionOrder: null,
-                rowIndex: null,
-                columnIndex: null,
-              })
-            );
+            const newOptions = Array.from({ length: newValue }, (_, index) => ({
+              content: (index + 1).toString(),
+              order: index + 1,
+              poster: null,
+              points: 0,
+              isCorrect: false,
+              nextQuestionOrder: null,
+              rowIndex: null,
+              columnIndex: null,
+            }));
             setNewQuestions((prev) =>
               prev.map((item, index) =>
                 index === currentPage
@@ -84,7 +84,7 @@ const RatingOptionsEditor: React.FC<RatingOptionsEditorProps> = ({
           <div className="flex flex-col gap-2 w-full">
             <Radio value={"STAR"}>
               <div className="flex flex-row items-center justify-between">
-                <p>Одтой үнэлгээ</p>
+                <p>{t("edit_q.starRate")}</p>
                 <div className="flex flex-row gap-2">
                   <RateStarIcon className="text-yellow-400" />
                   <RateStarIcon className="text-yellow-400" />
@@ -94,7 +94,7 @@ const RatingOptionsEditor: React.FC<RatingOptionsEditorProps> = ({
             </Radio>
             <Radio value={"NUMBER"}>
               <div className="flex flex-row items-center justify-between">
-                <p>Тоон үнэлгээ</p>
+                <p>{t("edit_q.numberRate")}</p>
                 <div className="flex flex-row gap-2">
                   <p className="font-bold text-[17px]">1</p>
                   <p className="font-bold text-[17px]">2</p>

@@ -3,6 +3,7 @@ import { Table, Input, Button, Space, Modal } from "antd";
 import { PollOption, PollQuestion } from "./types";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface GridTableProps {
   question: PollQuestion;
@@ -10,6 +11,7 @@ interface GridTableProps {
 }
 
 const GridTable = ({ question, isShowUser }: GridTableProps) => {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<string[]>([]);
@@ -102,17 +104,19 @@ const GridTable = ({ question, isShowUser }: GridTableProps) => {
               }}
               onClick={() => {
                 if (hasMore) {
-                  setModalContent(value.answeredBy.map((user) => user.username));
+                  setModalContent(
+                    value.answeredBy.map((user) => user.username)
+                  );
                   setIsModalVisible(true);
                 }
               }}
             >
               <p>
-                <strong>Сонгосон тоо:</strong> {value.selectionCount}
+                <strong>{t("stat.optionCount")}:</strong> {value.selectionCount}
               </p>
               {isShowUser && (
                 <p>
-                  <strong>Оролцогчид:</strong> {value.displayText}
+                  <strong>{t("stat.pollsters")}:</strong> {value.displayText}
                 </p>
               )}
             </div>

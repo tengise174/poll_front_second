@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PollData } from "./types";
 import { calculateUserStats } from "./utils";
 import { SearchOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -13,6 +14,7 @@ interface ParticipantsTableProps {
 }
 
 const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -56,12 +58,12 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
 
   return (
     <Collapse defaultActiveKey={[""]} expandIconPosition="end">
-      <Panel header="Оролцогчдын мэдээлэл" key="1">
+      <Panel header={t("stat.pollsterInfo")} key="1">
         <Card>
           <Table
             columns={[
               {
-                title: "Хэрэглэгчийн нэр",
+                title: `${t("stat.username")}`,
                 dataIndex: "username",
                 key: "username",
                 filterDropdown: ({
@@ -72,7 +74,7 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
                 }) => (
                   <div style={{ padding: 8 }}>
                     <Input
-                      placeholder="Хайх"
+                      placeholder={t("table.search")}
                       value={selectedKeys[0]}
                       onChange={(e) =>
                         setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -94,7 +96,7 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
                         size="small"
                         style={{ width: 90 }}
                       >
-                        Хайх
+                        {t("table.search")}
                       </Button>
                       <Button
                         onClick={() => {
@@ -106,7 +108,7 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
                         size="small"
                         style={{ width: 90 }}
                       >
-                        Цэвэрлэх
+                        {t("table.clear")}
                       </Button>
                     </Space>
                   </div>
@@ -118,14 +120,14 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
                     .includes((value as string).toLowerCase()),
               },
               {
-                title: "Төлөв",
+                title: `${t("stat.status")}`,
                 dataIndex: "status",
                 key: "status",
                 render: (text) =>
                   text === "submitted" ? (
-                    <Tag color="green">Хариулсан</Tag>
+                    <Tag color="green">{t("filter.answered")}</Tag>
                   ) : (
-                    <Tag color="yellow">Амжаагүй</Tag>
+                    <Tag color="yellow">{t("filter.cantAnswered")}</Tag>
                   ),
                 filterDropdown: ({ confirm, clearFilters }) => (
                   <div style={{ padding: 8 }}>
@@ -137,9 +139,9 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
                       }}
                       style={{ width: 150, marginBottom: 8, display: "block" }}
                     >
-                      <Option value="all">Бүгд</Option>
-                      <Option value="submitted">Хариулсан</Option>
-                      <Option value="failed">Амжаагүй</Option>
+                      <Option value="all">{t("filter.all")}</Option>
+                      <Option value="submitted">{t("filter.answered")}</Option>
+                      <Option value="failed">{t("filter.cantAnswered")}</Option>
                     </Select>
                     <Button
                       onClick={() => {
@@ -150,35 +152,35 @@ const ParticipantsTable = ({ data }: ParticipantsTableProps) => {
                       size="small"
                       style={{ width: 90 }}
                     >
-                      Цэвэрлэх
+                      {t("table.clear")}
                     </Button>
                   </div>
                 ),
                 filterIcon: () => <SearchOutlined />,
               },
               {
-                title: "Зарцуулсан хугацаа (с)",
+                title: `${t("stat.takenTime")}`,
                 dataIndex: "takenTime",
                 key: "takenTime",
                 render: (text) => (text ? text.toFixed(2) : "-"),
                 sorter: (a, b) => (a.takenTime || 0) - (b.takenTime || 0),
               },
               {
-                title: "Нийт оноо",
+                title: `${t("stat.netTakenPoint")}`,
                 dataIndex: "totalPoints",
                 key: "totalPoints",
                 render: (text) => text ?? "0",
                 sorter: (a, b) => a.totalPoints - b.totalPoints,
               },
               {
-                title: "Онооны хувь (%)",
+                title: `${t("stat.pointPerc")}`,
                 dataIndex: "percentage",
                 key: "percentage",
                 render: (text) => (text ? text.toFixed(2) : "0.00"),
                 sorter: (a, b) => a.percentage - b.percentage,
               },
               {
-                title: "Зөв хариулт",
+                title: `${t("stat.correctAnswer")}`,
                 dataIndex: "correctAnswers",
                 key: "correctAnswers",
                 render: (text) => text ?? "0",

@@ -4,6 +4,7 @@ import { FileImageOutlined } from "@ant-design/icons";
 import CustomInput from "../../CustomInput";
 import { useAlert } from "@/context/AlertProvider";
 import { QuestionProps } from "@/utils/componentTypes";
+import { useTranslation } from "react-i18next";
 
 const questionInputClass =
   "w-full !h-9 bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -23,6 +24,7 @@ const QuestionTitleEditor: React.FC<QuestionTitleEditorProps> = ({
   setNewQuestions,
   currentPage,
 }) => {
+  const { t } = useTranslation();
   const { showAlert } = useAlert();
   const [fileList, setFileList] = useState<any[]>([]);
 
@@ -77,7 +79,7 @@ const QuestionTitleEditor: React.FC<QuestionTitleEditorProps> = ({
     <div className="rounded-[10px] bg-[#F5F5F5] w-full h-auto flex flex-col justify-between gap-2 mt-5 p-[10px] relative">
       <div className="flex flex-col justify-between gap-2 flex-1">
         <p className="text-[13px] text-[#1E1E1E] font-semibold leading-[14.6px]">
-          Гарчиг
+          {t("edit_q.title")}
         </p>
         <CustomInput
           onChange={(e: any) => {
@@ -94,7 +96,7 @@ const QuestionTitleEditor: React.FC<QuestionTitleEditorProps> = ({
           }}
           value={currentQuestion?.content || ""}
           className={questionInputClass}
-          placeholder="Асуултаа энд бичнэ үү?"
+          placeholder={t("edit_q.enterTitle")}
         />
       </div>
       <Upload

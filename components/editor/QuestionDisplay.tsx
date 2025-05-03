@@ -16,6 +16,7 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import RateSection from "../RatingSection";
 import { QuestionDisplayProps } from "@/utils/componentTypes";
 import CloseCircleIcon from "@/public/icons/close_circle";
+import { useTranslation } from "react-i18next";
 
 const QuestionDisplay = ({
   chosenType,
@@ -29,6 +30,7 @@ const QuestionDisplay = ({
   newQuestions,
   setNewQuestions,
 }: QuestionDisplayProps) => {
+  const { t } = useTranslation();
   const [isCardView, setIsCardView] = useState(true);
 
   const handleCardClick = (question: any, index: number) => {
@@ -87,8 +89,8 @@ const QuestionDisplay = ({
         <Switch
           checked={isCardView}
           onChange={(checked) => setIsCardView(checked)}
-          checkedChildren="Хамтад нь"
-          unCheckedChildren="Тусад нь"
+          checkedChildren={t("edit_q.all")}
+          unCheckedChildren={t("edit_q.single")}
         />
       </div>
       {isCardView ? (
@@ -112,15 +114,16 @@ const QuestionDisplay = ({
                       style={{ color: dualColors[themeId][1] }}
                       className="text-[14px] leading-[17px] font-semibold"
                     >
-                      {index + 1}. {question.content || "Асуулт"}
+                      {index + 1}.{" "}
+                      {question.content || `${t("edit_q.question")}`}
                       {question.isPointBased && (
                         <span className="ml-2 text-[12px] italic">
-                          (Оноотой)
+                          ({t("edit_q.hasPoint")})
                         </span>
                       )}
                       {question.hasCorrectAnswer && (
                         <span className="ml-2 text-[12px] italic">
-                          (Зөв хариулттай)
+                          ({t("edit_q.hasCorrect")})
                         </span>
                       )}
                       {question.required && (
@@ -153,7 +156,7 @@ const QuestionDisplay = ({
                                     ? `${optIndex + 1}.`
                                     : String.fromCharCode(65 + optIndex) + "."}
                                 </span>
-                                {item.content || "Хариулт"}
+                                {item.content || `${t("edit_q.Option")}`}
                                 {question.isPointBased && (
                                   <span className="ml-2 text-[12px]">
                                     ({item.points} pts)
@@ -227,12 +230,12 @@ const QuestionDisplay = ({
                         ))}
                       {question.questionType === "DROPDOWN" && (
                         <Select
-                          placeholder="Сонголтоо сонго"
+                          placeholder={t("edit_q.chooseOption")}
                           style={{ width: "100%", height: 44 }}
                         >
                           {question.options?.map((item, optIndex) => (
                             <Select.Option key={optIndex} value={optIndex}>
-                              {item.content || "Хариулт"}
+                              {item.content || `${t("edit_q.Option")}`}
                               {question.isPointBased && ` (${item.points} pts)`}
                               {item.isCorrect && (
                                 <CheckCircleOutlined
@@ -240,7 +243,9 @@ const QuestionDisplay = ({
                                 />
                               )}
                               {item.nextQuestionOrder != null &&
-                                ` (Дараах: А${item.nextQuestionOrder})`}
+                                ` ${t("edit_q.nextQ")} ${
+                                  item.nextQuestionOrder
+                                })`}
                             </Select.Option>
                           ))}
                         </Select>
@@ -262,7 +267,8 @@ const QuestionDisplay = ({
                                 )}
                                 {item.nextQuestionOrder != null && (
                                   <span className="ml-2 text-[12px]">
-                                    (Дараах: А{item.nextQuestionOrder})
+                                    ({t("edit_q.nextQ")}{" "}
+                                    {item.nextQuestionOrder})
                                   </span>
                                 )}
                               </div>
@@ -282,20 +288,20 @@ const QuestionDisplay = ({
                         ))}
                       {question.questionType === "TEXT" && (
                         <div className="w-full h-[100px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5 flex items-center">
-                          Хариулт оруул
+                          {t("edit_q.enterAnswer")}
                         </div>
                       )}
                       {question.questionType === "DATE" && (
                         <DatePicker
                           style={{ width: "100%", height: 44 }}
-                          placeholder="Огноо сонгоно уу!"
+                          placeholder={t("edit_q.chooseDate")}
                           disabled
                         />
                       )}
                       {question.questionType === "TIME" && (
                         <TimePicker
                           style={{ width: "100%", height: 44 }}
-                          placeholder="Цаг сонгоно уу!"
+                          placeholder={t("edit_q.chooseTime")}
                           disabled
                         />
                       )}
@@ -309,7 +315,7 @@ const QuestionDisplay = ({
                         <div className="flex flex-col gap-2">
                           <div className="flex justify-between">
                             <span className="text-[14px]">
-                              {question.minLabel || "Доод"}
+                              {question.minLabel || `${t("edit_q.minValue")}`}
                             </span>
                             <Radio.Group
                               disabled
@@ -334,7 +340,7 @@ const QuestionDisplay = ({
                               ))}
                             </Radio.Group>
                             <span className="text-[14px]">
-                              {question.maxLabel || "Дээд"}
+                              {question.maxLabel || `${t("edit_q.maxValue")}`}
                             </span>
                           </div>
                         </div>
@@ -375,13 +381,16 @@ const QuestionDisplay = ({
                   style={{ color: dualColors[themeId][1] }}
                   className="text-[14px] leading-[17px] font-semibold cursor-pointer"
                 >
-                  {currentPage + 1}. {currentQuestion?.content || "Асуулт"}
+                  {currentPage + 1}.{" "}
+                  {currentQuestion?.content || `${t("edit_q.question")}`}
                   {currentQuestion?.isPointBased && (
-                    <span className="ml-2 text-[12px] italic">(Оноотой)</span>
+                    <span className="ml-2 text-[12px] italic">
+                      ({t("edit_q.hasPoint")})
+                    </span>
                   )}
                   {currentQuestion?.hasCorrectAnswer && (
                     <span className="ml-2 text-[12px] italic">
-                      (Зөв хариулттай)
+                      ({t("edit_q.hasCorrect")})
                     </span>
                   )}
                   {currentQuestion.required && (
@@ -411,7 +420,7 @@ const QuestionDisplay = ({
                                 ? `${index + 1}.`
                                 : String.fromCharCode(65 + index) + "."}
                             </span>
-                            {item.content || "Хариулт"}
+                            {item.content || `${t("edit_q.Option")}`}
                             {currentQuestion?.isPointBased && (
                               <span className="ml-2 text-[12px]">
                                 ({item.points} pts)
@@ -425,7 +434,7 @@ const QuestionDisplay = ({
                             )}
                             {item.nextQuestionOrder != null && (
                               <span className="ml-2 text-[12px]">
-                                (Дараах: А{item.nextQuestionOrder})
+                                ({t("edit_q.nextQ")} {item.nextQuestionOrder})
                               </span>
                             )}
                           </div>
@@ -480,13 +489,12 @@ const QuestionDisplay = ({
                     ))}
                   {currentQuestion?.questionType === "DROPDOWN" && (
                     <Select
-                      placeholder="Сонголтоо сонгоно уу"
+                      placeholder={t("edit_q.chooseOption")}
                       style={{ width: "100%", height: 44 }}
-                      disabled
                     >
                       {currentQuestion?.options?.map((item, index) => (
                         <Select.Option key={index} value={index}>
-                          {item.content || "Хариулт"}
+                          {item.content || `${t("edit_q.Option")}`}
                           {currentQuestion.isPointBased &&
                             ` (${item.points} pts)`}
                           {item.isCorrect && (
@@ -495,7 +503,7 @@ const QuestionDisplay = ({
                             />
                           )}
                           {item.nextQuestionOrder != null &&
-                            ` (Дараах: А${item.nextQuestionOrder})`}
+                            ` (${t("edit_q.nextQ")} ${item.nextQuestionOrder})`}
                         </Select.Option>
                       ))}
                     </Select>
@@ -514,7 +522,7 @@ const QuestionDisplay = ({
                             )}
                             {item.nextQuestionOrder != null && (
                               <span className="ml-2 text-[12px]">
-                                (Дараах: А{item.nextQuestionOrder})
+                                ({t("edit_q.nextQ")} {item.nextQuestionOrder})
                               </span>
                             )}
                           </div>
@@ -534,20 +542,20 @@ const QuestionDisplay = ({
                     ))}
                   {currentQuestion?.questionType === "TEXT" && (
                     <div className="w-full h-[200px] border border-[#D9D9D9] rounded-[10px] italic text-[14px] px-5">
-                      Хариулт оруул
+                      {t("edit_q.enterAnswer")}
                     </div>
                   )}
                   {currentQuestion?.questionType === "DATE" && (
                     <DatePicker
                       style={{ width: "100%", height: 44 }}
-                      placeholder="Огноо сонгоно уу!"
+                      placeholder={t("edit_q.chooseDate")}
                       disabled
                     />
                   )}
                   {currentQuestion?.questionType === "TIME" && (
                     <TimePicker
                       style={{ width: "100%", height: 44 }}
-                      placeholder="Цаг сонгоно уу!"
+                      placeholder={t("edit_q.chooseTime")}
                       disabled
                     />
                   )}
@@ -558,15 +566,10 @@ const QuestionDisplay = ({
                     />
                   )}
                   {currentQuestion?.questionType === "LINEAR_SCALE" && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between">
-                        <span className="text-[14px]">
-                          {currentQuestion.minLabel || "Доод"}
-                        </span>
-                        <span className="text-[14px]">
-                          {currentQuestion.maxLabel || "Дээд"}
-                        </span>
-                      </div>
+                    <div className="flex flex-row w-full justify-between">
+                      <span className="text-[14px]">
+                        {currentQuestion.minLabel || `${t("edit_q.minLabel")}`}
+                      </span>
                       <Radio.Group disabled className="flex justify-between">
                         {currentQuestion.options?.map((item) => (
                           <Radio key={item.order} value={item.content}>
@@ -579,6 +582,9 @@ const QuestionDisplay = ({
                           </Radio>
                         ))}
                       </Radio.Group>
+                      <span className="text-[14px]">
+                        {currentQuestion.maxLabel || `${t("edit_q.maxLabel")}`}
+                      </span>
                     </div>
                   )}
                   {["MULTIPLE_CHOICE_GRID", "TICK_BOX_GRID"].includes(
@@ -598,7 +604,7 @@ const QuestionDisplay = ({
           ) : (
             <div className="max-w-[340px] w-full">
               <p className="text-[14px] leading-[14px] font-medium text-[#757575] italic mb-5">
-                Асуулт нэмэх товч дарж асуултын төрөл сонгоно уу!
+                {t("edit_q.chooseQuestionType")}
               </p>
             </div>
           )}

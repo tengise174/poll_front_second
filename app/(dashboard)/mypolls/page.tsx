@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   Card,
   Modal,
@@ -21,8 +21,10 @@ import { Content, Header } from "antd/es/layout/layout";
 import Link from "next/link";
 import { CopyOutlined } from "@ant-design/icons";
 import { categoryTrans, Category } from "@/utils/componentTypes";
+import { useTranslation } from "react-i18next";
 
 const MyPollsPage = () => {
+  const { t } = useTranslation();
   const { showAlert } = useAlert();
   const queryClient = useQueryClient();
   const [data, setData] = useState<any>(null);
@@ -174,19 +176,19 @@ const MyPollsPage = () => {
               className="!flex !flex-row !gap-2"
             >
               <Radio.Button className="!rounded" value="all">
-                Бүгд
+                {t("filter.all")}
               </Radio.Button>
               <Radio.Button className="!rounded" value="created">
-                Үүссэн
+                {t("filter.created")}
               </Radio.Button>
               <Radio.Button className="!rounded" value="published">
-                Нийтлэгдсэн
+                {t("filter.published")}
               </Radio.Button>
               <Radio.Button className="!rounded" value="ended">
-                Дууссан
+                {t("filter.closed")}
               </Radio.Button>
               <Radio.Button className="!rounded" value="recentlyCreated">
-                Сүүлд үүссэн
+                {t("filter.recent")}
               </Radio.Button>
             </Radio.Group>
             <Select
@@ -204,7 +206,7 @@ const MyPollsPage = () => {
             </Select>
           </div>
           <Input.Search
-            placeholder="Асуулгын гарчиг"
+            placeholder={t("filter.pollTitle")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ width: 300 }}

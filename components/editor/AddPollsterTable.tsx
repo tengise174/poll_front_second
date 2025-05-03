@@ -10,8 +10,10 @@ import CustomButton from "../CustomButton";
 import { checkUserExists } from "@/api/action";
 import { useAlert } from "@/context/AlertProvider";
 import * as XLSX from "xlsx";
+import { useTranslation } from "react-i18next";
 
 const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
+  const { t } = useTranslation();
   const searchInput = useRef(null);
   const { showAlert } = useAlert();
   const [value, setValue] = useState<string>("");
@@ -35,7 +37,7 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
       <div style={{ padding: 8 }}>
         <Input
           ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
+          placeholder={`${t("show_settings.searchUser")}`}
           value={selectedKeys[0]}
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -52,14 +54,14 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
             style={{ width: 90 }}
             className="!bg-main-purple"
           >
-            Хайх
+            {t("table.search")}
           </Button>
           <Button
             onClick={() => handleReset(clearFilters)}
             size="small"
             style={{ width: 90 }}
           >
-            Цэвэрлэх
+            {t("table.clear")}
           </Button>
         </Space>
       </div>
@@ -110,7 +112,7 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
 
   const pollsterTableColumns = [
     {
-      title: "Нэр",
+      title: `${t("show_settings.name")}`,
       dataIndex: "name",
       key: "name",
       defaultSortOrder: "descend" as const,
@@ -118,7 +120,7 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Үйлдэл",
+      title: `${t("show_settings.action")}`,
       key: "action",
       render: (_: any, record: any) => (
         <Space size={"middle"}>
@@ -195,10 +197,9 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
           header: 1,
         });
 
-        // Assuming usernames are in the first column
         const usernames = jsonData
           .map((row) => row[0]?.toString().trim())
-          .filter((username) => username); // Remove empty or undefined entries
+          .filter((username) => username);
 
         if (usernames.length === 0) {
           showAlert("Excel дээр хэрэглэгчийн нэр байхгүй", "warning", "", true);
@@ -303,14 +304,14 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
       )}
       <div className="flex flex-row items-end gap-5 mb-5 !h-9">
         <Input
-          placeholder="Оролцогчийн нэр оруул"
+          placeholder={t("show_settings.enterUsername")}
           value={value}
           className="flex-1"
           onChange={(e: any) => setValue(e.target.value)}
           onPressEnter={() => searchUsername(value)}
         />
         <CustomButton
-          title={"Нэмэх"}
+          title={t("show_settings.add")}
           className="bg-main-purple px-3 rounded-2xl text-white cursor-pointer h-full !text-xs"
           onClick={() => {
             searchUsername(value);

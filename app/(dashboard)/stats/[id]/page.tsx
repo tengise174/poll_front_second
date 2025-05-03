@@ -13,6 +13,7 @@ import ParticipantsTable from "@/components/stats/ParticipantsTable";
 import PollstersTable from "@/components/stats/PollstersTable";
 import QuestionCard from "@/components/stats/QuestionCard";
 import { Header, Content } from "antd/es/layout/layout";
+import { useTranslation } from "react-i18next";
 
 const radioStyle = `
   .custom-radio .ant-radio-button-wrapper {
@@ -37,6 +38,7 @@ const radioStyle = `
 `;
 
 const StatsPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [data, setData] = useState<PollData | null>(null);
   const [chartTypes, setChartTypes] = useState<ChartType[]>([]);
@@ -90,10 +92,10 @@ const StatsPage = () => {
             className="mr-4 custom-radio !flex !flex-row !gap-2"
           >
             <Radio.Button className="!rounded" value="summary">
-              Ерөнхий
+              {t("stat.general")}
             </Radio.Button>
             <Radio.Button className="!rounded" value="question">
-              Асуултууд
+              {t("stat.questions")}
             </Radio.Button>
           </Radio.Group>
         </div>

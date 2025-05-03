@@ -1,6 +1,7 @@
 import React from "react";
 import CustomButton from "../../CustomButton";
 import { DeleteQuestionButtonProps } from "@/utils/componentTypes";
+import { useTranslation } from "react-i18next";
 
 const DeleteQuestionButton = ({
   newQuestions,
@@ -10,6 +11,7 @@ const DeleteQuestionButton = ({
   setCurrentQuestion,
   setChosenType,
 }: DeleteQuestionButtonProps) => {
+  const { t } = useTranslation();
   const handleDeleteQuestion = () => {
     if (newQuestions.length <= 1) {
       setNewQuestions([
@@ -58,7 +60,7 @@ const DeleteQuestionButton = ({
 
   return (
     <CustomButton
-      title="Устгах"
+      title={t("edit_q.delete")}
       onClick={handleDeleteQuestion}
       className="bg-first-red w-full rounded-xl text-white !h-10 !text-sm hover:cursor-pointer"
     />

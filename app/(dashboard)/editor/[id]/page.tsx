@@ -19,8 +19,10 @@ import { dualColors, questionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { Category, QuestionProps, QuestionTypes } from "@/utils/componentTypes";
+import { useTranslation } from "react-i18next";
 
 export default function SurveyDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const router = useRouter();
   const { showAlert } = useAlert();
@@ -633,7 +635,7 @@ export default function SurveyDetailPage() {
       ...(questionType === "YES_NO" && {
         options: [
           {
-            content: "Тийм",
+            content: `${t("edit_q.yes")}`,
             order: 1,
             poster: null,
             points: 0,
@@ -643,7 +645,7 @@ export default function SurveyDetailPage() {
             columnIndex: null,
           },
           {
-            content: "Үгүй",
+            content: `${t("edit_q.no")}`,
             order: 2,
             poster: null,
             points: 0,
@@ -850,37 +852,32 @@ export default function SurveyDetailPage() {
     setIsQuestionTypeModalOpen(false);
   };
 
-  useEffect(() => {
-    const lastIndex =
-      newQuestions.length === 1 && newQuestions[currentPage].content === ""
-        ? 0
-        : newQuestions.length - 1;
-    setCurrentQuestion(newQuestions[currentPage]);
-  }, [currentPage, chosenType]);
-
   return (
     <div className="bg-[#F4F6F8] font-open h-full p-4 w-full">
       <div className="flex flex-col md:flex-row h-full">
         <div className="w-full md:min-w-[350px] md:max-w-[400px] flex flex-col bg-[#FDFDFD] max-h-full py-3 rounded">
           <div className="px-5">
             <div className="rounded-full w-full flex items-center h-[34px] bg-[#D9D9D9]">
-              {["Тохиргоо", "Нүүр", "Асуултууд", "Төгсгөл"].map(
-                (text, index) => (
-                  <p
-                    onClick={() => {
-                      setActiveSection(index);
-                    }}
-                    key={index}
-                    className={`text-[13px] w-1/3 cursor-pointer flex items-center justify-center h-full ${
-                      activeSection === index
-                        ? "bg-black text-[#FDFDFD] rounded-full font-semibold"
-                        : "text-[#757575] font-medium"
-                    }`}
-                  >
-                    {text}
-                  </p>
-                )
-              )}
+              {[
+                t("edit_top.settings"),
+                t("edit_top.start"),
+                t("edit_top.questions"),
+                t("edit_top.end"),
+              ].map((text, index) => (
+                <p
+                  onClick={() => {
+                    setActiveSection(index);
+                  }}
+                  key={index}
+                  className={`text-[13px] w-1/3 cursor-pointer flex items-center justify-center h-full ${
+                    activeSection === index
+                      ? "bg-black text-[#FDFDFD] rounded-full font-semibold"
+                      : "text-[#757575] font-medium"
+                  }`}
+                >
+                  {text}
+                </p>
+              ))}
             </div>
           </div>
           <div className="flex-1">
@@ -919,9 +916,7 @@ export default function SurveyDetailPage() {
                       setCurrentQuestion={setCurrentQuestion}
                     />
                   ) : (
-                    <p className="p-5 text-black">
-                      Асуултын төрлөө сонгоно уу!
-                    </p>
+                    <p className="p-5 text-black">{t("edit_q.chooseType")}</p>
                   )}
                 </div>
                 <div
@@ -930,7 +925,7 @@ export default function SurveyDetailPage() {
                 >
                   <AddIcon className="text-[#071522]" />
                   <p className="text-[#071522] text-[14px] font-semibold">
-                    Асуулт нэмэх
+                    {t("edit_q.addQuestion")}
                   </p>
                 </div>
               </div>

@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import { PollData } from "./types";
 import { questionTypeTranslations } from "@/utils/utils";
+import { useTranslation } from "react-i18next";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -26,6 +27,7 @@ interface QuestionSummaryProps {
 }
 
 const QuestionSummary = ({ data }: QuestionSummaryProps) => {
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<"table" | "pie" | "bar" | "line">(
     "pie"
   );
@@ -50,12 +52,12 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
 
   const columns = [
     {
-      title: "Асуултын төрөл",
+      title: `${t("stat.questionType")}`,
       dataIndex: "type",
       key: "type",
     },
     {
-      title: "Тоо",
+      title: `${t("stat.count")}`,
       dataIndex: "count",
       key: "count",
       sorter: (a: { count: number }, b: { count: number }) => a.count - b.count,
@@ -67,7 +69,7 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
       }),
     },
   ];
-  
+
   const sortedData = [...questionTypeList].sort((a, b) => {
     if (sortOrder === "ascend") return a.count - b.count;
     if (sortOrder === "descend") return b.count - a.count;
@@ -128,7 +130,7 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
 
   return (
     <Collapse defaultActiveKey={[""]} expandIconPosition="end">
-      <Panel header="Асуултууд" key="1">
+      <Panel header={t("stat.questions")} key="1">
         <Card>
           <style>
             {`
@@ -149,10 +151,10 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
               }
               className="w-32"
             >
-              <Option value="table">Хүснэгт</Option>
-              <Option value="pie">Дугуй диаграм</Option>
-              <Option value="bar">Баганан диаграм</Option>
-              <Option value="line">Шугаман диаргам</Option>
+              <Option value="table">{t("stat.table")}</Option>
+              <Option value="pie">{t("chart.pie")}</Option>
+              <Option value="bar">{t("chart.bar")}</Option>
+              <Option value="line">{t("chart.line")}</Option>
             </Select>
             {viewMode === "table" ? (
               <Table
@@ -166,7 +168,7 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
               <div className="mt-4">{renderChart(viewMode)}</div>
             )}
             <p className="font-bold text-xl flex flex-row justify-between">
-              <span>Нийт</span>
+              <span>{t("stat.total")}</span>
               <span>{data.questions.length}</span>
             </p>
           </div>
