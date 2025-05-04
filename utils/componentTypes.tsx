@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface CustomHeaderProps {}
 
@@ -131,17 +132,23 @@ interface SettingsPageProps {
   published: boolean;
 }
 
-export const categoryTrans: { [key in Category as string]: string } = {
-  EDUCATION: "Боловсрол",
-  HEALTH: "Эрүүл мэнд",
-  POLITICS: "Улс төр",
-  ECONOMY: "Эдийн засаг",
-  SOCIETY: "Нийгэм",
-  TECHNOLOGY: "Технологи",
-  ENVIRONMENT: "Байгаль орчин",
-  CULTURE: "Соёл",
-  SPORTS: "Спорт",
-  OTHER: "Бусад",
+export const useCategoryTrans = () => {
+  const { t } = useTranslation();
+
+  const categoryTrans: { [key in Exclude<Category, null>]: string } = {
+    EDUCATION: t("category.education"),
+    HEALTH: t("category.health"),
+    POLITICS: t("category.politics"),
+    ECONOMY: t("category.economy"),
+    SOCIETY: t("category.society"),
+    TECHNOLOGY: t("category.technology"),
+    ENVIRONMENT: t("category.environment"),
+    CULTURE: t("category.culture"),
+    SPORTS: t("category.sports"),
+    OTHER: t("category.other"),
+  };
+
+  return categoryTrans;
 };
 
 export type Category =

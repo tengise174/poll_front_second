@@ -12,38 +12,25 @@ import { useTranslation } from "react-i18next";
 type MenuItem = Required<MenuProps>["items"][number];
 
 const CustomMenu = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const [hydration, setHydration] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [selectedKey, setSelectedKey] = useState<string>("1");
   const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [items, setItems] = useState<MenuItem[]>([]);
 
-  const baseItems: MenuItem[] = [
-    {
-      key: "1",
-      label: t("menu.my_polls"), 
-    },
-    {
-      key: "2",
-      label: t("menu.new_poll"),
-    },
-    {
-      type: "divider",
-      className: "custom-divider-1",
-    },
-    {
-      key: "3",
-      label: t("menu.my_answers"),
-    },
-    {
-      key: "4",
-      label: t("menu.profile"),
-    },
-  ];
-
-  const [items, setItems] = useState<MenuItem[]>(baseItems);
+  useEffect(() => {
+    const updatedItems: MenuItem[] = [
+      { key: "1", label: t("menu.my_polls") },
+      { key: "2", label: t("menu.new_poll") },
+      { type: "divider", className: "custom-divider-1" },
+      { key: "3", label: t("menu.my_answers") },
+      { key: "4", label: t("menu.profile") },
+    ];
+    setItems(updatedItems);
+  }, [t]);
 
   useEffect(() => {
     setHydration(true);
@@ -53,6 +40,21 @@ const CustomMenu = () => {
       setUserProfile(parsedProfile);
     }
   }, []);
+
+  useEffect(() => {
+    if (pathname === "/editor/new") {
+      setSelectedKey("2");
+    } else if (
+      pathname === "/myanswers" ||
+      pathname.startsWith("/myanswers/")
+    ) {
+      setSelectedKey("3");
+    } else if (pathname === "/profile") {
+      setSelectedKey("4");
+    } else {
+      setSelectedKey("1");
+    }
+  }, [pathname]);
 
   const onClick: MenuProps["onClick"] = (e) => {
     switch (e.key) {

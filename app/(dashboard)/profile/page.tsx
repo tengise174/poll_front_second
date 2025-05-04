@@ -12,8 +12,10 @@ import {
 } from "@/api/action";
 import CustomButton from "@/components/CustomButton";
 import { useAlert } from "@/context/AlertProvider";
+import { useTranslation } from "react-i18next";
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { showAlert } = useAlert();
   const queryClient = useQueryClient();
@@ -128,7 +130,7 @@ const ProfilePage = () => {
         localStorage.removeItem("profile");
         queryClient.invalidateQueries({ queryKey: ["profile"] });
         setTimeout(() => {
-          router.push("/login"); 
+          router.push("/login");
         }, 1500);
       }
     } catch (error: any) {
@@ -200,9 +202,9 @@ const ProfilePage = () => {
 
   return (
     <div className="w-full flex items-center justify-center mt-20">
-      <Card className="w-100" title="Хэрэглэгчийн мэдээлэл">
+      <Card className="w-100" title={t("profile.user_info")}>
         <Form layout="vertical">
-          <Form.Item label="Хэрэглэгчийн нэр">
+          <Form.Item label={t("profile.username")}>
             <Input
               value={profile?.username}
               onChange={(e) => {
@@ -213,7 +215,7 @@ const ProfilePage = () => {
               }}
             />
           </Form.Item>
-          <Form.Item label="Нэр">
+          <Form.Item label={t("profile.firstname")}>
             <Input
               value={profile?.firstname}
               onChange={(e) => {
@@ -224,7 +226,7 @@ const ProfilePage = () => {
               }}
             />
           </Form.Item>
-          <Form.Item label="Овог">
+          <Form.Item label={t("profile.lastname")}>
             <Input
               value={profile?.lastname}
               onChange={(e) => {
@@ -238,13 +240,13 @@ const ProfilePage = () => {
           <div className="flex flex-row gap-4">
             <CustomButton
               onClick={() => updateProf()}
-              title="Өөрчлөх"
+              title={t("profile.change")}
               className="px-4 bg-clicked text-white rounded-xl !text-xs hover:cursor-pointer hover:bg-main-purple"
               disabled={!isProfileChanged}
             />
             <CustomButton
               onClick={() => setIsModalOpen(true)}
-              title="Нууц үг солих"
+              title={t("profile.change_password")}
               className="px-4 bg-main-bg border text-black rounded-xl !text-xs hover:cursor-pointer hover:bg-[#888] hover:text-white"
             />
           </div>
@@ -252,21 +254,21 @@ const ProfilePage = () => {
         <Divider />
         <CustomButton
           onClick={() => setIsDeleteModalOpen(true)}
-          title="Бүртгэл устгах"
+          title={t("profile.delete_acc")}
           className="w-full px-4 bg-red-500 text-white rounded-xl !text-xs hover:cursor-pointer hover:bg-red-600"
-        /> 
+        />
       </Card>
       <Modal
-        title="Нууц үг солих"
+        title={t("profile.change_password")}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText="Солих"
-        cancelText="Болих"
+        okText={t("profile.change")}
+        cancelText={t("profile.no")}
         okButtonProps={{ disabled: isOkButtonDisabled }}
       >
         <Form>
-          <Form.Item label="Хуучин нууц үг" required>
+          <Form.Item label={t("profile.curr_password")} required>
             <Input.Password
               value={passwords.currentPassword}
               onChange={(e) =>
@@ -274,7 +276,11 @@ const ProfilePage = () => {
               }
             />
           </Form.Item>
-          <Form.Item label="Шинэ нууц үг" required help={passwordError}>
+          <Form.Item
+            label={t("profile.new_password")}
+            required
+            help={passwordError}
+          >
             <Input.Password
               value={passwords.newPassword}
               onChange={(e) =>
@@ -283,7 +289,7 @@ const ProfilePage = () => {
               status={passwordError ? "error" : undefined}
             />
           </Form.Item>
-          <Form.Item label="Шинэ нууц үг давтах" required>
+          <Form.Item label={t("profile.confirm_password")} required>
             <Input.Password
               value={passwords.confirmPassword}
               onChange={(e) =>
@@ -295,18 +301,15 @@ const ProfilePage = () => {
         </Form>
       </Modal>
       <Modal
-        title="Бүртгэл устгах"
+        title={t("profile.delete_acc")}
         open={isDeleteModalOpen}
         onOk={handleDeleteProf}
         onCancel={() => setIsDeleteModalOpen(false)}
-        okText="Устгах"
-        cancelText="Болих"
+        okText={t("profile.delete")}
+        cancelText={t("profile.no")}
         okButtonProps={{ danger: true }}
       >
-        <p>
-          Та бүртгэлээ устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах
-          боломжгүй.
-        </p>
+        <p>{t("profile.you_sure")}</p>
       </Modal>
     </div>
   );

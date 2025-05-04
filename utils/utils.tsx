@@ -1,4 +1,5 @@
 import { QuestionTypeProps } from "./componentTypes";
+import { TFunction } from "i18next";
 
 export const manualStatusTag = ({ status }: { status: string }) => {
   switch (status) {
@@ -46,60 +47,60 @@ export const questionTypeTranslations: Record<string, string> = {
   RANKING: "Ranking",
 };
 
-export const questionTypes: QuestionTypeProps[] = [
+export const getQuestionTypes = (t: TFunction): QuestionTypeProps[] => [
   {
     icon: <div>📝</div>,
-    title: questionTypeTranslations["MULTI_CHOICE"],
+    title: t("questionTypes.MULTI_CHOICE"),
     questionType: "MULTI_CHOICE",
   },
   {
     icon: <div>🔘</div>,
-    title: questionTypeTranslations["SINGLE_CHOICE"],
+    title: t("questionTypes.SINGLE_CHOICE"),
     questionType: "SINGLE_CHOICE",
   },
   {
     icon: <div>⭐</div>,
-    title: questionTypeTranslations["RATING"],
+    title: t("questionTypes.RATING"),
     questionType: "RATING",
   },
   {
     icon: <div>✅</div>,
-    title: questionTypeTranslations["YES_NO"],
+    title: t("questionTypes.YES_NO"),
     questionType: "YES_NO",
   },
   {
     icon: <div>📜</div>,
-    title: questionTypeTranslations["TEXT"],
+    title: t("questionTypes.TEXT"),
     questionType: "TEXT",
   },
   {
     icon: <div>📜</div>,
-    title: questionTypeTranslations["DROPDOWN"],
+    title: t("questionTypes.DROPDOWN"),
     questionType: "DROPDOWN",
   },
   {
     icon: <div>📊</div>,
-    title: questionTypeTranslations["MULTIPLE_CHOICE_GRID"],
+    title: t("questionTypes.MULTIPLE_CHOICE_GRID"),
     questionType: "MULTIPLE_CHOICE_GRID",
   },
   {
     icon: <div>☑️</div>,
-    title: questionTypeTranslations["TICK_BOX_GRID"],
+    title: t("questionTypes.TICK_BOX_GRID"),
     questionType: "TICK_BOX_GRID",
   },
   {
     icon: <div>📏</div>,
-    title: questionTypeTranslations["LINEAR_SCALE"],
+    title: t("questionTypes.LINEAR_SCALE"),
     questionType: "LINEAR_SCALE",
   },
   {
     icon: <div>📅</div>,
-    title: questionTypeTranslations["DATE"],
+    title: t("questionTypes.DATE"),
     questionType: "DATE",
   },
   {
     icon: <div>🕒</div>,
-    title: questionTypeTranslations["TIME"],
+    title: t("questionTypes.TIME"),
     questionType: "TIME",
   },
 ];

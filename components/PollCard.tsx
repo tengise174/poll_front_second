@@ -7,8 +7,9 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { categoryTrans, PollCardType } from "@/utils/componentTypes";
+import {  PollCardType, useCategoryTrans } from "@/utils/componentTypes";
 import { CalendarOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const formatDate = (createdAt: string) => {
   const date = new Date(createdAt);
@@ -42,7 +43,9 @@ const PollCard = ({
   pollstersLength,
   questionLength,
 }: PollCardType) => {
+  const { t } = useTranslation();
   const router = useRouter();
+  const categoryTrans = useCategoryTrans();
   const [isPopoverVisible, setIsPopoverVisible] = useState(false);
   const handleDeleteConfirm = () => {
     if (onDelete) {
@@ -70,9 +73,9 @@ const PollCard = ({
   const popoverContent = (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2 justify-end">
-        <Button onClick={handleDeleteCancel}>Үгүй</Button>
+        <Button onClick={handleDeleteCancel}>{t("edit_q.no")}</Button>
         <Button type="primary" danger onClick={handleDeleteConfirm}>
-          Тийм
+          {t("edit_q.yes")}
         </Button>
       </div>
     </div>
@@ -81,13 +84,13 @@ const PollCard = ({
   const cardActions =
     cardType === "POLL"
       ? [
-          <Tooltip title="Өөрчлөх">
+          <Tooltip title={t("mypolls.edit")}>
             <EditOutlined
               key="edit"
               onClick={() => router.push(`/editor/${id}`)}
             />
           </Tooltip>,
-          <Tooltip title="Хариу харах">
+          <Tooltip title={t("mypolls.result")}>
             <BarChartOutlined
               key="stat"
               onClick={() => router.push(`/stats/${id}`)}
@@ -95,12 +98,12 @@ const PollCard = ({
           </Tooltip>,
           <Popover
             content={popoverContent}
-            title="Асуулгыг устгахдаа итгэлтэй байна уу?"
+            title={t("mypolls.sureDelete")}
             trigger="click"
             open={isPopoverVisible}
             onOpenChange={(visible) => setIsPopoverVisible(visible)}
           >
-            <Tooltip title="Устгах">
+            <Tooltip title={t("mypolls.delete")}>
               <DeleteOutlined
                 key="delete"
                 onClick={() => setIsPopoverVisible(true)}
@@ -114,7 +117,7 @@ const PollCard = ({
     if (cardType !== "POLL") return null;
 
     if (!published) {
-      return { label: "Үүссэн", color: "blue" };
+      return { label: `${t("mypolls.created")}`, color: "blue" };
     }
 
     const currentDate = new Date();
@@ -126,10 +129,10 @@ const PollCard = ({
         (submittedUserNumber ?? 0) >= (pollstersLength ?? 0));
 
     if (isEnded) {
-      return { label: "Дууссан", color: "red" };
+      return { label: `${t("mypolls.closed")}`, color: "red" };
     }
 
-    return { label: "Нийтэлсэн", color: "green" };
+    return { label: `${t("mypolls.published")}`, color: "green" };
   };
 
   const status = getPollStatus();
@@ -169,7 +172,11 @@ const PollCard = ({
               </div>
             ) : (
               <div>
-                <Tag>{answeredAt ? formatDate(answeredAt) : "Бусад"}</Tag>
+                <Tag>
+                  {answeredAt
+                    ? formatDate(answeredAt)
+                    : `${t("mypolls.other")}`}
+                </Tag>
               </div>
             )}
           </div>
@@ -180,18 +187,20 @@ const PollCard = ({
               <div>
                 <Tag color={status.color}>{status.label}</Tag>
                 <Tag color="pink">
-                  {category ? categoryTrans[category] : "Бусад"}
+                  {category ? categoryTrans[category] : `${t("mypolls.other")}`}
                 </Tag>
               </div>
-              <p className="text-xs text-[#555]">{questionLength} асуулттай</p>
+              <p className="text-xs text-[#555]">
+                {questionLength} {t("mypolls.question")}
+              </p>
             </div>
           )}
           {cardType === "ANSWER" && (
             <div>
               {hasAnswers ? (
-                <Tag color="green">Хариулсан</Tag>
+                <Tag color="green">{t("mypolls.answered")}</Tag>
               ) : (
-                <Tag color="red">Амжаагүй</Tag>
+                <Tag color="red">{t("mypolls.notAnswered")}</Tag>
               )}
             </div>
           )}

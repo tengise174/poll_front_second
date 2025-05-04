@@ -20,11 +20,12 @@ import { useAlert } from "@/context/AlertProvider";
 import { Content, Header } from "antd/es/layout/layout";
 import Link from "next/link";
 import { CopyOutlined } from "@ant-design/icons";
-import { categoryTrans, Category } from "@/utils/componentTypes";
+import { Category, useCategoryTrans } from "@/utils/componentTypes";
 import { useTranslation } from "react-i18next";
 
 const MyPollsPage = () => {
   const { t } = useTranslation();
+  const categoryTrans = useCategoryTrans();
   const { showAlert } = useAlert();
   const queryClient = useQueryClient();
   const [data, setData] = useState<any>(null);
@@ -197,7 +198,7 @@ const MyPollsPage = () => {
               style={{ width: 200 }}
               placeholder="Ангилал сонгох"
             >
-              <Select.Option value="all">Бүх ангилал</Select.Option>
+              <Select.Option value="all">{t("category.all")}</Select.Option>
               {Object.entries(categoryTrans).map(([key, value]) => (
                 <Select.Option key={key} value={key}>
                   {value}
@@ -217,7 +218,7 @@ const MyPollsPage = () => {
       <Content className="overflow-y-auto">
         <div className="p-4">
           {!filteredData?.length ? (
-            <div>Танд үүсгэсэн асуулга байхгүй байна</div>
+            <div>{t("mypolls.noPoll")}</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-5 gap-y-4 mt-5 justify-center">
               {filteredData.map((item: any, index: number) => (
@@ -235,7 +236,7 @@ const MyPollsPage = () => {
           )}
           <div className="w-full flex my-4 justify-end">
             <CustomButton
-              title="Дахин оролдох"
+              title={t("mypolls.reload")}
               onClick={() => window.location.reload()}
               className="bg-clicked text-white hover:bg-main-purple hover:cursor-pointer px-4 !text-xs rounded-2xl"
             />
@@ -244,7 +245,7 @@ const MyPollsPage = () => {
             open={isModalOpen}
             onCancel={() => setIsModalOpen(false)}
             footer={null}
-            title="Асуулга"
+            title={t("mypolls.poll")}
             width={500}
           >
             <div>
@@ -260,7 +261,7 @@ const MyPollsPage = () => {
                       <QRCode value={reqUrl || "-"} />
                     </div>
                     <div>
-                      <p>Оролцох URL</p>
+                      <p>{t("mypolls.url")}</p>
                       <div className="flex flex-row gap-2 items-center">
                         <Link href={reqUrl}>{reqUrl}</Link>
                         <Button

@@ -15,7 +15,7 @@ import EndEditor from "@/components/editor/EndEditor";
 import EndDisplay from "@/components/editor/EndDisplay";
 import SettingsEditor from "@/components/editor/SettingsEditor";
 import SettingsDisplay from "@/components/editor/SettingsDisplay";
-import { dualColors, questionTypes } from "@/utils/utils";
+import { dualColors, getQuestionTypes } from "@/utils/utils";
 import AddIcon from "@/public/icons/add";
 import { useAlert } from "@/context/AlertProvider";
 import { Category, QuestionProps, QuestionTypes } from "@/utils/componentTypes";
@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 
 export default function SurveyDetailPage() {
   const { t } = useTranslation();
+  const questionTypes = getQuestionTypes(t);
   const { id } = useParams();
   const router = useRouter();
   const { showAlert } = useAlert();

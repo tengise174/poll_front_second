@@ -1,7 +1,5 @@
-import CustomHeader from "@/components/CustomHeader";
 import CustomMenu from "@/components/CustomMenu";
-import { Layout, Menu, Skeleton } from "antd";
-import { Content, Header } from "antd/es/layout/layout";
+import { Layout, Skeleton } from "antd";
 import { Suspense } from "react";
 
 export default function DashboardLayout({
