@@ -265,7 +265,7 @@ const AddPollsterTable = ({ settingsPage, setSettingsPage }: any) => {
       }
     };
     reader.readAsArrayBuffer(file);
-    return false; // Prevent default upload behavior
+    return false;
   };
 
   return (
