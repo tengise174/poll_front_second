@@ -198,6 +198,7 @@ export interface StartShapeEditorProps {
 }
 
 export interface OptionProps {
+  id?: string | null;
   content: string;
   order: number;
   poster?: string | null;
@@ -209,6 +210,7 @@ export interface OptionProps {
 }
 
 export interface QuestionProps {
+  id?: number | null;
   content: string;
   options?: OptionProps[];
   questionType: QuestionTypes | null;
@@ -216,7 +218,6 @@ export interface QuestionProps {
   order: number;
   rateNumber?: number;
   rateType?: "STAR" | "NUMBER";
-  id?: number;
   required: boolean;
   poster?: string | null;
   isPointBased: boolean;

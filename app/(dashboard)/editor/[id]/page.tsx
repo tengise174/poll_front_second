@@ -142,6 +142,8 @@ export default function SurveyDetailPage() {
     },
   ]);
 
+  console.log(newQuestions);
+
   const { data, isFetching } = useQuery({
     queryKey: ["survey_detail", [id]],
     refetchOnWindowFocus: false,
@@ -188,6 +190,7 @@ export default function SurveyDetailPage() {
 
       const transformedQuestions = data.questions
         .map((question: any, index: any) => ({
+          id: question.id,
           content: question.content,
           questionType: question.questionType,
           minAnswerCount: question.minAnswerCount || 1,
@@ -207,6 +210,7 @@ export default function SurveyDetailPage() {
           options:
             question.options
               ?.map((option: any) => ({
+                id: option.id,
                 content: option.content,
                 order: option.order,
                 poster: option.poster || null,
@@ -242,6 +246,7 @@ export default function SurveyDetailPage() {
     pollsterNumber: settingsPage.pollsterNumber,
     questions: newQuestions.map((q) => ({
       ...q,
+      id: q.id || null,
       gridRows: q.gridRows || [],
       gridColumns: q.gridColumns || [],
       minValue: q.minValue || 1,
@@ -250,6 +255,7 @@ export default function SurveyDetailPage() {
       maxLabel: q.maxLabel || "",
       options: (q.options ?? []).map((opt) => ({
         ...opt,
+        id: opt.id || null,
         rowIndex: opt.rowIndex || 0,
         columnIndex: opt.columnIndex || 0,
       })),
@@ -569,6 +575,7 @@ export default function SurveyDetailPage() {
         const result = await updatePoll(id as string, pollData);
         if (result) {
           showAlert("Амжилттай өөрчлөгдлөө", "success", "", true);
+          router.refresh();
         }
       } catch (e) {
         showAlert("Failed", "warning", "", true);
