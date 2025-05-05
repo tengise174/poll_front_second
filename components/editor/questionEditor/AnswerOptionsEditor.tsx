@@ -263,9 +263,13 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                     {["MULTI_CHOICE", "SINGLE_CHOICE", "DROPDOWN"].includes(
                       currentQuestion?.questionType ?? ""
                     ) ? (
-                      focusedIndex === answerIndex ? (
+                      <div className="flex items-center w-full">
                         <CustomInput
-                          className="w-full !h-9 bg-[#E6E6E6] !rounded-[10px] text-[#757575] font-medium !italic !text-[13px] px-2 flex items-center"
+                          className={`w-full !h-9 bg-[#E6E6E6] !rounded-[10px] text-[#757575] font-medium !text-[13px] px-2 flex items-center ${
+                            focusedIndex === answerIndex
+                              ? "border border-[#D9D9D9]"
+                              : "!italic cursor-default border-none"
+                          }`}
                           value={item.content}
                           onChange={(e: any) => {
                             setCurrentQuestion((prev) => ({
@@ -300,17 +304,7 @@ const AnswerOptionsEditor: React.FC<AnswerOptionsEditorProps> = ({
                           onBlur={() => setFocusedIndex(null)}
                           placeholder={t("edit_q.Option")}
                         />
-                      ) : (
-                        <div
-                          className="w-full h-9 bg-[#E6E6E6] rounded-[10px] text-[#757575] font-medium italic text-[13px] px-2 flex items-center"
-                          onClick={() => setFocusedIndex(answerIndex)}
-                        >
-                          <span className="text-[#1E1E1E]">
-                            {String.fromCharCode(65 + answerIndex)}.
-                          </span>
-                          {item.content || `${t("edit_q.Option")}`}
-                        </div>
-                      )
+                      </div>
                     ) : (
                       <div className="w-full h-9 bg-[#E6E6E6] rounded-[10px] text-[#757575] font-medium italic text-[13px] px-2 flex items-center">
                         {item.content}

@@ -39,6 +39,31 @@ const QuestionDisplay = ({
     setChosenType(question.questionType);
   };
 
+  const handleDeleteOption = (index: number, questionIndex: number) => {
+    const updatedOptions =
+      currentQuestion.options?.filter((_, i) => i !== index) || [];
+    setCurrentQuestion((prev) => ({
+      ...prev!,
+      options: updatedOptions.map((opt, i) => ({
+        ...opt,
+        order: i + 1,
+      })),
+    }));
+    setNewQuestions((prev) =>
+      prev.map((question, qIndex) =>
+        qIndex === questionIndex
+          ? {
+              ...question,
+              options: updatedOptions.map((opt, i) => ({
+                ...opt,
+                order: i + 1,
+              })),
+            }
+          : question
+      )
+    );
+  };
+
   const gridColumns = (question: any) => [
     {
       title: "",
@@ -179,36 +204,7 @@ const QuestionDisplay = ({
                                   <CloseCircleIcon
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      const updatedOptions =
-                                        question.options?.filter(
-                                          (_, i) => i !== optIndex
-                                        ) || [];
-                                      setNewQuestions((prev) =>
-                                        prev.map((q, qIndex) =>
-                                          qIndex === index
-                                            ? {
-                                                ...q,
-                                                options: updatedOptions.map(
-                                                  (opt, i) => ({
-                                                    ...opt,
-                                                    order: i + 1,
-                                                  })
-                                                ),
-                                              }
-                                            : q
-                                        )
-                                      );
-                                      if (currentPage === index) {
-                                        setCurrentQuestion({
-                                          ...question,
-                                          options: updatedOptions.map(
-                                            (opt, i) => ({
-                                              ...opt,
-                                              order: i + 1,
-                                            })
-                                          ),
-                                        });
-                                      }
+                                      handleDeleteOption(optIndex, index);
                                     }}
                                     style={{ color: dualColors[themeId][1] }}
                                     className="ml-[10px] cursor-pointer"
@@ -235,17 +231,36 @@ const QuestionDisplay = ({
                         >
                           {question.options?.map((item, optIndex) => (
                             <Select.Option key={optIndex} value={optIndex}>
-                              {item.content || `${t("edit_q.Option")}`}
-                              {question.isPointBased && ` (${item.points} pts)`}
-                              {item.isCorrect && (
-                                <CheckCircleOutlined
-                                  style={{ color: "#52c41a", marginLeft: 8 }}
-                                />
-                              )}
-                              {item.nextQuestionOrder != null &&
-                                ` ${t("edit_q.nextQ")} ${
-                                  item.nextQuestionOrder
-                                })`}
+                              <div className="flex items-center justify-between">
+                                <span>
+                                  {item.content || `${t("edit_q.Option")}`}
+                                  {question.isPointBased &&
+                                    ` (${item.points} pts)`}
+                                  {item.isCorrect && (
+                                    <CheckCircleOutlined
+                                      style={{
+                                        color: "#52c41a",
+                                        marginLeft: 8,
+                                      }}
+                                    />
+                                  )}
+                                  {item.nextQuestionOrder != null &&
+                                    ` ${t("edit_q.nextQ")} ${
+                                      item.nextQuestionOrder
+                                    })`}
+                                </span>
+                                {question.options &&
+                                  question.options.length > 2 && (
+                                    <CloseCircleIcon
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteOption(optIndex, index);
+                                      }}
+                                      style={{ color: dualColors[themeId][1] }}
+                                      className="cursor-pointer"
+                                    />
+                                  )}
+                              </div>
                             </Select.Option>
                           ))}
                         </Select>
@@ -441,34 +456,9 @@ const QuestionDisplay = ({
                           {currentQuestion?.options &&
                             currentQuestion.options.length > 2 && (
                               <CloseCircleIcon
-                                onClick={() => {
-                                  const updatedOptions =
-                                    currentQuestion.options?.filter(
-                                      (_, i) => i !== index
-                                    ) || [];
-                                  setCurrentQuestion((prev) => ({
-                                    ...prev!,
-                                    options: updatedOptions.map((opt, i) => ({
-                                      ...opt,
-                                      order: i + 1,
-                                    })),
-                                  }));
-                                  setNewQuestions((prev) =>
-                                    prev.map((question, questionIndex) =>
-                                      questionIndex === currentPage
-                                        ? {
-                                            ...question,
-                                            options: updatedOptions.map(
-                                              (opt, i) => ({
-                                                ...opt,
-                                                order: i + 1,
-                                              })
-                                            ),
-                                          }
-                                        : question
-                                    )
-                                  );
-                                }}
+                                onClick={() =>
+                                  handleDeleteOption(index, currentPage)
+                                }
                                 style={{ color: dualColors[themeId][1] }}
                                 className="ml-[10px] cursor-pointer"
                               />
@@ -494,16 +484,33 @@ const QuestionDisplay = ({
                     >
                       {currentQuestion?.options?.map((item, index) => (
                         <Select.Option key={index} value={index}>
-                          {item.content || `${t("edit_q.Option")}`}
-                          {currentQuestion.isPointBased &&
-                            ` (${item.points} pts)`}
-                          {item.isCorrect && (
-                            <CheckCircleOutlined
-                              style={{ color: "#52c41a", marginLeft: 8 }}
-                            />
-                          )}
-                          {item.nextQuestionOrder != null &&
-                            ` (${t("edit_q.nextQ")} ${item.nextQuestionOrder})`}
+                          <div className="flex items-center justify-between">
+                            <span>
+                              {item.content || `${t("edit_q.Option")}`}
+                              {currentQuestion.isPointBased &&
+                                ` (${item.points} pts)`}
+                              {item.isCorrect && (
+                                <CheckCircleOutlined
+                                  style={{ color: "#52c41a", marginLeft: 8 }}
+                                />
+                              )}
+                              {item.nextQuestionOrder != null &&
+                                ` (${t("edit_q.nextQ")} ${
+                                  item.nextQuestionOrder
+                                })`}
+                            </span>
+                            {currentQuestion?.options &&
+                              currentQuestion.options.length > 2 && (
+                                <CloseCircleIcon
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteOption(index, currentPage);
+                                  }}
+                                  style={{ color: dualColors[themeId][1] }}
+                                  className="cursor-pointer"
+                                />
+                              )}
+                          </div>
                         </Select.Option>
                       ))}
                     </Select>

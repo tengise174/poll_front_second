@@ -608,7 +608,7 @@ const QuestionCard = ({
         {question.content}
       </span>
       <Tag color="geekblue">
-        {questionTypeTranslations[question.questionType]}
+      {t(`questionTypes.${question.questionType}`)}
       </Tag>
       {question.isPointBased && <Tag color="blue">{t("edit_q.hasPoint")}</Tag>}
       {question.hasCorrectAnswer && (

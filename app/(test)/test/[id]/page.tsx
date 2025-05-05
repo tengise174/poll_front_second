@@ -357,7 +357,6 @@ export default function TestPage() {
       showAlert("Амжилттай", "success", "", true);
       setTimerActive(false);
       setStep("end");
-      // Clear localStorage on successful submission
       localStorage.removeItem(`poll_${id}`);
     } catch (error: any) {
       showAlert("Амжилтгүй", "warning", "", true);

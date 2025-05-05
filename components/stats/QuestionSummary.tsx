@@ -40,7 +40,7 @@ const QuestionSummary = ({ data }: QuestionSummaryProps) => {
 
   const questionTypeList = Object.entries(questionTypeCounts).map(
     ([type, count]) => ({
-      type: questionTypeTranslations[type] || type,
+      type: t(`questionTypes.${type}`) || type,
       count,
     })
   );
