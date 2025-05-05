@@ -511,7 +511,7 @@ export default function PollQuestion({
               <div className="flex-1">
                 <Radio
                   style={{ color: custStyle.primaryColor }}
-                  className="custom-radio w-full border font-open !mt-3 border-[#D9D9D9] rounded-[10px] text-[13px] font-medium items-center bg-transparent"
+                  className="custom-radio w-full !border font-open !mt-3 !border-black rounded-[10px] text-[13px] font-medium items-center bg-transparent"
                   value={item}
                 >
                   {item.content}
@@ -579,13 +579,16 @@ export default function PollQuestion({
             const formattedTime = time ? dayjs(time).format("HH:mm") : "";
             handleChange(question.id, [], formattedTime);
           }}
-          value={getValidDayjsValue(
-            `2000-01-01 ${
-              answers.find((answer) => answer.questionId === question.id)
-                ?.textAnswer
-            }`,
-            "HH:mm"
-          )}
+          value={
+            answers.find((answer) => answer.questionId === question.id)
+              ?.textAnswer
+              ? dayjs(
+                  answers.find((answer) => answer.questionId === question.id)
+                    ?.textAnswer,
+                  "HH:mm"
+                )
+              : null
+          }
           format="HH:mm"
           placeholder="Цаг сонгоно уу"
           style={{

@@ -27,7 +27,7 @@ export default function PollNavigation({
     <div className="w-full flex flex-row gap-24 justify-between items-center">
       <CustomButton
         title="Буцах"
-        className="text-[#B3B3B3] text-[13px] font-semibold h-9 w-[79px]"
+        className="text-[#B3B3B3] text-[13px] font-semibold h-9 w-[79px] hover:cursor-pointer"
         onClick={onBack}
       />
       {showSubmit ? (

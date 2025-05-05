@@ -95,6 +95,22 @@ export default function TestPage() {
     retry: false,
   });
 
+  const initializeTimer = (duration: number) => {
+    const pollKey = `poll_${id}`;
+    const storedData = localStorage.getItem(pollKey);
+    if (storedData) {
+      const { startTime, pollDuration } = JSON.parse(storedData);
+      const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      const remainingTime = pollDuration * 60 - elapsedTime;
+      if (remainingTime <= 0) {
+        handleTimeUp();
+        return 0;
+      }
+      return remainingTime;
+    }
+    return duration * 60;
+  };
+
   useEffect(() => {
     if (fetchedData && !fetchedData.message) {
       setData(fetchedData);
@@ -129,17 +145,17 @@ export default function TestPage() {
       if (hasNonNullNextQuestionOrder) {
         setDisplayMode("single");
       }
-    }
 
-    if (data && data?.duration) {
-      setTimeLeft(fetchedData.duration * 60);
-    }
+      if (data?.duration) {
+        setTimeLeft(initializeTimer(data.duration));
+      }
 
-    if (data && data?.themeId) {
-      setCustStyle({
-        backgroundColor: dualColors[data?.themeId][0],
-        primaryColor: dualColors[data?.themeId][1],
-      });
+      if (data?.themeId) {
+        setCustStyle({
+          backgroundColor: dualColors[data?.themeId][0],
+          primaryColor: dualColors[data?.themeId][1],
+        });
+      }
     }
   }, [data]);
 
@@ -163,6 +179,16 @@ export default function TestPage() {
   useEffect(() => {
     if (step === "questions" && timeLeft > 0) {
       setTimerActive(true);
+      const pollKey = `poll_${id}`;
+      if (!localStorage.getItem(pollKey)) {
+        localStorage.setItem(
+          pollKey,
+          JSON.stringify({
+            startTime: Date.now(),
+            pollDuration: data?.duration,
+          })
+        );
+      }
     }
   }, [step]);
 
@@ -175,6 +201,7 @@ export default function TestPage() {
     try {
       await recordFailedAttendance(id as string);
       showAlert("Хугацаа дууслаа", "warning", "", true);
+      localStorage.removeItem(`poll_${id}`);
     } catch (error: any) {
       console.log(error);
     }
@@ -330,6 +357,8 @@ export default function TestPage() {
       showAlert("Амжилттай", "success", "", true);
       setTimerActive(false);
       setStep("end");
+      // Clear localStorage on successful submission
+      localStorage.removeItem(`poll_${id}`);
     } catch (error: any) {
       showAlert("Амжилтгүй", "warning", "", true);
     } finally {

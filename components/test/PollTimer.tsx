@@ -6,5 +6,9 @@ interface PollTimerProps {
 }
 
 export default function PollTimer({ timeLeft, formatTime }: PollTimerProps) {
-  return <div>{formatTime(timeLeft)}</div>;
+  return (
+    <div className="text-lg font-semibold" style={{ color: "#2C2C2C" }}>
+      {formatTime(timeLeft)}
+    </div>
+  );
 }

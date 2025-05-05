@@ -890,12 +890,19 @@ export default function SurveyDetailPage() {
           </div>
           <div className="flex-1">
             {activeSection === 0 && (
-              <SettingsEditor
-                id={id?.toString() || "new"}
-                showUrlModal={showUrlModal}
-                settingsPage={settingsPage}
-                setSettingsPage={setSettingsPage}
-              />
+              <div className="flex flex-col h-full justify-between">
+                <div
+                  className="overflow-y-auto h-full"
+                  style={{ maxHeight: "calc(100vh - 90px)" }}
+                >
+                  <SettingsEditor
+                    id={id?.toString() || "new"}
+                    showUrlModal={showUrlModal}
+                    settingsPage={settingsPage}
+                    setSettingsPage={setSettingsPage}
+                  />
+                </div>
+              </div>
             )}
             {activeSection === 1 && (
               <StartShapeEditor
