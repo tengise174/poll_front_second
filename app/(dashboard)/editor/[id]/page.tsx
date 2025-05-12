@@ -993,7 +993,7 @@ export default function SurveyDetailPage() {
         </div>
       </div>
       <Modal
-        title="Select Question Type"
+        title={t("selectType")}
         open={isQuestionTypeModalOpen}
         onCancel={() => setIsQuestionTypeModalOpen(false)}
         footer={null}

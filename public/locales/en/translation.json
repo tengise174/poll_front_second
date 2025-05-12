@@ -2,6 +2,7 @@
   "welcome": "Welcome",
   "home": "Home",
   "language": "Language",
+  "selectType": "Select question type!",
   "questionTypes": {
     "MULTI_CHOICE": "Multiple Choice",
     "SINGLE_CHOICE": "Single Choice",

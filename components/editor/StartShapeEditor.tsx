@@ -6,6 +6,7 @@ import CustomInput from "../CustomInput";
 import { StartShapeEditorProps } from "@/utils/componentTypes";
 import { dualColors } from "@/utils/utils";
 import { useTranslation } from "react-i18next";
+import TextArea from "antd/es/input/TextArea";
 
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -85,7 +86,7 @@ const StartShapeEditor = ({
             {t("edit_start.description")}
           </p>
         </div>
-        <CustomInput
+        <TextArea
           value={startPage?.greetingMessage}
           onChange={(e: any) =>
             setStartPage((prev) => ({
@@ -95,7 +96,6 @@ const StartShapeEditor = ({
           }
           className="w-full bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal"
           placeholder={t("edit_start.pollDescription")}
-          itemType="textarea"
         />
       </div>
 
@@ -162,7 +162,9 @@ const StartShapeEditor = ({
           listType="picture"
           maxCount={1}
         >
-          <Button icon={<UploadOutlined />}>{t("edit_start.enterPoster")}</Button>
+          <Button icon={<UploadOutlined />}>
+            {t("edit_start.enterPoster")}
+          </Button>
         </Upload>
       </div>
       <div className="rounded-[10px] bg-[#F5F5F5] w-full h-[90px] mt-5 p-[10px]">

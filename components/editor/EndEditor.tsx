@@ -3,6 +3,7 @@ import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
 import { StartEditorProps } from "@/utils/componentTypes";
 import { useTranslation } from "react-i18next";
+import TextArea from "antd/es/input/TextArea";
 
 const startPageInputClass =
   "w-full !h-[30px] bg-[#E6E6E6] !rounded-[10px] !text-[13px] mt-[14px] border-none placeholder:text-[#B3B3B3] placeholder:text-[13px] placeholder:font-normal";
@@ -43,7 +44,7 @@ const EndEditor = ({
               {t("edit_end.description")}
             </p>
           </div>
-          <CustomInput
+          <TextArea
             onChange={(e: any) =>
               setEndPage((prev) => ({
                 ...prev,

@@ -106,8 +106,10 @@ export default function PollQuestion({
       }
       className="w-full shadow-xl hover:scale-102 transition-all duration-300 ease-in-out"
       style={{ marginBottom: 16, backgroundColor: custStyle.backgroundColor }}
-      headStyle={{ color: custStyle.primaryColor }}
-      styles={{ body: { color: custStyle.primaryColor } }}
+      styles={{
+        body: { color: custStyle.primaryColor },
+        header: { color: custStyle.primaryColor },
+      }}
     >
       {question.poster && (
         <Image
