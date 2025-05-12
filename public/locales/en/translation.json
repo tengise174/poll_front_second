@@ -3,6 +3,7 @@
   "home": "Home",
   "language": "Language",
   "selectType": "Select question type!",
+  "allPollsters": "All pollsters",
   "questionTypes": {
     "MULTI_CHOICE": "Multiple Choice",
     "SINGLE_CHOICE": "Single Choice",

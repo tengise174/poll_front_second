@@ -3,6 +3,7 @@
   "home": "Нүүр хуудас",
   "language": "Хэл",
   "selectType": "Асуултын төрөл сонгоно уу!",
+  "allPollsters": "Бүх оролцогчид",
   "questionTypes": {
     "MULTI_CHOICE": "Олон сонголт",
     "SINGLE_CHOICE": "Нэг сонголт",

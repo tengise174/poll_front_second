@@ -14,7 +14,6 @@ import { ResponsiveContainer } from "recharts";
 import ChartSelector from "./ChartSelector";
 import GridTable from "./GridTable";
 import { PollQuestion, ChartType, PollOption } from "./types";
-import { questionTypeTranslations } from "@/utils/utils";
 import { renderChart } from "./utils";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState, Key } from "react";
@@ -46,6 +45,7 @@ const QuestionCard = ({
   const [answerSearchText, setAnswerSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<string[]>([]);
+  const [modalSearchText, setModalSearchText] = useState("");
 
   const MAX_USERNAMES = 3;
 
@@ -419,6 +419,69 @@ const QuestionCard = ({
           },
         ];
 
+  const modalColumns: ColumnsType<{ username: string }> = [
+    {
+      title: `${t("stat.pollsters")}`,
+      dataIndex: "username",
+      key: "username",
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }: {
+        setSelectedKeys: (keys: React.Key[]) => void;
+        selectedKeys: React.Key[];
+        confirm: () => void;
+        clearFilters?: () => void;
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder={t("stat.searchUsername")}
+            value={selectedKeys[0]}
+            onChange={(e) =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => {
+              setModalSearchText((selectedKeys[0] as string) || "");
+              confirm();
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => {
+                setModalSearchText((selectedKeys[0] as string) || "");
+                confirm();
+              }}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("table.search")}
+            </Button>
+            <Button
+              onClick={() => {
+                setSelectedKeys([]);
+                setModalSearchText("");
+                clearFilters && clearFilters();
+                confirm();
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("table.clear")}
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: () => <SearchOutlined />,
+      onFilter: (value: boolean | Key, record: { username: string }) =>
+        record.username.toLowerCase().includes(String(value).toLowerCase()),
+    },
+  ];
+
   const dataSource = [...(question.options || [])].sort(
     (a, b) => a.order - b.order
   );
@@ -435,6 +498,8 @@ const QuestionCard = ({
       (statusFilter === "noUsers" && option.answeredBy.length === 0);
     return matchesSearch && matchesStatus;
   });
+
+  const modalDataSource = modalContent.map((username) => ({ username }));
 
   const renderTextOrDateContent = () => (
     <div className="p-6 rounded-lg">
@@ -558,7 +623,7 @@ const QuestionCard = ({
         </div>
         {isShowUser && (
           <Modal
-            title="Бүх Оролцогчид"
+            title={t("allPollsters")}
             open={isModalVisible}
             onCancel={() => setIsModalVisible(false)}
             footer={[
@@ -566,19 +631,17 @@ const QuestionCard = ({
                 Хаах
               </Button>,
             ]}
-            width={400}
+            width={600}
           >
-            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-              {modalContent.length > 0 ? (
-                <ul style={{ paddingLeft: "20px" }}>
-                  {modalContent.map((username, index) => (
-                    <li key={index}>{username}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>{t("stat.noPollster")}</p>
-              )}
-            </div>
+            <Table
+              columns={modalColumns}
+              dataSource={modalDataSource}
+              rowKey={(record) => record.username}
+              pagination={{ pageSize: 10 }}
+              bordered
+              size="middle"
+              locale={{ emptyText: t("stat.noPollster") }}
+            />
           </Modal>
         )}
       </div>
@@ -607,9 +670,7 @@ const QuestionCard = ({
       <span className="text-lg font-semibold text-gray-700">
         {question.content}
       </span>
-      <Tag color="geekblue">
-      {t(`questionTypes.${question.questionType}`)}
-      </Tag>
+      <Tag color="geekblue">{t(`questionTypes.${question.questionType}`)}</Tag>
       {question.isPointBased && <Tag color="blue">{t("edit_q.hasPoint")}</Tag>}
       {question.hasCorrectAnswer && (
         <Tag color="green">{t("stat.hasCorrect")}</Tag>

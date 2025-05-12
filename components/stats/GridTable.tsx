@@ -2,8 +2,9 @@
 import { Table, Input, Button, Space, Modal } from "antd";
 import { PollOption, PollQuestion } from "./types";
 import { SearchOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { Key, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ColumnsType } from "antd/es/table";
 
 interface GridTableProps {
   question: PollQuestion;
@@ -15,6 +16,7 @@ const GridTable = ({ question, isShowUser }: GridTableProps) => {
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<string[]>([]);
+  const [modalSearchText, setModalSearchText] = useState("");
 
   const MAX_USERNAMES = 3;
 
@@ -126,6 +128,71 @@ const GridTable = ({ question, isShowUser }: GridTableProps) => {
     ];
   };
 
+  const modalColumns: ColumnsType<{ username: string }> = [
+    {
+      title: `${t("stat.pollsters")}`,
+      dataIndex: "username",
+      key: "username",
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }: {
+        setSelectedKeys: (keys: React.Key[]) => void;
+        selectedKeys: React.Key[];
+        confirm: () => void;
+        clearFilters?: () => void;
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder={t("stat.searchUsername")}
+            value={selectedKeys[0]}
+            onChange={(e) =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => {
+              setModalSearchText((selectedKeys[0] as string) || "");
+              confirm();
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => {
+                setModalSearchText((selectedKeys[0] as string) || "");
+                confirm();
+              }}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("table.search")}
+            </Button>
+            <Button
+              onClick={() => {
+                setSelectedKeys([]);
+                setModalSearchText("");
+                clearFilters && clearFilters();
+                confirm();
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("table.clear")}
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: () => <SearchOutlined />,
+      onFilter: (value: boolean | Key, record: { username: string }) =>
+        record.username.toLowerCase().includes(String(value).toLowerCase()),
+    },
+  ];
+
+  const modalDataSource = modalContent.map((username) => ({ username }));
+
   const handleSearch = (value: string) => {
     setSearchText(value);
   };
@@ -140,7 +207,7 @@ const GridTable = ({ question, isShowUser }: GridTableProps) => {
         <div style={{ marginBottom: 16 }}>
           <Space>
             <Input
-              placeholder="Хэрэглэгчийн нэрээр хайх"
+              placeholder={t("stat.searchUsername")}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 200 }}
@@ -151,9 +218,9 @@ const GridTable = ({ question, isShowUser }: GridTableProps) => {
               icon={<SearchOutlined />}
               onClick={() => handleSearch(searchText)}
             >
-              Хайх
+              {t("table.search")}
             </Button>
-            <Button onClick={handleReset}>Цэвэрлэх</Button>
+            <Button onClick={handleReset}>{t("table.clear")}</Button>
           </Space>
         </div>
       )}
@@ -168,7 +235,7 @@ const GridTable = ({ question, isShowUser }: GridTableProps) => {
       />
       {isShowUser && (
         <Modal
-          title="Бүх Оролцогчид"
+          title={t("allPollsters")}
           open={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           footer={[
@@ -176,19 +243,17 @@ const GridTable = ({ question, isShowUser }: GridTableProps) => {
               Хаах
             </Button>,
           ]}
-          width={400}
+          width={600}
         >
-          <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-            {modalContent.length > 0 ? (
-              <ul style={{ paddingLeft: "20px" }}>
-                {modalContent.map((username, index) => (
-                  <li key={index}>{username}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>Оролцогч байхгүй</p>
-            )}
-          </div>
+          <Table
+            columns={modalColumns}
+            dataSource={modalDataSource}
+            rowKey={(record) => record.username}
+            pagination={{ pageSize: 10 }}
+            bordered
+            size="middle"
+            locale={{ emptyText: t("stat.noPollster") }}
+          />
         </Modal>
       )}
     </div>
